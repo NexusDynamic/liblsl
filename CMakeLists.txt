@@ -1,6 +1,6 @@
-cmake_minimum_required (VERSION 3.12)
+cmake_minimum_required (VERSION 3.16)
 project (liblsl
-	VERSION 1.16.0
+	VERSION 1.16.2
 	LANGUAGES C CXX
 	DESCRIPTION "Labstreaminglayer C/C++ library"
 	HOMEPAGE_URL "https://github.com/sccn/liblsl"
@@ -11,9 +11,7 @@ set(LSL_ABI_VERSION 2)
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
-if(NOT MSVC_VERSION VERSION_LESS 1700)
-	set(CMAKE_CXX_STANDARD 14)
-endif()
+	set(CMAKE_CXX_STANDARD 17)
 # generate a compilation database (compile_commands.json) for clang tooling
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -27,10 +25,9 @@ option(LSL_OPTIMIZATIONS "Enable some more compiler optimizations" ON)
 option(LSL_UNITTESTS "Build LSL library unit tests" OFF)
 option(LSL_BUNDLED_BOOST "Use the bundled Boost by default" ON)
 option(LSL_BUNDLED_PUGIXML "Use the bundled pugixml by default" ON)
-option(LSL_SLIMARCHIVE "Use experimental but smaller serialization code" OFF)
 option(LSL_TOOLS "Build some experimental tools for in-depth tests" OFF)
 
-mark_as_advanced(LSL_SLIMARCHIVE LSL_FORCE_FANCY_LIBNAME)
+mark_as_advanced(LSL_FORCE_FANCY_LIBNAME)
 
 set(LSL_WINVER "0x0601" CACHE STRING
 	"Windows version (_WIN32_WINNT) to target (defaults to 0x0601 for Windows 7)")
@@ -184,18 +181,11 @@ else()
 	target_link_libraries(lslboost INTERFACE Boost::boost Boost::disable_autolinking)
 endif()
 
-if(LSL_SLIMARCHIVE OR NOT LSL_BUNDLED_BOOST)
-	message(STATUS "Using shim instead of full Boost.Archive")
-	target_compile_definitions(lslboost INTERFACE SLIMARCHIVE)
-elseif(LSL_BUNDLED_BOOST)
-	# compile Boost.Serialization objects as part of lslobj
-	target_sources(lslobj PRIVATE lslboost/serialization_objects.cpp)
-endif()
 target_compile_definitions(lslboost INTERFACE BOOST_ALL_NO_LIB)
 
 # target configuration for the internal lslobj target
 target_link_libraries(lslobj PRIVATE lslboost Threads::Threads)
-target_compile_features(lslobj PUBLIC cxx_std_11 cxx_lambda_init_captures)
+target_compile_features(lslobj PUBLIC cxx_std_17)
 target_include_directories(lslobj
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
@@ -213,6 +203,9 @@ target_compile_definitions(lslobj PRIVATE
 	LOGURU_DEBUG_LOGGING=$<BOOL:${LSL_DEBUGLOG}>
 	PUBLIC ASIO_NO_DEPRECATED
 )
+if(MINGW)
+	target_link_libraries(lslobj PRIVATE bcrypt)
+endif()
 
 # platform specific configuration
 if(UNIX AND NOT APPLE)
@@ -262,7 +255,7 @@ else()
 	# build one object file for Asio instead of once every time an Asio function is called. See
 	# https://think-async.com/Asio/asio-1.18.2/doc/asio/using.html#asio.using.optional_separate_compilation
 	target_sources(lslobj PRIVATE thirdparty/asio_objects.cpp)
-	target_compile_definitions(lslobj PUBLIC ASIO_SEPARATE_COMPILATION)
+	target_compile_definitions(lslobj PUBLIC ASIO_SEPARATE_COMPILATION ASIO_DISABLE_VISIBILITY)
 endif()
 
 
@@ -336,7 +329,11 @@ install(FILES
 
 include(cmake/LSLCMake.cmake)
 
-if(LSL_TOOLS)
+add_executable(lslver testing/lslver.c)
+target_link_libraries(lslver PRIVATE lsl)
+installLSLApp(lslver)
+
+if(NOT WIN32 AND LSL_TOOLS)
 	add_executable(blackhole testing/blackhole.cpp)
 	target_link_libraries(blackhole PRIVATE Threads::Threads)
 	target_include_directories(blackhole PRIVATE "thirdparty/asio/")

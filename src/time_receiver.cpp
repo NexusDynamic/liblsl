@@ -20,11 +20,18 @@ time_receiver::time_receiver(inlet_connection &conn)
 	: conn_(conn), was_reset_(false), timeoffset_(std::numeric_limits<double>::max()),
 	  remote_time_(std::numeric_limits<double>::max()),
 	  uncertainty_(std::numeric_limits<double>::max()), cfg_(api_config::get_instance()),
-	  time_sock_(time_io_), next_estimate_(time_io_), aggregate_results_(time_io_),
-	  next_packet_(time_io_) {
+	  time_sock_(time_io_), outlet_addr_(conn_.get_udp_endpoint()), next_estimate_(time_io_),
+	  aggregate_results_(time_io_), next_packet_(time_io_) {
 	conn_.register_onlost(this, &timeoffset_upd_);
-	conn_.register_onrecover(this, [this]() { reset_timeoffset_on_recovery(); });
-	time_sock_.open(conn_.udp_protocol());
+	conn_.register_onrecover(this, [this]() {
+		reset_timeoffset_on_recovery();
+		outlet_addr_ = conn_.get_udp_endpoint();
+		DLOG_F(INFO, "Set new time service address: %s", outlet_addr_.address().to_string().c_str());
+		// handle outlet switching between IPv4 and IPv6
+		time_sock_.close();
+		time_sock_.open(outlet_addr_.protocol());
+	});
+	time_sock_.open(outlet_addr_.protocol());
 }
 
 time_receiver::~time_receiver() {
@@ -128,7 +135,7 @@ void time_receiver::send_next_packet(int packet_num) {
 		request.precision(16);
 		request << "LSL:timedata\r\n" << current_wave_id_ << " " << lsl_clock() << "\r\n";
 		auto msg_buffer = std::make_shared<std::string>(request.str());
-		time_sock_.async_send_to(asio::buffer(*msg_buffer), conn_.get_udp_endpoint(),
+		time_sock_.async_send_to(asio::buffer(*msg_buffer), outlet_addr_,
 			[msg_buffer](err_t /*unused*/, std::size_t /*unused*/) {
 				/* Do nothing, but keep the msg_buffer alive until async_send is completed */
 			});
@@ -166,9 +173,9 @@ void time_receiver::handle_receive_outcome(err_t err, std::size_t len) {
 					((t1 - t0) + (t2 - t3)) /
 					2; // averaged clock offset (other clock - my clock) with rtt bias averaged out
 				// store it
-				estimates_.push_back(std::make_pair(rtt, offset));
-				estimate_times_.push_back(
-					std::make_pair((t3 + t0) / 2.0, (t2 + t1) / 2.0)); // local_time, remote_time
+				estimates_.emplace_back(rtt, offset);
+				// local_time, remote_time
+				estimate_times_.emplace_back((t3 + t0) / 2.0, (t2 + t1) / 2.0);
 			}
 		}
 	} catch (std::exception &e) {

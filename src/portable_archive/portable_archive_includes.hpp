@@ -14,11 +14,11 @@
  * Based on the portable archive example by Robert Ramey this implementation
  * uses Beman Dawes endian library and fp_utilities from Johan Rade, both being
  * in boost since 1.36. Prior to that you need to add them both (header only)
- * to your boost directory before you're able to use the archives provided. 
+ * to your boost directory before you're able to use the archives provided.
  * Our archives have been tested successfully for boost versions 1.33 to 1.49!
  *
- * \note This version adds support for the USE_SHRINKWRAPPED_BOOST define, 
- *       which allows to toggle between a vanilla boost distribution and one with 
+ * \note This version adds support for the USE_SHRINKWRAPPED_BOOST define,
+ *       which allows to toggle between a vanilla boost distribution and one with
  *       mangled names (custom to LSL).
  *
  * \note Correct behaviour has so far been confirmed using PowerPC-32, x86-32
@@ -34,7 +34,7 @@
  *       Arash Abghari for this suggestion). With that all unit tests from the
  *       serialization library pass again with the notable exception of user
  *       defined primitive types. Those are not supported and as a result any
- *       user defined type to be used with the portable archives are required 
+ *       user defined type to be used with the portable archives are required
  *       to be at least object_serializable.
  *
  * \note Oliver Putz pointed out that -0.0 was not serialized correctly, so
@@ -91,19 +91,17 @@
 #pragma once
 
 // endian and fpclassify
-// disable std::fpclassify because it lacks the fp_traits::bits classes
-#define BOOST_MATH_DISABLE_STD_FPCLASSIFY
 #include <boost/endian/conversion.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
 
 // generic type traits for numeric types
 #include "portable_archive_exception.hpp"
+#include <cmath>
 #include <cstdint>
 #include <type_traits>
 
 namespace lsl {
-/*template<typename T>
-int fpclassify(T val) { return std::fpclassify(val); }*/
+template <typename T> int fpclassify(T val) { return std::fpclassify(val); }
+using std::isfinite;
 namespace detail {
 
 template <typename T> struct fp_traits_consts {};
@@ -111,6 +109,8 @@ template <> struct fp_traits_consts<double> {
 	using bits = uint64_t;
 	static constexpr bits sign = (0x80000000ull) << 32, exponent = (0x7ff00000ll) << 32,
 						  significand = ((0x000fffffll) << 32) + (0xfffffffful);
+	static void get_bits(double src, bits &dst) { std::memcpy(&dst, &src, sizeof(src)); }
+	static void set_bits(double &dst, bits src) { std::memcpy(&dst, &src, sizeof(src)); }
 };
 template <> struct fp_traits_consts<float> {
 	using bits = uint32_t;
@@ -132,12 +132,6 @@ template <typename T> struct fp_traits {
 } // namespace detail
 } // namespace lsl
 
-namespace fp = lslboost::math;
+namespace fp = lsl;
 // namespace alias endian
 namespace endian = lslboost::endian;
-
-// hint from Johan Rade: on VMS there is still support for
-// the VAX floating point format and this macro detects it
-#if defined(__vms) && defined(__DECCXX) && !__IEEE_FLOAT
-#error "VAX floating point format is not supported!"
-#endif

@@ -52,7 +52,10 @@ void lsl::info_receiver::info_thread() {
 				buffer.register_at(&conn_);
 				std::iostream server_stream(&buffer);
 				// connect...
-				buffer.connect(conn_.get_tcp_endpoint());
+				if (nullptr == buffer.connect(conn_.get_tcp_endpoint()))
+				{
+					throw asio::system_error(buffer.error());
+				}
 				// send the query
 				server_stream << "LSL:fullinfo\r\n" << std::flush;
 				// receive and parse the response
@@ -62,7 +65,7 @@ void lsl::info_receiver::info_thread() {
 				std::string msg = os.str();
 				info.from_fullinfo_message(msg);
 				// if this is not a valid streaminfo we retry
-				if (!info.created_at()) continue;
+				if (info.created_at() == 0.0) continue;
 				// store the result for pickup & return
 				{
 					std::lock_guard<std::mutex> lock(fullinfo_mut_);

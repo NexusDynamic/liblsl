@@ -8,16 +8,29 @@ enable_testing()
 
 option(LSL_BENCHMARKS "Enable benchmarks in unit tests" OFF)
 
+
+Include(FetchContent)
+FetchContent_Declare(
+		Catch2
+		GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+		GIT_TAG        v3.4.0 # or a later release
+)
+FetchContent_MakeAvailable(Catch2)
+
+
 add_library(catch_main OBJECT catch_main.cpp)
 target_compile_features(catch_main PUBLIC cxx_std_14)
 if(CMAKE_SYSTEM_NAME STREQUAL "Android")
 	target_link_libraries(catch_main PUBLIC log)
 endif()
 find_package(Threads REQUIRED)
-target_link_libraries(catch_main PUBLIC Threads::Threads)
+target_link_libraries(catch_main
+	PUBLIC
+		Threads::Threads
+		Catch2::Catch2
+)
 
 target_compile_definitions(catch_main PRIVATE LSL_VERSION_INFO="${LSL_VERSION_INFO}")
-target_include_directories(catch_main PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../thirdparty)
 if(LSL_BENCHMARKS)
 	target_compile_definitions(catch_main PUBLIC CATCH_CONFIG_ENABLE_BENCHMARKING)
 endif()
@@ -30,9 +43,9 @@ add_library(common OBJECT
 )
 target_compile_features(common PUBLIC cxx_std_14)
 target_include_directories(common PUBLIC
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../thirdparty>
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../src>
 )
+target_link_libraries(common PUBLIC Catch2::Catch2)
 
 
 add_executable(lsl_test_exported
@@ -45,18 +58,23 @@ add_executable(lsl_test_exported
 target_link_libraries(lsl_test_exported PRIVATE lsl common catch_main)
 
 
-add_executable(lsl_test_internal
-	int/inireader.cpp
-	int/loguruthreadnames.cpp
-	int/network.cpp
-	int/stringfuncs.cpp
-	int/streaminfo.cpp
-	int/samples.cpp
-	int/postproc.cpp
-	int/serialization_v100.cpp
-	int/tcpserver.cpp
+set(LSL_TEST_INTERNAL_SRCS
+		int/inireader.cpp
+		int/network.cpp
+		int/stringfuncs.cpp
+		int/streaminfo.cpp
+		int/samples.cpp
+		int/postproc.cpp
+		int/serialization_v100.cpp
+		int/tcpserver.cpp
 )
+if(NOT MINGW)
+	LIST(APPEND LSL_INTERNAL_SRCS int/loguruthreadnames.cpp)
+endif()
+message(STATUS ${LSL_TEST_INTERNAL_SRCS})
+add_executable(lsl_test_internal ${LSL_TEST_INTERNAL_SRCS})
 target_link_libraries(lsl_test_internal PRIVATE lslobj lslboost common catch_main)
+
 
 if(LSL_BENCHMARKS)
 	# to get somewhat reproducible performance numbers:
@@ -77,6 +95,19 @@ set(LSL_TESTS lsl_test_exported lsl_test_internal)
 foreach(lsltest ${LSL_TESTS})
 	add_test(NAME ${lsltest} COMMAND ${lsltest} --wait-for-keypress never)
 	installLSLApp(${lsltest})
+
+#	# Uncomment me if debugging tests on Windows. Commented because it does not work well on CI runners.
+#	if(WIN32)
+#		# Copy dependencies into build directory to enable debugging builds in Windows.
+#		add_custom_command(TARGET ${lsltest}
+#			POST_BUILD
+#			COMMAND
+#				${CMAKE_COMMAND} -E copy_if_different
+#					$<TARGET_RUNTIME_DLLS:${lsltest}>
+#					$<TARGET_FILE_DIR:${lsltest}>
+#			COMMAND_EXPAND_LISTS
+#		)
+#	endif(WIN32)
 endforeach()
 
 installLSLAuxFiles(lsl_test_exported directory lslcfgs)

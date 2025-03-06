@@ -1,6 +1,7 @@
 #include "stream_info_impl.h"
 #include "udp_server.h"
-#include <catch2/catch.hpp>
+#include <catch2/benchmark/catch_benchmark.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <sstream>
 #include <thread>
 
@@ -15,7 +16,7 @@ TEST_CASE("timesync", "[basic][latency]") {
 	auto udp_server = std::make_shared<lsl::udp_server>(info, ctx, udp::v4());
 	udp::endpoint ep(address_v4(0x7f000001), info->v4service_port());
 
-	INFO(info->to_shortinfo_message())
+	INFO(info->to_shortinfo_message());
 	udp_server->begin_serving();
 	std::thread iothread([&ctx]() { ctx.run(); });
 
