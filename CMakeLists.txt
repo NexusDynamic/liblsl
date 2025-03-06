@@ -336,15 +336,19 @@ install(FILES
 
 include(cmake/LSLCMake.cmake)
 
-add_executable(lslver testing/lslver.c)
-target_link_libraries(lslver PRIVATE lsl)
-installLSLApp(lslver)
-
 if(LSL_TOOLS)
 	add_executable(blackhole testing/blackhole.cpp)
 	target_link_libraries(blackhole PRIVATE Threads::Threads)
 	target_include_directories(blackhole PRIVATE "thirdparty/asio/")
 	installLSLApp(blackhole)
+endif()
+
+if(APPLE)
+	set_target_properties(lsl PROPERTIES
+        MACOSX_BUNDLE TRUE
+        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist
+        XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.zeyus.liblsl"
+    )
 endif()
 
 set(LSL_INSTALL_ROOT ${CMAKE_CURRENT_BINARY_DIR})
