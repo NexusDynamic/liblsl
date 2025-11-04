@@ -8,26 +8,25 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IP_BASIC_RESOLVER_ENTRY_HPP
-#define BOOST_ASIO_IP_BASIC_RESOLVER_ENTRY_HPP
+#ifndef ASIO_IP_BASIC_RESOLVER_ENTRY_HPP
+#define ASIO_IP_BASIC_RESOLVER_ENTRY_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <string>
-#include <boost/asio/detail/string_view.hpp>
+#include "asio/detail/string_view.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace ip {
 
 /// An entry produced by a resolver.
 /**
- * The boost::asio::ip::basic_resolver_entry class template describes an entry
+ * The asio::ip::basic_resolver_entry class template describes an entry
  * as returned by a resolver.
  *
  * @par Thread Safety
@@ -51,7 +50,7 @@ public:
 
   /// Construct with specified endpoint, host name and service name.
   basic_resolver_entry(const endpoint_type& ep,
-      BOOST_ASIO_STRING_VIEW_PARAM host, BOOST_ASIO_STRING_VIEW_PARAM service)
+      ASIO_STRING_VIEW_PARAM host, ASIO_STRING_VIEW_PARAM service)
     : endpoint_(ep),
       host_name_(static_cast<std::string>(host)),
       service_name_(static_cast<std::string>(service))
@@ -108,8 +107,7 @@ private:
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_IP_BASIC_RESOLVER_ENTRY_HPP
+#endif // ASIO_IP_BASIC_RESOLVER_ENTRY_HPP

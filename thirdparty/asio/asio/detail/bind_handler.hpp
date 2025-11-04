@@ -8,21 +8,20 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_BIND_HANDLER_HPP
-#define BOOST_ASIO_DETAIL_BIND_HANDLER_HPP
+#ifndef ASIO_DETAIL_BIND_HANDLER_HPP
+#define ASIO_DETAIL_BIND_HANDLER_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/associator.hpp>
-#include <boost/asio/detail/handler_cont_helpers.hpp>
-#include <boost/asio/detail/type_traits.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/associator.hpp"
+#include "asio/detail/handler_cont_helpers.hpp"
+#include "asio/detail/type_traits.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -69,7 +68,7 @@ template <typename Handler>
 inline bool asio_handler_is_continuation(
     binder0<Handler>* this_handler)
 {
-  return boost_asio_handler_cont_helpers::is_continuation(
+  return asio_handler_cont_helpers::is_continuation(
       this_handler->handler_);
 }
 
@@ -130,7 +129,7 @@ template <typename Handler, typename Arg1>
 inline bool asio_handler_is_continuation(
     binder1<Handler, Arg1>* this_handler)
 {
-  return boost_asio_handler_cont_helpers::is_continuation(
+  return asio_handler_cont_helpers::is_continuation(
       this_handler->handler_);
 }
 
@@ -198,7 +197,7 @@ template <typename Handler, typename Arg1, typename Arg2>
 inline bool asio_handler_is_continuation(
     binder2<Handler, Arg1, Arg2>* this_handler)
 {
-  return boost_asio_handler_cont_helpers::is_continuation(
+  return asio_handler_cont_helpers::is_continuation(
       this_handler->handler_);
 }
 
@@ -273,7 +272,7 @@ template <typename Handler, typename Arg1, typename Arg2, typename Arg3>
 inline bool asio_handler_is_continuation(
     binder3<Handler, Arg1, Arg2, Arg3>* this_handler)
 {
-  return boost_asio_handler_cont_helpers::is_continuation(
+  return asio_handler_cont_helpers::is_continuation(
       this_handler->handler_);
 }
 
@@ -357,7 +356,7 @@ template <typename Handler, typename Arg1,
 inline bool asio_handler_is_continuation(
     binder4<Handler, Arg1, Arg2, Arg3, Arg4>* this_handler)
 {
-  return boost_asio_handler_cont_helpers::is_continuation(
+  return asio_handler_cont_helpers::is_continuation(
       this_handler->handler_);
 }
 
@@ -448,7 +447,7 @@ template <typename Handler, typename Arg1, typename Arg2,
 inline bool asio_handler_is_continuation(
     binder5<Handler, Arg1, Arg2, Arg3, Arg4, Arg5>* this_handler)
 {
-  return boost_asio_handler_cont_helpers::is_continuation(
+  return asio_handler_cont_helpers::is_continuation(
       this_handler->handler_);
 }
 
@@ -494,7 +493,7 @@ template <typename Handler, typename Arg1>
 inline bool asio_handler_is_continuation(
     move_binder1<Handler, Arg1>* this_handler)
 {
-  return boost_asio_handler_cont_helpers::is_continuation(
+  return asio_handler_cont_helpers::is_continuation(
       this_handler->handler_);
 }
 
@@ -534,7 +533,7 @@ template <typename Handler, typename Arg1, typename Arg2>
 inline bool asio_handler_is_continuation(
     move_binder2<Handler, Arg1, Arg2>* this_handler)
 {
-  return boost_asio_handler_cont_helpers::is_continuation(
+  return asio_handler_cont_helpers::is_continuation(
       this_handler->handler_);
 }
 
@@ -706,8 +705,7 @@ struct associator<Associator,
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_BIND_HANDLER_HPP
+#endif // ASIO_DETAIL_BIND_HANDLER_HPP

@@ -9,20 +9,19 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IP_IMPL_NETWORK_V4_HPP
-#define BOOST_ASIO_IP_IMPL_NETWORK_V4_HPP
+#ifndef ASIO_IP_IMPL_NETWORK_V4_HPP
+#define ASIO_IP_IMPL_NETWORK_V4_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#if !defined(BOOST_ASIO_NO_IOSTREAM)
+#if !defined(ASIO_NO_IOSTREAM)
 
-#include <boost/asio/detail/throw_error.hpp>
+#include "asio/detail/throw_error.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace ip {
 
@@ -30,12 +29,12 @@ template <typename Elem, typename Traits>
 std::basic_ostream<Elem, Traits>& operator<<(
     std::basic_ostream<Elem, Traits>& os, const network_v4& addr)
 {
-  boost::system::error_code ec;
+  asio::error_code ec;
   std::string s = addr.to_string(ec);
   if (ec)
   {
     if (os.exceptions() & std::basic_ostream<Elem, Traits>::failbit)
-      boost::asio::detail::throw_error(ec);
+      asio::detail::throw_error(ec);
     else
       os.setstate(std::basic_ostream<Elem, Traits>::failbit);
   }
@@ -47,10 +46,9 @@ std::basic_ostream<Elem, Traits>& operator<<(
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // !defined(BOOST_ASIO_NO_IOSTREAM)
+#endif // !defined(ASIO_NO_IOSTREAM)
 
-#endif // BOOST_ASIO_IP_IMPL_NETWORK_V4_HPP
+#endif // ASIO_IP_IMPL_NETWORK_V4_HPP

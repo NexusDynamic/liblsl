@@ -8,22 +8,21 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IMPL_BUFFERED_READ_STREAM_HPP
-#define BOOST_ASIO_IMPL_BUFFERED_READ_STREAM_HPP
+#ifndef ASIO_IMPL_BUFFERED_READ_STREAM_HPP
+#define ASIO_IMPL_BUFFERED_READ_STREAM_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/associator.hpp>
-#include <boost/asio/detail/handler_cont_helpers.hpp>
-#include <boost/asio/detail/handler_type_requirements.hpp>
-#include <boost/asio/detail/non_const_lvalue.hpp>
-#include <boost/asio/detail/type_traits.hpp>
+#include "asio/associator.hpp"
+#include "asio/detail/handler_cont_helpers.hpp"
+#include "asio/detail/handler_type_requirements.hpp"
+#include "asio/detail/non_const_lvalue.hpp"
+#include "asio/detail/type_traits.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 template <typename Stream>
@@ -41,7 +40,7 @@ std::size_t buffered_read_stream<Stream>::fill()
 }
 
 template <typename Stream>
-std::size_t buffered_read_stream<Stream>::fill(boost::system::error_code& ec)
+std::size_t buffered_read_stream<Stream>::fill(asio::error_code& ec)
 {
   detail::buffer_resize_guard<detail::buffered_stream_storage>
     resize_guard(storage_);
@@ -83,7 +82,7 @@ namespace detail
     {
     }
 
-    void operator()(const boost::system::error_code& ec,
+    void operator()(const asio::error_code& ec,
         const std::size_t bytes_transferred)
     {
       storage_.resize(previous_size_ + bytes_transferred);
@@ -100,7 +99,7 @@ namespace detail
   inline bool asio_handler_is_continuation(
       buffered_fill_handler<ReadHandler>* this_handler)
   {
-    return boost_asio_handler_cont_helpers::is_continuation(
+    return asio_handler_cont_helpers::is_continuation(
           this_handler->handler_);
   }
 
@@ -128,7 +127,7 @@ namespace detail
     {
       // If you get an error on the following line it means that your handler
       // does not meet the documented type requirements for a ReadHandler.
-      BOOST_ASIO_READ_HANDLER_CHECK(ReadHandler, handler) type_check;
+      ASIO_READ_HANDLER_CHECK(ReadHandler, handler) type_check;
 
       non_const_lvalue<ReadHandler> handler2(handler);
       std::size_t previous_size = storage->size();
@@ -173,17 +172,17 @@ struct associator<Associator,
 
 template <typename Stream>
 template <
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
       std::size_t)) ReadHandler>
 inline auto buffered_read_stream<Stream>::async_fill(ReadHandler&& handler)
   -> decltype(
     async_initiate<ReadHandler,
-      void (boost::system::error_code, std::size_t)>(
+      void (asio::error_code, std::size_t)>(
         declval<detail::initiate_async_buffered_fill<Stream>>(),
         handler, declval<detail::buffered_stream_storage*>()))
 {
   return async_initiate<ReadHandler,
-    void (boost::system::error_code, std::size_t)>(
+    void (asio::error_code, std::size_t)>(
       detail::initiate_async_buffered_fill<Stream>(next_layer_),
       handler, &storage_);
 }
@@ -193,7 +192,7 @@ template <typename MutableBufferSequence>
 std::size_t buffered_read_stream<Stream>::read_some(
     const MutableBufferSequence& buffers)
 {
-  using boost::asio::buffer_size;
+  using asio::buffer_size;
   if (buffer_size(buffers) == 0)
     return 0;
 
@@ -206,11 +205,11 @@ std::size_t buffered_read_stream<Stream>::read_some(
 template <typename Stream>
 template <typename MutableBufferSequence>
 std::size_t buffered_read_stream<Stream>::read_some(
-    const MutableBufferSequence& buffers, boost::system::error_code& ec)
+    const MutableBufferSequence& buffers, asio::error_code& ec)
 {
-  ec = boost::system::error_code();
+  ec = asio::error_code();
 
-  using boost::asio::buffer_size;
+  using asio::buffer_size;
   if (buffer_size(buffers) == 0)
     return 0;
 
@@ -248,7 +247,7 @@ namespace detail
     {
     }
 
-    void operator()(const boost::system::error_code& ec, std::size_t)
+    void operator()(const asio::error_code& ec, std::size_t)
     {
       if (ec || storage_.empty())
       {
@@ -257,7 +256,7 @@ namespace detail
       }
       else
       {
-        const std::size_t bytes_copied = boost::asio::buffer_copy(
+        const std::size_t bytes_copied = asio::buffer_copy(
             buffers_, storage_.data(), storage_.size());
         storage_.consume(bytes_copied);
         static_cast<ReadHandler&&>(handler_)(ec, bytes_copied);
@@ -275,7 +274,7 @@ namespace detail
       buffered_read_some_handler<
         MutableBufferSequence, ReadHandler>* this_handler)
   {
-    return boost_asio_handler_cont_helpers::is_continuation(
+    return asio_handler_cont_helpers::is_continuation(
           this_handler->handler_);
   }
 
@@ -304,9 +303,9 @@ namespace detail
     {
       // If you get an error on the following line it means that your handler
       // does not meet the documented type requirements for a ReadHandler.
-      BOOST_ASIO_READ_HANDLER_CHECK(ReadHandler, handler) type_check;
+      ASIO_READ_HANDLER_CHECK(ReadHandler, handler) type_check;
 
-      using boost::asio::buffer_size;
+      using asio::buffer_size;
       non_const_lvalue<ReadHandler> handler2(handler);
       if (buffer_size(buffers) == 0 || !storage->empty())
       {
@@ -361,18 +360,18 @@ struct associator<Associator,
 
 template <typename Stream>
 template <typename MutableBufferSequence,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
       std::size_t)) ReadHandler>
 inline auto buffered_read_stream<Stream>::async_read_some(
     const MutableBufferSequence& buffers, ReadHandler&& handler)
   -> decltype(
     async_initiate<ReadHandler,
-      void (boost::system::error_code, std::size_t)>(
+      void (asio::error_code, std::size_t)>(
         declval<detail::initiate_async_buffered_read_some<Stream>>(),
         handler, declval<detail::buffered_stream_storage*>(), buffers))
 {
   return async_initiate<ReadHandler,
-    void (boost::system::error_code, std::size_t)>(
+    void (asio::error_code, std::size_t)>(
       detail::initiate_async_buffered_read_some<Stream>(next_layer_),
       handler, &storage_, buffers);
 }
@@ -390,17 +389,16 @@ std::size_t buffered_read_stream<Stream>::peek(
 template <typename Stream>
 template <typename MutableBufferSequence>
 std::size_t buffered_read_stream<Stream>::peek(
-    const MutableBufferSequence& buffers, boost::system::error_code& ec)
+    const MutableBufferSequence& buffers, asio::error_code& ec)
 {
-  ec = boost::system::error_code();
+  ec = asio::error_code();
   if (storage_.empty() && !this->fill(ec))
     return 0;
   return this->peek_copy(buffers);
 }
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_IMPL_BUFFERED_READ_STREAM_HPP
+#endif // ASIO_IMPL_BUFFERED_READ_STREAM_HPP

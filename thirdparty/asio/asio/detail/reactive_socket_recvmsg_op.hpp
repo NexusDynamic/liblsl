@@ -8,27 +8,26 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_REACTIVE_SOCKET_RECVMSG_OP_HPP
-#define BOOST_ASIO_DETAIL_REACTIVE_SOCKET_RECVMSG_OP_HPP
+#ifndef ASIO_DETAIL_REACTIVE_SOCKET_RECVMSG_OP_HPP
+#define ASIO_DETAIL_REACTIVE_SOCKET_RECVMSG_OP_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/bind_handler.hpp>
-#include <boost/asio/detail/buffer_sequence_adapter.hpp>
-#include <boost/asio/detail/fenced_block.hpp>
-#include <boost/asio/detail/handler_alloc_helpers.hpp>
-#include <boost/asio/detail/handler_work.hpp>
-#include <boost/asio/detail/memory.hpp>
-#include <boost/asio/detail/reactor_op.hpp>
-#include <boost/asio/detail/socket_ops.hpp>
-#include <boost/asio/socket_base.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/bind_handler.hpp"
+#include "asio/detail/buffer_sequence_adapter.hpp"
+#include "asio/detail/fenced_block.hpp"
+#include "asio/detail/handler_alloc_helpers.hpp"
+#include "asio/detail/handler_work.hpp"
+#include "asio/detail/memory.hpp"
+#include "asio/detail/reactor_op.hpp"
+#include "asio/detail/socket_ops.hpp"
+#include "asio/socket_base.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -36,7 +35,7 @@ template <typename MutableBufferSequence>
 class reactive_socket_recvmsg_op_base : public reactor_op
 {
 public:
-  reactive_socket_recvmsg_op_base(const boost::system::error_code& success_ec,
+  reactive_socket_recvmsg_op_base(const asio::error_code& success_ec,
       socket_type socket, const MutableBufferSequence& buffers,
       socket_base::message_flags in_flags,
       socket_base::message_flags& out_flags, func_type complete_func)
@@ -51,11 +50,11 @@ public:
 
   static status do_perform(reactor_op* base)
   {
-    BOOST_ASIO_ASSUME(base != 0);
+    ASIO_ASSUME(base != 0);
     reactive_socket_recvmsg_op_base* o(
         static_cast<reactive_socket_recvmsg_op_base*>(base));
 
-    buffer_sequence_adapter<boost::asio::mutable_buffer,
+    buffer_sequence_adapter<asio::mutable_buffer,
         MutableBufferSequence> bufs(o->buffers_);
 
     status result = socket_ops::non_blocking_recvmsg(o->socket_,
@@ -63,7 +62,7 @@ public:
         o->in_flags_, o->out_flags_,
         o->ec_, o->bytes_transferred_) ? done : not_done;
 
-    BOOST_ASIO_HANDLER_REACTOR_OPERATION((*o, "non_blocking_recvmsg",
+    ASIO_HANDLER_REACTOR_OPERATION((*o, "non_blocking_recvmsg",
           o->ec_, o->bytes_transferred_));
 
     return result;
@@ -84,9 +83,9 @@ public:
   typedef Handler handler_type;
   typedef IoExecutor io_executor_type;
 
-  BOOST_ASIO_DEFINE_HANDLER_PTR(reactive_socket_recvmsg_op);
+  ASIO_DEFINE_HANDLER_PTR(reactive_socket_recvmsg_op);
 
-  reactive_socket_recvmsg_op(const boost::system::error_code& success_ec,
+  reactive_socket_recvmsg_op(const asio::error_code& success_ec,
       socket_type socket, const MutableBufferSequence& buffers,
       socket_base::message_flags in_flags,
       socket_base::message_flags& out_flags, Handler& handler,
@@ -100,23 +99,23 @@ public:
   }
 
   static void do_complete(void* owner, operation* base,
-      const boost::system::error_code& /*ec*/,
+      const asio::error_code& /*ec*/,
       std::size_t /*bytes_transferred*/)
   {
     // Take ownership of the handler object.
-    BOOST_ASIO_ASSUME(base != 0);
+    ASIO_ASSUME(base != 0);
     reactive_socket_recvmsg_op* o(
         static_cast<reactive_socket_recvmsg_op*>(base));
-    ptr p = { boost::asio::detail::addressof(o->handler_), o, o };
+    ptr p = { asio::detail::addressof(o->handler_), o, o };
 
-    BOOST_ASIO_HANDLER_COMPLETION((*o));
+    ASIO_HANDLER_COMPLETION((*o));
 
     // Take ownership of the operation's outstanding work.
     handler_work<Handler, IoExecutor> w(
         static_cast<handler_work<Handler, IoExecutor>&&>(
           o->work_));
 
-    BOOST_ASIO_ERROR_LOCATION(o->ec_);
+    ASIO_ERROR_LOCATION(o->ec_);
 
     // Make a copy of the handler so that the memory can be deallocated before
     // the upcall is made. Even if we're not about to make an upcall, a
@@ -124,37 +123,37 @@ public:
     // with the handler. Consequently, a local copy of the handler is required
     // to ensure that any owning sub-object remains valid until after we have
     // deallocated the memory here.
-    detail::binder2<Handler, boost::system::error_code, std::size_t>
+    detail::binder2<Handler, asio::error_code, std::size_t>
       handler(o->handler_, o->ec_, o->bytes_transferred_);
-    p.h = boost::asio::detail::addressof(handler.handler_);
+    p.h = asio::detail::addressof(handler.handler_);
     p.reset();
 
     // Make the upcall if required.
     if (owner)
     {
       fenced_block b(fenced_block::half);
-      BOOST_ASIO_HANDLER_INVOCATION_BEGIN((handler.arg1_, handler.arg2_));
+      ASIO_HANDLER_INVOCATION_BEGIN((handler.arg1_, handler.arg2_));
       w.complete(handler, handler.handler_);
-      BOOST_ASIO_HANDLER_INVOCATION_END;
+      ASIO_HANDLER_INVOCATION_END;
     }
   }
 
   static void do_immediate(operation* base, bool, const void* io_ex)
   {
     // Take ownership of the handler object.
-    BOOST_ASIO_ASSUME(base != 0);
+    ASIO_ASSUME(base != 0);
     reactive_socket_recvmsg_op* o(
         static_cast<reactive_socket_recvmsg_op*>(base));
-    ptr p = { boost::asio::detail::addressof(o->handler_), o, o };
+    ptr p = { asio::detail::addressof(o->handler_), o, o };
 
-    BOOST_ASIO_HANDLER_COMPLETION((*o));
+    ASIO_HANDLER_COMPLETION((*o));
 
     // Take ownership of the operation's outstanding work.
     immediate_handler_work<Handler, IoExecutor> w(
         static_cast<handler_work<Handler, IoExecutor>&&>(
           o->work_));
 
-    BOOST_ASIO_ERROR_LOCATION(o->ec_);
+    ASIO_ERROR_LOCATION(o->ec_);
 
     // Make a copy of the handler so that the memory can be deallocated before
     // the upcall is made. Even if we're not about to make an upcall, a
@@ -162,14 +161,14 @@ public:
     // with the handler. Consequently, a local copy of the handler is required
     // to ensure that any owning sub-object remains valid until after we have
     // deallocated the memory here.
-    detail::binder2<Handler, boost::system::error_code, std::size_t>
+    detail::binder2<Handler, asio::error_code, std::size_t>
       handler(o->handler_, o->ec_, o->bytes_transferred_);
-    p.h = boost::asio::detail::addressof(handler.handler_);
+    p.h = asio::detail::addressof(handler.handler_);
     p.reset();
 
-    BOOST_ASIO_HANDLER_INVOCATION_BEGIN((handler.arg1_, handler.arg2_));
+    ASIO_HANDLER_INVOCATION_BEGIN((handler.arg1_, handler.arg2_));
     w.complete(handler, handler.handler_, io_ex);
-    BOOST_ASIO_HANDLER_INVOCATION_END;
+    ASIO_HANDLER_INVOCATION_END;
   }
 
 private:
@@ -179,8 +178,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_REACTIVE_SOCKET_RECVMSG_OP_HPP
+#endif // ASIO_DETAIL_REACTIVE_SOCKET_RECVMSG_OP_HPP

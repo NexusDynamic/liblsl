@@ -8,23 +8,22 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_NULL_THREAD_HPP
-#define BOOST_ASIO_DETAIL_NULL_THREAD_HPP
+#ifndef ASIO_DETAIL_NULL_THREAD_HPP
+#define ASIO_DETAIL_NULL_THREAD_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if !defined(BOOST_ASIO_HAS_THREADS)
+#if !defined(ASIO_HAS_THREADS)
 
-#include <boost/asio/detail/throw_error.hpp>
-#include <boost/asio/error.hpp>
+#include "asio/detail/throw_error.hpp"
+#include "asio/error.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -40,16 +39,16 @@ public:
   template <typename Function>
   null_thread(Function, unsigned int = 0)
   {
-    boost::asio::detail::throw_error(
-        boost::asio::error::operation_not_supported, "thread");
+    asio::detail::throw_error(
+        asio::error::operation_not_supported, "thread");
   }
 
   // Construct with custom allocator.
   template <typename Allocator, typename Function>
   null_thread(allocator_arg_t, const Allocator&, Function, unsigned int = 0)
   {
-    boost::asio::detail::throw_error(
-        boost::asio::error::operation_not_supported, "thread");
+    asio::detail::throw_error(
+        asio::error::operation_not_supported, "thread");
   }
 
   // Move constructor.
@@ -88,10 +87,9 @@ public:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // !defined(BOOST_ASIO_HAS_THREADS)
+#endif // !defined(ASIO_HAS_THREADS)
 
-#endif // BOOST_ASIO_DETAIL_NULL_THREAD_HPP
+#endif // ASIO_DETAIL_NULL_THREAD_HPP

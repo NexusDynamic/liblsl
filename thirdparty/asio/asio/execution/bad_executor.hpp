@@ -8,18 +8,17 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXECUTION_BAD_EXECUTOR_HPP
-#define BOOST_ASIO_EXECUTION_BAD_EXECUTOR_HPP
+#ifndef ASIO_EXECUTION_BAD_EXECUTOR_HPP
+#define ASIO_EXECUTION_BAD_EXECUTOR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <exception>
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace execution {
 
@@ -29,20 +28,19 @@ class bad_executor
 {
 public:
   /// Constructor.
-  BOOST_ASIO_DECL bad_executor() noexcept;
+  ASIO_DECL bad_executor() noexcept;
 
   /// Obtain message associated with exception.
-  BOOST_ASIO_DECL virtual const char* what() const noexcept;
+  ASIO_DECL virtual const char* what() const noexcept;
 };
 
 } // namespace execution
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#if defined(BOOST_ASIO_HEADER_ONLY)
-# include <boost/asio/execution/impl/bad_executor.ipp>
-#endif // defined(BOOST_ASIO_HEADER_ONLY)
+#if defined(ASIO_HEADER_ONLY)
+# include "asio/execution/impl/bad_executor.ipp"
+#endif // defined(ASIO_HEADER_ONLY)
 
-#endif // BOOST_ASIO_EXECUTION_BAD_EXECUTOR_HPP
+#endif // ASIO_EXECUTION_BAD_EXECUTOR_HPP

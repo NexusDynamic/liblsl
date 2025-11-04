@@ -8,22 +8,21 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_IMPL_RESOLVER_THREAD_POOL_IPP
-#define BOOST_ASIO_DETAIL_IMPL_RESOLVER_THREAD_POOL_IPP
+#ifndef ASIO_DETAIL_IMPL_RESOLVER_THREAD_POOL_IPP
+#define ASIO_DETAIL_IMPL_RESOLVER_THREAD_POOL_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/config.hpp>
-#include <boost/asio/detail/memory.hpp>
-#include <boost/asio/detail/resolver_thread_pool.hpp>
-#include <boost/asio/error.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/config.hpp"
+#include "asio/detail/memory.hpp"
+#include "asio/detail/resolver_thread_pool.hpp"
+#include "asio/error.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -37,7 +36,7 @@ public:
 
   void operator()()
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     work_scheduler_.run(ec);
   }
 
@@ -47,7 +46,7 @@ private:
 
 resolver_thread_pool::resolver_thread_pool(execution_context& context)
   : execution_context_service_base<resolver_thread_pool>(context),
-    scheduler_(boost::asio::use_service<scheduler_impl>(context)),
+    scheduler_(asio::use_service<scheduler_impl>(context)),
     work_scheduler_(scheduler_impl::internal(), context),
     work_threads_(execution_context::allocator<void>(context)),
     num_work_threads_(config(context).get("resolver", "threads", 0U)),
@@ -104,14 +103,14 @@ void resolver_thread_pool::start_resolve_op(resolve_op* op)
   }
   else
   {
-    op->ec_ = boost::asio::error::operation_not_supported;
+    op->ec_ = asio::error::operation_not_supported;
     scheduler_.post_immediate_completion(op, false);
   }
 }
 
 void resolver_thread_pool::start_work_threads()
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  asio::detail::mutex::scoped_lock lock(mutex_);
   if (work_threads_.empty())
     for (unsigned int i = 0; i < num_work_threads_; ++i)
       work_threads_.create_thread(work_scheduler_runner(work_scheduler_));
@@ -119,8 +118,7 @@ void resolver_thread_pool::start_work_threads()
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_IMPL_RESOLVER_THREAD_POOL_IPP
+#endif // ASIO_DETAIL_IMPL_RESOLVER_THREAD_POOL_IPP

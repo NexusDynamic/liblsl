@@ -8,29 +8,28 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_USE_AWAITABLE_HPP
-#define BOOST_ASIO_USE_AWAITABLE_HPP
+#ifndef ASIO_USE_AWAITABLE_HPP
+#define ASIO_USE_AWAITABLE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_CO_AWAIT) || defined(GENERATING_DOCUMENTATION)
+#if defined(ASIO_HAS_CO_AWAIT) || defined(GENERATING_DOCUMENTATION)
 
-#include <boost/asio/awaitable.hpp>
-#include <boost/asio/detail/handler_tracking.hpp>
+#include "asio/awaitable.hpp"
+#include "asio/detail/handler_tracking.hpp"
 
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
-# if defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#  include <boost/asio/detail/source_location.hpp>
-# endif // defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
+# if defined(ASIO_HAS_SOURCE_LOCATION)
+#  include "asio/detail/source_location.hpp"
+# endif // defined(ASIO_HAS_SOURCE_LOCATION)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 /// A @ref completion_token that represents the currently executing coroutine.
@@ -55,40 +54,40 @@ struct use_awaitable_t
 {
   /// Default constructor.
   constexpr use_awaitable_t(
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
-# if defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
+# if defined(ASIO_HAS_SOURCE_LOCATION)
       detail::source_location location = detail::source_location::current()
-# endif // defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+# endif // defined(ASIO_HAS_SOURCE_LOCATION)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
     )
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
-# if defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
+# if defined(ASIO_HAS_SOURCE_LOCATION)
     : file_name_(location.file_name()),
       line_(location.line()),
       function_name_(location.function_name())
-# else // defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
+# else // defined(ASIO_HAS_SOURCE_LOCATION)
     : file_name_(0),
       line_(0),
       function_name_(0)
-# endif // defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+# endif // defined(ASIO_HAS_SOURCE_LOCATION)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
   {
   }
 
   /// Constructor used to specify file name, line, and function name.
   constexpr use_awaitable_t(const char* file_name,
       int line, const char* function_name)
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
     : file_name_(file_name),
       line_(line),
       function_name_(function_name)
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
   {
-#if !defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#if !defined(ASIO_ENABLE_HANDLER_TRACKING)
     (void)file_name;
     (void)line;
     (void)function_name;
-#endif // !defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#endif // !defined(ASIO_ENABLE_HANDLER_TRACKING)
   }
 
   /// Adapts an executor to add the @c use_awaitable_t completion token as the
@@ -133,31 +132,30 @@ struct use_awaitable_t
       >::other(static_cast<T&&>(object));
   }
 
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
   const char* file_name_;
   int line_;
   const char* function_name_;
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
 };
 
 /// A @ref completion_token object that represents the currently executing
 /// coroutine.
 /**
- * See the documentation for boost::asio::use_awaitable_t for a usage example.
+ * See the documentation for asio::use_awaitable_t for a usage example.
  */
 #if defined(GENERATING_DOCUMENTATION)
-BOOST_ASIO_INLINE_VARIABLE constexpr use_awaitable_t<> use_awaitable;
+ASIO_INLINE_VARIABLE constexpr use_awaitable_t<> use_awaitable;
 #else
-BOOST_ASIO_INLINE_VARIABLE constexpr use_awaitable_t<> use_awaitable(0, 0, 0);
+ASIO_INLINE_VARIABLE constexpr use_awaitable_t<> use_awaitable(0, 0, 0);
 #endif
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#include <boost/asio/impl/use_awaitable.hpp>
+#include "asio/impl/use_awaitable.hpp"
 
-#endif // defined(BOOST_ASIO_HAS_CO_AWAIT) || defined(GENERATING_DOCUMENTATION)
+#endif // defined(ASIO_HAS_CO_AWAIT) || defined(GENERATING_DOCUMENTATION)
 
-#endif // BOOST_ASIO_USE_AWAITABLE_HPP
+#endif // ASIO_USE_AWAITABLE_HPP

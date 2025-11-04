@@ -8,39 +8,38 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_AWAITABLE_HPP
-#define BOOST_ASIO_AWAITABLE_HPP
+#ifndef ASIO_AWAITABLE_HPP
+#define ASIO_AWAITABLE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_CO_AWAIT) || defined(GENERATING_DOCUMENTATION)
+#if defined(ASIO_HAS_CO_AWAIT) || defined(GENERATING_DOCUMENTATION)
 
-#if defined(BOOST_ASIO_HAS_STD_COROUTINE)
+#if defined(ASIO_HAS_STD_COROUTINE)
 # include <coroutine>
-#else // defined(BOOST_ASIO_HAS_STD_COROUTINE)
+#else // defined(ASIO_HAS_STD_COROUTINE)
 # include <experimental/coroutine>
-#endif // defined(BOOST_ASIO_HAS_STD_COROUTINE)
+#endif // defined(ASIO_HAS_STD_COROUTINE)
 
 #include <utility>
-#include <boost/asio/any_io_executor.hpp>
+#include "asio/any_io_executor.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
-#if defined(BOOST_ASIO_HAS_STD_COROUTINE)
+#if defined(ASIO_HAS_STD_COROUTINE)
 using std::coroutine_handle;
 using std::suspend_always;
-#else // defined(BOOST_ASIO_HAS_STD_COROUTINE)
+#else // defined(ASIO_HAS_STD_COROUTINE)
 using std::experimental::coroutine_handle;
 using std::experimental::suspend_always;
-#endif // defined(BOOST_ASIO_HAS_STD_COROUTINE)
+#endif // defined(ASIO_HAS_STD_COROUTINE)
 
 template <typename> class awaitable_thread;
 template <typename, typename> class awaitable_frame;
@@ -49,7 +48,7 @@ template <typename, typename> class awaitable_frame;
 
 /// The return type of a coroutine or asynchronous operation.
 template <typename T, typename Executor = any_io_executor>
-class BOOST_ASIO_NODISCARD awaitable
+class ASIO_NODISCARD awaitable
 {
 public:
   /// The type of the awaited value.
@@ -133,15 +132,14 @@ private:
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#include <boost/asio/impl/awaitable.hpp>
-#if defined(BOOST_ASIO_HEADER_ONLY)
-# include <boost/asio/impl/awaitable.ipp>
-#endif // defined(BOOST_ASIO_HEADER_ONLY)
+#include "asio/impl/awaitable.hpp"
+#if defined(ASIO_HEADER_ONLY)
+# include "asio/impl/awaitable.ipp"
+#endif // defined(ASIO_HEADER_ONLY)
 
-#endif // defined(BOOST_ASIO_HAS_CO_AWAIT) || defined(GENERATING_DOCUMENTATION)
+#endif // defined(ASIO_HAS_CO_AWAIT) || defined(GENERATING_DOCUMENTATION)
 
-#endif // BOOST_ASIO_AWAITABLE_HPP
+#endif // ASIO_AWAITABLE_HPP

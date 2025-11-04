@@ -8,23 +8,22 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXECUTION_CONTEXT_HPP
-#define BOOST_ASIO_EXECUTION_CONTEXT_HPP
+#ifndef ASIO_EXECUTION_CONTEXT_HPP
+#define ASIO_EXECUTION_CONTEXT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <cstddef>
 #include <stdexcept>
 #include <typeinfo>
-#include <boost/asio/detail/memory.hpp>
-#include <boost/asio/detail/noncopyable.hpp>
+#include "asio/detail/memory.hpp"
+#include "asio/detail/noncopyable.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 class execution_context;
@@ -114,7 +113,7 @@ public:
 
 public:
   /// Constructor.
-  BOOST_ASIO_DECL execution_context();
+  ASIO_DECL execution_context();
 
   /// Constructor.
   /**
@@ -133,7 +132,7 @@ public:
    * @param initial_services Used to create the initial services. The @c make
    * function will be called once at the end of execution_context construction.
    */
-  BOOST_ASIO_DECL explicit execution_context(
+  ASIO_DECL explicit execution_context(
       const service_maker& initial_services);
 
   /// Constructor.
@@ -153,7 +152,7 @@ public:
       const service_maker& initial_services);
 
   /// Destructor.
-  BOOST_ASIO_DECL ~execution_context();
+  ASIO_DECL ~execution_context();
 
 protected:
   /// Shuts down all services in the context.
@@ -164,7 +163,7 @@ protected:
    * reverse order of the beginning of service object lifetime, performs @c
    * svc->shutdown().
    */
-  BOOST_ASIO_DECL void shutdown();
+  ASIO_DECL void shutdown();
 
   /// Destroys all services in the context.
   /**
@@ -174,7 +173,7 @@ protected:
    * reverse order * of the beginning of service object lifetime, performs
    * <tt>delete static_cast<execution_context::service*>(svc)</tt>.
    */
-  BOOST_ASIO_DECL void destroy();
+  ASIO_DECL void destroy();
 
 public:
   /// Fork-related event notifications.
@@ -205,7 +204,7 @@ public:
    *
    * @param event A fork-related event.
    *
-   * @throws boost::system::system_error Thrown on failure. If the notification
+   * @throws asio::system_error Thrown on failure. If the notification
    * fails the execution_context object should no longer be used and should be
    * destroyed.
    *
@@ -230,7 +229,7 @@ public:
    * object lifetime. Otherwise, services are visited in order of the beginning
    * of service object lifetime.
    */
-  BOOST_ASIO_DECL void notify_fork(fork_event event);
+  ASIO_DECL void notify_fork(fork_event event);
 
   /// Obtain the service object corresponding to the given type.
   /**
@@ -272,7 +271,7 @@ public:
    * @param args Zero or more arguments to be passed to the service
    * constructor.
    *
-   * @throws boost::asio::service_already_exists Thrown if a service of the
+   * @throws asio::service_already_exists Thrown if a service of the
    * given type is already present in the execution_context.
    */
   template <typename Service, typename... Args>
@@ -290,10 +289,10 @@ public:
    * is destroyed, it will destroy the service object by performing: @code
    * delete static_cast<execution_context::service*>(svc) @endcode
    *
-   * @throws boost::asio::service_already_exists Thrown if a service of the
+   * @throws asio::service_already_exists Thrown if a service of the
    * given type is already present in the execution_context.
    *
-   * @throws boost::asio::invalid_service_owner Thrown if the service's owning
+   * @throws asio::invalid_service_owner Thrown if the service's owning
    * execution_context is not the execution_context object specified by the
    * @c e parameter.
    */
@@ -318,8 +317,8 @@ private:
   template <typename Allocator> class allocator_impl;
 
   // Helper constructors to perform non-templated parts of context construction.
-  BOOST_ASIO_DECL explicit execution_context(allocator_impl_base* alloc);
-  BOOST_ASIO_DECL execution_context(allocator_impl_base* alloc,
+  ASIO_DECL explicit execution_context(allocator_impl_base* alloc);
+  ASIO_DECL execution_context(allocator_impl_base* alloc,
       const service_maker& initial_services);
 
   // The allocator used for all services and other context-wide allocations.
@@ -341,7 +340,7 @@ public:
   virtual void deallocate(void* ptr, std::size_t size, std::size_t align) = 0;
 
 protected:
-  BOOST_ASIO_DECL virtual ~allocator_impl_base();
+  ASIO_DECL virtual ~allocator_impl_base();
 };
 
 template <typename Allocator>
@@ -482,10 +481,10 @@ protected:
   /**
    * @param owner The execution_context object that owns the service.
    */
-  BOOST_ASIO_DECL service(execution_context& owner);
+  ASIO_DECL service(execution_context& owner);
 
   /// Destructor.
-  BOOST_ASIO_DECL virtual ~service();
+  ASIO_DECL virtual ~service();
 
 private:
   /// Destroy all user-defined handler objects owned by the service.
@@ -497,7 +496,7 @@ private:
    * This function is not a pure virtual so that services only have to
    * implement it if necessary. The default implementation does nothing.
    */
-  BOOST_ASIO_DECL virtual void notify_fork(
+  ASIO_DECL virtual void notify_fork(
       execution_context::fork_event event);
 
   friend class detail::service_registry;
@@ -527,7 +526,7 @@ public:
 
 protected:
   /// Destructor.
-  BOOST_ASIO_DECL virtual ~service_maker();
+  ASIO_DECL virtual ~service_maker();
 };
 
 /// Exception thrown when trying to add a duplicate service to an
@@ -536,7 +535,7 @@ class service_already_exists
   : public std::logic_error
 {
 public:
-  BOOST_ASIO_DECL service_already_exists();
+  ASIO_DECL service_already_exists();
 };
 
 /// Exception thrown when trying to add a service object to an
@@ -545,7 +544,7 @@ class invalid_service_owner
   : public std::logic_error
 {
 public:
-  BOOST_ASIO_DECL invalid_service_owner();
+  ASIO_DECL invalid_service_owner();
 };
 
 namespace detail {
@@ -577,13 +576,12 @@ service_id<Type> execution_context_service_base<Type>::id;
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#include <boost/asio/impl/execution_context.hpp>
-#if defined(BOOST_ASIO_HEADER_ONLY)
-# include <boost/asio/impl/execution_context.ipp>
-#endif // defined(BOOST_ASIO_HEADER_ONLY)
+#include "asio/impl/execution_context.hpp"
+#if defined(ASIO_HEADER_ONLY)
+# include "asio/impl/execution_context.ipp"
+#endif // defined(ASIO_HEADER_ONLY)
 
-#endif // BOOST_ASIO_EXECUTION_CONTEXT_HPP
+#endif // ASIO_EXECUTION_CONTEXT_HPP

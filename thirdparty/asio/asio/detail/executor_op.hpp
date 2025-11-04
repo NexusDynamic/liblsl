@@ -8,21 +8,20 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_EXECUTOR_OP_HPP
-#define BOOST_ASIO_DETAIL_EXECUTOR_OP_HPP
+#ifndef ASIO_DETAIL_EXECUTOR_OP_HPP
+#define ASIO_DETAIL_EXECUTOR_OP_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/fenced_block.hpp>
-#include <boost/asio/detail/handler_alloc_helpers.hpp>
-#include <boost/asio/detail/scheduler_operation.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/fenced_block.hpp"
+#include "asio/detail/handler_alloc_helpers.hpp"
+#include "asio/detail/scheduler_operation.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -31,7 +30,7 @@ template <typename Handler, typename Alloc,
 class executor_op : public Operation
 {
 public:
-  BOOST_ASIO_DEFINE_HANDLER_ALLOCATOR_PTR(executor_op);
+  ASIO_DEFINE_HANDLER_ALLOCATOR_PTR(executor_op);
 
   template <typename H>
   executor_op(H&& h, const Alloc& allocator)
@@ -42,16 +41,16 @@ public:
   }
 
   static void do_complete(void* owner, Operation* base,
-      const boost::system::error_code& /*ec*/,
+      const asio::error_code& /*ec*/,
       std::size_t /*bytes_transferred*/)
   {
     // Take ownership of the handler object.
-    BOOST_ASIO_ASSUME(base != 0);
+    ASIO_ASSUME(base != 0);
     executor_op* o(static_cast<executor_op*>(base));
     Alloc allocator(o->allocator_);
     ptr p = { detail::addressof(allocator), o, o };
 
-    BOOST_ASIO_HANDLER_COMPLETION((*o));
+    ASIO_HANDLER_COMPLETION((*o));
 
     // Make a copy of the handler so that the memory can be deallocated before
     // the upcall is made. Even if we're not about to make an upcall, a
@@ -66,9 +65,9 @@ public:
     if (owner)
     {
       fenced_block b(fenced_block::half);
-      BOOST_ASIO_HANDLER_INVOCATION_BEGIN(());
+      ASIO_HANDLER_INVOCATION_BEGIN(());
       static_cast<Handler&&>(handler)();
-      BOOST_ASIO_HANDLER_INVOCATION_END;
+      ASIO_HANDLER_INVOCATION_END;
     }
   }
 
@@ -79,8 +78,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_EXECUTOR_OP_HPP
+#endif // ASIO_DETAIL_EXECUTOR_OP_HPP

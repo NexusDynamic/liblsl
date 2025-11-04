@@ -8,16 +8,16 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_VERSION_HPP
-#define BOOST_ASIO_VERSION_HPP
+#ifndef ASIO_VERSION_HPP
+#define ASIO_VERSION_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-// BOOST_ASIO_VERSION % 100 is the sub-minor version
-// BOOST_ASIO_VERSION / 100 % 1000 is the minor version
-// BOOST_ASIO_VERSION / 100000 is the major version
-#define BOOST_ASIO_VERSION 103600 // 1.36.0
+// ASIO_VERSION % 100 is the sub-minor version
+// ASIO_VERSION / 100 % 1000 is the minor version
+// ASIO_VERSION / 100000 is the major version
+#define ASIO_VERSION 103600 // 1.36.0
 
-#endif // BOOST_ASIO_VERSION_HPP
+#endif // ASIO_VERSION_HPP

@@ -9,33 +9,32 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_POSIX_SERIAL_PORT_SERVICE_HPP
-#define BOOST_ASIO_DETAIL_POSIX_SERIAL_PORT_SERVICE_HPP
+#ifndef ASIO_DETAIL_POSIX_SERIAL_PORT_SERVICE_HPP
+#define ASIO_DETAIL_POSIX_SERIAL_PORT_SERVICE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_SERIAL_PORT)
-#if !defined(BOOST_ASIO_WINDOWS) && !defined(__CYGWIN__)
+#if defined(ASIO_HAS_SERIAL_PORT)
+#if !defined(ASIO_WINDOWS) && !defined(__CYGWIN__)
 
 #include <string>
-#include <boost/asio/error.hpp>
-#include <boost/asio/execution_context.hpp>
-#include <boost/asio/serial_port_base.hpp>
-#include <boost/asio/detail/descriptor_ops.hpp>
+#include "asio/error.hpp"
+#include "asio/execution_context.hpp"
+#include "asio/serial_port_base.hpp"
+#include "asio/detail/descriptor_ops.hpp"
 
-#if defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
-# include <boost/asio/detail/io_uring_descriptor_service.hpp>
-#else // defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
-# include <boost/asio/detail/reactive_descriptor_service.hpp>
-#endif // defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+#if defined(ASIO_HAS_IO_URING_AS_DEFAULT)
+# include "asio/detail/io_uring_descriptor_service.hpp"
+#else // defined(ASIO_HAS_IO_URING_AS_DEFAULT)
+# include "asio/detail/reactive_descriptor_service.hpp"
+#endif // defined(ASIO_HAS_IO_URING_AS_DEFAULT)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -44,11 +43,11 @@ class posix_serial_port_service :
   public execution_context_service_base<posix_serial_port_service>
 {
 public:
-#if defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+#if defined(ASIO_HAS_IO_URING_AS_DEFAULT)
   typedef io_uring_descriptor_service descriptor_service;
-#else // defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+#else // defined(ASIO_HAS_IO_URING_AS_DEFAULT)
   typedef reactive_descriptor_service descriptor_service;
-#endif // defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+#endif // defined(ASIO_HAS_IO_URING_AS_DEFAULT)
 
   // The native type of a serial port.
   typedef descriptor_service::native_handle_type native_handle_type;
@@ -56,10 +55,10 @@ public:
   // The implementation type of the serial port.
   typedef descriptor_service::implementation_type implementation_type;
 
-  BOOST_ASIO_DECL posix_serial_port_service(execution_context& context);
+  ASIO_DECL posix_serial_port_service(execution_context& context);
 
   // Destroy all user-defined handler objects owned by the service.
-  BOOST_ASIO_DECL void shutdown();
+  ASIO_DECL void shutdown();
 
   // Construct a new serial port implementation.
   void construct(implementation_type& impl)
@@ -90,13 +89,13 @@ public:
   }
 
   // Open the serial port using the specified device name.
-  BOOST_ASIO_DECL boost::system::error_code open(implementation_type& impl,
-      const std::string& device, boost::system::error_code& ec);
+  ASIO_DECL asio::error_code open(implementation_type& impl,
+      const std::string& device, asio::error_code& ec);
 
   // Assign a native descriptor to a serial port implementation.
-  boost::system::error_code assign(implementation_type& impl,
+  asio::error_code assign(implementation_type& impl,
       const native_handle_type& native_descriptor,
-      boost::system::error_code& ec)
+      asio::error_code& ec)
   {
     return descriptor_service_.assign(impl, native_descriptor, ec);
   }
@@ -108,8 +107,8 @@ public:
   }
 
   // Destroy a serial port implementation.
-  boost::system::error_code close(implementation_type& impl,
-      boost::system::error_code& ec)
+  asio::error_code close(implementation_type& impl,
+      asio::error_code& ec)
   {
     return descriptor_service_.close(impl, ec);
   }
@@ -121,16 +120,16 @@ public:
   }
 
   // Cancel all operations associated with the serial port.
-  boost::system::error_code cancel(implementation_type& impl,
-      boost::system::error_code& ec)
+  asio::error_code cancel(implementation_type& impl,
+      asio::error_code& ec)
   {
     return descriptor_service_.cancel(impl, ec);
   }
 
   // Set an option on the serial port.
   template <typename SettableSerialPortOption>
-  boost::system::error_code set_option(implementation_type& impl,
-      const SettableSerialPortOption& option, boost::system::error_code& ec)
+  asio::error_code set_option(implementation_type& impl,
+      const SettableSerialPortOption& option, asio::error_code& ec)
   {
     return do_set_option(impl,
         &posix_serial_port_service::store_option<SettableSerialPortOption>,
@@ -139,8 +138,8 @@ public:
 
   // Get an option from the serial port.
   template <typename GettableSerialPortOption>
-  boost::system::error_code get_option(const implementation_type& impl,
-      GettableSerialPortOption& option, boost::system::error_code& ec) const
+  asio::error_code get_option(const implementation_type& impl,
+      GettableSerialPortOption& option, asio::error_code& ec) const
   {
     return do_get_option(impl,
         &posix_serial_port_service::load_option<GettableSerialPortOption>,
@@ -148,19 +147,19 @@ public:
   }
 
   // Send a break sequence to the serial port.
-  boost::system::error_code send_break(implementation_type& impl,
-      boost::system::error_code& ec)
+  asio::error_code send_break(implementation_type& impl,
+      asio::error_code& ec)
   {
     int result = ::tcsendbreak(descriptor_service_.native_handle(impl), 0);
     descriptor_ops::get_last_error(ec, result < 0);
-    BOOST_ASIO_ERROR_LOCATION(ec);
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
   // Write the given data. Returns the number of bytes sent.
   template <typename ConstBufferSequence>
   size_t write_some(implementation_type& impl,
-      const ConstBufferSequence& buffers, boost::system::error_code& ec)
+      const ConstBufferSequence& buffers, asio::error_code& ec)
   {
     return descriptor_service_.write_some(impl, buffers, ec);
   }
@@ -178,7 +177,7 @@ public:
   // Read some data. Returns the number of bytes received.
   template <typename MutableBufferSequence>
   size_t read_some(implementation_type& impl,
-      const MutableBufferSequence& buffers, boost::system::error_code& ec)
+      const MutableBufferSequence& buffers, asio::error_code& ec)
   {
     return descriptor_service_.read_some(impl, buffers, ec);
   }
@@ -196,40 +195,40 @@ public:
 
 private:
   // Function pointer type for storing a serial port option.
-  typedef boost::system::error_code (*store_function_type)(
-      const void*, termios&, boost::system::error_code&);
+  typedef asio::error_code (*store_function_type)(
+      const void*, termios&, asio::error_code&);
 
   // Helper function template to store a serial port option.
   template <typename SettableSerialPortOption>
-  static boost::system::error_code store_option(const void* option,
-      termios& storage, boost::system::error_code& ec)
+  static asio::error_code store_option(const void* option,
+      termios& storage, asio::error_code& ec)
   {
     static_cast<const SettableSerialPortOption*>(option)->store(storage, ec);
     return ec;
   }
 
   // Helper function to set a serial port option.
-  BOOST_ASIO_DECL boost::system::error_code do_set_option(
+  ASIO_DECL asio::error_code do_set_option(
       implementation_type& impl, store_function_type store,
-      const void* option, boost::system::error_code& ec);
+      const void* option, asio::error_code& ec);
 
   // Function pointer type for loading a serial port option.
-  typedef boost::system::error_code (*load_function_type)(
-      void*, const termios&, boost::system::error_code&);
+  typedef asio::error_code (*load_function_type)(
+      void*, const termios&, asio::error_code&);
 
   // Helper function template to load a serial port option.
   template <typename GettableSerialPortOption>
-  static boost::system::error_code load_option(void* option,
-      const termios& storage, boost::system::error_code& ec)
+  static asio::error_code load_option(void* option,
+      const termios& storage, asio::error_code& ec)
   {
     static_cast<GettableSerialPortOption*>(option)->load(storage, ec);
     return ec;
   }
 
   // Helper function to get a serial port option.
-  BOOST_ASIO_DECL boost::system::error_code do_get_option(
+  ASIO_DECL asio::error_code do_get_option(
       const implementation_type& impl, load_function_type load,
-      void* option, boost::system::error_code& ec) const;
+      void* option, asio::error_code& ec) const;
 
   // The implementation used for initiating asynchronous operations.
   descriptor_service descriptor_service_;
@@ -237,15 +236,14 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#if defined(BOOST_ASIO_HEADER_ONLY)
-# include <boost/asio/detail/impl/posix_serial_port_service.ipp>
-#endif // defined(BOOST_ASIO_HEADER_ONLY)
+#if defined(ASIO_HEADER_ONLY)
+# include "asio/detail/impl/posix_serial_port_service.ipp"
+#endif // defined(ASIO_HEADER_ONLY)
 
-#endif // !defined(BOOST_ASIO_WINDOWS) && !defined(__CYGWIN__)
-#endif // defined(BOOST_ASIO_HAS_SERIAL_PORT)
+#endif // !defined(ASIO_WINDOWS) && !defined(__CYGWIN__)
+#endif // defined(ASIO_HAS_SERIAL_PORT)
 
-#endif // BOOST_ASIO_DETAIL_POSIX_SERIAL_PORT_SERVICE_HPP
+#endif // ASIO_DETAIL_POSIX_SERIAL_PORT_SERVICE_HPP

@@ -8,22 +8,21 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IMPL_CANCEL_AT_HPP
-#define BOOST_ASIO_IMPL_CANCEL_AT_HPP
+#ifndef ASIO_IMPL_CANCEL_AT_HPP
+#define ASIO_IMPL_CANCEL_AT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/associated_executor.hpp>
-#include <boost/asio/async_result.hpp>
-#include <boost/asio/detail/initiation_base.hpp>
-#include <boost/asio/detail/timed_cancel_op.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/associated_executor.hpp"
+#include "asio/async_result.hpp"
+#include "asio/detail/initiation_base.hpp"
+#include "asio/detail/timed_cancel_op.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -42,7 +41,7 @@ struct initiate_cancel_at : initiation_base<Initiation>
         basic_waitable_timer<Clock, WaitTraits>, Signatures...>;
 
     non_const_lvalue<Handler> handler2(handler);
-    typename op::ptr p = { boost::asio::detail::addressof(handler2.value),
+    typename op::ptr p = { asio::detail::addressof(handler2.value),
         op::ptr::allocate(handler2.value), 0 };
     p.p = new (p.v) op(handler2.value,
         basic_waitable_timer<Clock, WaitTraits,
@@ -63,7 +62,7 @@ struct initiate_cancel_at : initiation_base<Initiation>
         basic_waitable_timer<Clock, WaitTraits>, Signatures...>;
 
     non_const_lvalue<Handler> handler2(handler);
-    typename op::ptr p = { boost::asio::detail::addressof(handler2.value),
+    typename op::ptr p = { asio::detail::addressof(handler2.value),
         op::ptr::allocate(handler2.value), 0 };
     p.p = new (p.v) op(handler2.value,
         basic_waitable_timer<Clock, WaitTraits,
@@ -93,7 +92,7 @@ struct initiate_cancel_at_timer : initiation_base<Initiation>
         basic_waitable_timer<Clock, WaitTraits, Executor>&, Signatures...>;
 
     non_const_lvalue<Handler> handler2(handler);
-    typename op::ptr p = { boost::asio::detail::addressof(handler2.value),
+    typename op::ptr p = { asio::detail::addressof(handler2.value),
         op::ptr::allocate(handler2.value), 0 };
     timer->expires_at(expiry);
     p.p = new (p.v) op(handler2.value, *timer, cancel_type);
@@ -113,7 +112,7 @@ struct initiate_cancel_at_timer : initiation_base<Initiation>
         basic_waitable_timer<Clock, WaitTraits, Executor>&, Signatures...>;
 
     non_const_lvalue<Handler> handler2(handler);
-    typename op::ptr p = { boost::asio::detail::addressof(handler2.value),
+    typename op::ptr p = { asio::detail::addressof(handler2.value),
         op::ptr::allocate(handler2.value), 0 };
     timer->expires_at(expiry);
     p.p = new (p.v) op(handler2.value, *timer, cancel_type);
@@ -263,8 +262,7 @@ struct async_result<
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_IMPL_CANCEL_AT_HPP
+#endif // ASIO_IMPL_CANCEL_AT_HPP

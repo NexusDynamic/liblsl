@@ -8,19 +8,18 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_ASYNC_RESULT_HPP
-#define BOOST_ASIO_ASYNC_RESULT_HPP
+#ifndef ASIO_ASYNC_RESULT_HPP
+#define ASIO_ASYNC_RESULT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/type_traits.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/type_traits.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -44,7 +43,7 @@ struct is_completion_signature<R(Args...) &&> : true_type
 {
 };
 
-# if defined(BOOST_ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
+# if defined(ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
 
 template <typename R, typename... Args>
 struct is_completion_signature<R(Args...) noexcept> : true_type
@@ -61,7 +60,7 @@ struct is_completion_signature<R(Args...) && noexcept> : true_type
 {
 };
 
-# endif // defined(BOOST_ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
+# endif // defined(ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
 
 template <typename... T>
 struct are_completion_signatures : false_type
@@ -90,12 +89,12 @@ struct are_completion_signatures<T0, TN...>
 
 } // namespace detail
 
-#if defined(BOOST_ASIO_HAS_CONCEPTS)
+#if defined(ASIO_HAS_CONCEPTS)
 
 namespace detail {
 
 template <typename T, typename... Args>
-BOOST_ASIO_CONCEPT callable_with = requires(T&& t, Args&&... args)
+ASIO_CONCEPT callable_with = requires(T&& t, Args&&... args)
 {
   static_cast<T&&>(t)(static_cast<Args&&>(args)...);
 };
@@ -123,7 +122,7 @@ struct is_completion_handler_for<T, R(Args...) &&>
 {
 };
 
-# if defined(BOOST_ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
+# if defined(ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
 
 template <typename T, typename R, typename... Args>
 struct is_completion_handler_for<T, R(Args...) noexcept>
@@ -143,7 +142,7 @@ struct is_completion_handler_for<T, R(Args...) && noexcept>
 {
 };
 
-# endif // defined(BOOST_ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
+# endif // defined(ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
 
 template <typename T, typename Signature0, typename... SignatureN>
 struct is_completion_handler_for<T, Signature0, SignatureN...>
@@ -156,32 +155,32 @@ struct is_completion_handler_for<T, Signature0, SignatureN...>
 } // namespace detail
 
 template <typename T>
-BOOST_ASIO_CONCEPT completion_signature =
+ASIO_CONCEPT completion_signature =
   detail::is_completion_signature<T>::value;
 
-#define BOOST_ASIO_COMPLETION_SIGNATURE \
-  ::boost::asio::completion_signature
+#define ASIO_COMPLETION_SIGNATURE \
+  ::asio::completion_signature
 
 template <typename T, typename... Signatures>
-BOOST_ASIO_CONCEPT completion_handler_for =
+ASIO_CONCEPT completion_handler_for =
   detail::are_completion_signatures<Signatures...>::value
     && detail::is_completion_handler_for<T, Signatures...>::value;
 
-#define BOOST_ASIO_COMPLETION_HANDLER_FOR(sig) \
-  ::boost::asio::completion_handler_for<sig>
-#define BOOST_ASIO_COMPLETION_HANDLER_FOR2(sig0, sig1) \
-  ::boost::asio::completion_handler_for<sig0, sig1>
-#define BOOST_ASIO_COMPLETION_HANDLER_FOR3(sig0, sig1, sig2) \
-  ::boost::asio::completion_handler_for<sig0, sig1, sig2>
+#define ASIO_COMPLETION_HANDLER_FOR(sig) \
+  ::asio::completion_handler_for<sig>
+#define ASIO_COMPLETION_HANDLER_FOR2(sig0, sig1) \
+  ::asio::completion_handler_for<sig0, sig1>
+#define ASIO_COMPLETION_HANDLER_FOR3(sig0, sig1, sig2) \
+  ::asio::completion_handler_for<sig0, sig1, sig2>
 
-#else // defined(BOOST_ASIO_HAS_CONCEPTS)
+#else // defined(ASIO_HAS_CONCEPTS)
 
-#define BOOST_ASIO_COMPLETION_SIGNATURE typename
-#define BOOST_ASIO_COMPLETION_HANDLER_FOR(sig) typename
-#define BOOST_ASIO_COMPLETION_HANDLER_FOR2(sig0, sig1) typename
-#define BOOST_ASIO_COMPLETION_HANDLER_FOR3(sig0, sig1, sig2) typename
+#define ASIO_COMPLETION_SIGNATURE typename
+#define ASIO_COMPLETION_HANDLER_FOR(sig) typename
+#define ASIO_COMPLETION_HANDLER_FOR2(sig0, sig1) typename
+#define ASIO_COMPLETION_HANDLER_FOR3(sig0, sig1, sig2) typename
 
-#endif // defined(BOOST_ASIO_HAS_CONCEPTS)
+#endif // defined(ASIO_HAS_CONCEPTS)
 
 namespace detail {
 
@@ -195,14 +194,14 @@ struct is_lvalue_completion_signature<R(Args...) &> : true_type
 {
 };
 
-# if defined(BOOST_ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
+# if defined(ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
 
 template <typename R, typename... Args>
 struct is_lvalue_completion_signature<R(Args...) & noexcept> : true_type
 {
 };
 
-# endif // defined(BOOST_ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
+# endif // defined(ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
 
 template <typename... Signatures>
 struct are_any_lvalue_completion_signatures : false_type
@@ -233,14 +232,14 @@ struct is_rvalue_completion_signature<R(Args...) &&> : true_type
 {
 };
 
-# if defined(BOOST_ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
+# if defined(ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
 
 template <typename R, typename... Args>
 struct is_rvalue_completion_signature<R(Args...) && noexcept> : true_type
 {
 };
 
-# endif // defined(BOOST_ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
+# endif // defined(ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
 
 template <typename... Signatures>
 struct are_any_rvalue_completion_signatures : false_type
@@ -282,7 +281,7 @@ struct simple_completion_signature<R(Args...) &&>
   typedef R type(Args...);
 };
 
-# if defined(BOOST_ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
+# if defined(ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
 
 template <typename R, typename... Args>
 struct simple_completion_signature<R(Args...) noexcept>
@@ -302,10 +301,10 @@ struct simple_completion_signature<R(Args...) && noexcept>
   typedef R type(Args...);
 };
 
-# endif // defined(BOOST_ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
+# endif // defined(ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
 
 template <typename CompletionToken,
-    BOOST_ASIO_COMPLETION_SIGNATURE... Signatures>
+    ASIO_COMPLETION_SIGNATURE... Signatures>
 class completion_handler_async_result
 {
 public:
@@ -321,7 +320,7 @@ public:
   }
 
   template <typename Initiation,
-      BOOST_ASIO_COMPLETION_HANDLER_FOR(Signatures...) RawCompletionToken,
+      ASIO_COMPLETION_HANDLER_FOR(Signatures...) RawCompletionToken,
       typename... Args>
   static return_type initiate(Initiation&& initiation,
       RawCompletionToken&& token, Args&&... args)
@@ -381,7 +380,7 @@ private:
  * async_initiate function rather than using the async_result trait directly.
  */
 template <typename CompletionToken,
-    BOOST_ASIO_COMPLETION_SIGNATURE... Signatures>
+    ASIO_COMPLETION_SIGNATURE... Signatures>
 class async_result
 {
 public:
@@ -418,7 +417,7 @@ private:
 #else // defined(GENERATING_DOCUMENTATION)
 
 template <typename CompletionToken,
-    BOOST_ASIO_COMPLETION_SIGNATURE... Signatures>
+    ASIO_COMPLETION_SIGNATURE... Signatures>
 class async_result :
   public conditional_t<
       detail::are_any_lvalue_completion_signatures<Signatures...>::value
@@ -444,7 +443,7 @@ private:
   async_result& operator=(const async_result&) = delete;
 };
 
-template <BOOST_ASIO_COMPLETION_SIGNATURE... Signatures>
+template <ASIO_COMPLETION_SIGNATURE... Signatures>
 class async_result<void, Signatures...>
 {
   // Empty.
@@ -456,11 +455,11 @@ class async_result<void, Signatures...>
 /// a local copy of the handler, and then create an async_result for the
 /// handler.
 template <typename CompletionToken,
-    BOOST_ASIO_COMPLETION_SIGNATURE... Signatures>
+    ASIO_COMPLETION_SIGNATURE... Signatures>
 struct async_completion
 {
   /// The real handler type to be used for the asynchronous operation.
-  typedef typename boost::asio::async_result<
+  typedef typename asio::async_result<
     decay_t<CompletionToken>, Signatures...>::completion_handler_type
       completion_handler_type;
 
@@ -514,7 +513,7 @@ char async_result_initiate_memfn_helper(
       &async_result_memfns_derived<T>::initiate>*);
 
 template <typename CompletionToken,
-    BOOST_ASIO_COMPLETION_SIGNATURE... Signatures>
+    ASIO_COMPLETION_SIGNATURE... Signatures>
 struct async_result_has_initiate_memfn
   : integral_constant<bool, sizeof(async_result_initiate_memfn_helper<
       async_result<decay_t<CompletionToken>, Signatures...>
@@ -525,97 +524,97 @@ struct async_result_has_initiate_memfn
 } // namespace detail
 
 #if defined(GENERATING_DOCUMENTATION)
-# define BOOST_ASIO_INITFN_RESULT_TYPE(ct, sig) \
+# define ASIO_INITFN_RESULT_TYPE(ct, sig) \
   void_or_deduced
-# define BOOST_ASIO_INITFN_RESULT_TYPE2(ct, sig0, sig1) \
+# define ASIO_INITFN_RESULT_TYPE2(ct, sig0, sig1) \
   void_or_deduced
-# define BOOST_ASIO_INITFN_RESULT_TYPE3(ct, sig0, sig1, sig2) \
+# define ASIO_INITFN_RESULT_TYPE3(ct, sig0, sig1, sig2) \
   void_or_deduced
 #else
-# define BOOST_ASIO_INITFN_RESULT_TYPE(ct, sig) \
-  typename ::boost::asio::async_result< \
-    typename ::boost::asio::decay<ct>::type, sig>::return_type
-# define BOOST_ASIO_INITFN_RESULT_TYPE2(ct, sig0, sig1) \
-  typename ::boost::asio::async_result< \
-    typename ::boost::asio::decay<ct>::type, sig0, sig1>::return_type
-# define BOOST_ASIO_INITFN_RESULT_TYPE3(ct, sig0, sig1, sig2) \
-  typename ::boost::asio::async_result< \
-    typename ::boost::asio::decay<ct>::type, sig0, sig1, sig2>::return_type
-#define BOOST_ASIO_HANDLER_TYPE(ct, sig) \
-  typename ::boost::asio::async_result< \
-    typename ::boost::asio::decay<ct>::type, sig>::completion_handler_type
-#define BOOST_ASIO_HANDLER_TYPE2(ct, sig0, sig1) \
-  typename ::boost::asio::async_result< \
-    typename ::boost::asio::decay<ct>::type, \
+# define ASIO_INITFN_RESULT_TYPE(ct, sig) \
+  typename ::asio::async_result< \
+    typename ::asio::decay<ct>::type, sig>::return_type
+# define ASIO_INITFN_RESULT_TYPE2(ct, sig0, sig1) \
+  typename ::asio::async_result< \
+    typename ::asio::decay<ct>::type, sig0, sig1>::return_type
+# define ASIO_INITFN_RESULT_TYPE3(ct, sig0, sig1, sig2) \
+  typename ::asio::async_result< \
+    typename ::asio::decay<ct>::type, sig0, sig1, sig2>::return_type
+#define ASIO_HANDLER_TYPE(ct, sig) \
+  typename ::asio::async_result< \
+    typename ::asio::decay<ct>::type, sig>::completion_handler_type
+#define ASIO_HANDLER_TYPE2(ct, sig0, sig1) \
+  typename ::asio::async_result< \
+    typename ::asio::decay<ct>::type, \
       sig0, sig1>::completion_handler_type
-#define BOOST_ASIO_HANDLER_TYPE3(ct, sig0, sig1, sig2) \
-  typename ::boost::asio::async_result< \
-    typename ::boost::asio::decay<ct>::type, \
+#define ASIO_HANDLER_TYPE3(ct, sig0, sig1, sig2) \
+  typename ::asio::async_result< \
+    typename ::asio::decay<ct>::type, \
       sig0, sig1, sig2>::completion_handler_type
 #endif
 
 #if defined(GENERATING_DOCUMENTATION)
-# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ct, sig) \
+# define ASIO_INITFN_AUTO_RESULT_TYPE(ct, sig) \
   auto
-# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE2(ct, sig0, sig1) \
+# define ASIO_INITFN_AUTO_RESULT_TYPE2(ct, sig0, sig1) \
   auto
-# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE3(ct, sig0, sig1, sig2) \
+# define ASIO_INITFN_AUTO_RESULT_TYPE3(ct, sig0, sig1, sig2) \
   auto
-#elif defined(BOOST_ASIO_HAS_RETURN_TYPE_DEDUCTION)
-# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ct, sig) \
+#elif defined(ASIO_HAS_RETURN_TYPE_DEDUCTION)
+# define ASIO_INITFN_AUTO_RESULT_TYPE(ct, sig) \
   auto
-# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE2(ct, sig0, sig1) \
+# define ASIO_INITFN_AUTO_RESULT_TYPE2(ct, sig0, sig1) \
   auto
-# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE3(ct, sig0, sig1, sig2) \
+# define ASIO_INITFN_AUTO_RESULT_TYPE3(ct, sig0, sig1, sig2) \
   auto
 #else
-# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ct, sig) \
-  BOOST_ASIO_INITFN_RESULT_TYPE(ct, sig)
-# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE2(ct, sig0, sig1) \
-  BOOST_ASIO_INITFN_RESULT_TYPE2(ct, sig0, sig1)
-# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE3(ct, sig0, sig1, sig2) \
-  BOOST_ASIO_INITFN_RESULT_TYPE3(ct, sig0, sig1, sig2)
+# define ASIO_INITFN_AUTO_RESULT_TYPE(ct, sig) \
+  ASIO_INITFN_RESULT_TYPE(ct, sig)
+# define ASIO_INITFN_AUTO_RESULT_TYPE2(ct, sig0, sig1) \
+  ASIO_INITFN_RESULT_TYPE2(ct, sig0, sig1)
+# define ASIO_INITFN_AUTO_RESULT_TYPE3(ct, sig0, sig1, sig2) \
+  ASIO_INITFN_RESULT_TYPE3(ct, sig0, sig1, sig2)
 #endif
 
 #if defined(GENERATING_DOCUMENTATION)
-# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX(ct, sig) \
+# define ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX(ct, sig) \
   auto
-# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX2(ct, sig0, sig1) \
+# define ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX2(ct, sig0, sig1) \
   auto
-# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX3(ct, sig0, sig1, sig2) \
+# define ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX3(ct, sig0, sig1, sig2) \
   auto
-# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE_SUFFIX(expr)
-#elif defined(BOOST_ASIO_HAS_RETURN_TYPE_DEDUCTION)
-# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX(ct, sig) \
+# define ASIO_INITFN_AUTO_RESULT_TYPE_SUFFIX(expr)
+#elif defined(ASIO_HAS_RETURN_TYPE_DEDUCTION)
+# define ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX(ct, sig) \
   auto
-# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX2(ct, sig0, sig1) \
+# define ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX2(ct, sig0, sig1) \
   auto
-# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX3(ct, sig0, sig1, sig2) \
+# define ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX3(ct, sig0, sig1, sig2) \
   auto
-# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE_SUFFIX(expr)
+# define ASIO_INITFN_AUTO_RESULT_TYPE_SUFFIX(expr)
 #else
-# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX(ct, sig) \
+# define ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX(ct, sig) \
   auto
-# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX2(ct, sig0, sig1) \
+# define ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX2(ct, sig0, sig1) \
   auto
-# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX3(ct, sig0, sig1, sig2) \
+# define ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX3(ct, sig0, sig1, sig2) \
   auto
-# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE_SUFFIX(expr) -> decltype expr
+# define ASIO_INITFN_AUTO_RESULT_TYPE_SUFFIX(expr) -> decltype expr
 #endif
 
 #if defined(GENERATING_DOCUMENTATION)
-# define BOOST_ASIO_INITFN_DEDUCED_RESULT_TYPE(ct, sig, expr) \
+# define ASIO_INITFN_DEDUCED_RESULT_TYPE(ct, sig, expr) \
   void_or_deduced
-# define BOOST_ASIO_INITFN_DEDUCED_RESULT_TYPE2(ct, sig0, sig1, expr) \
+# define ASIO_INITFN_DEDUCED_RESULT_TYPE2(ct, sig0, sig1, expr) \
   void_or_deduced
-# define BOOST_ASIO_INITFN_DEDUCED_RESULT_TYPE3(ct, sig0, sig1, sig2, expr) \
+# define ASIO_INITFN_DEDUCED_RESULT_TYPE3(ct, sig0, sig1, sig2, expr) \
   void_or_deduced
 #else
-# define BOOST_ASIO_INITFN_DEDUCED_RESULT_TYPE(ct, sig, expr) \
+# define ASIO_INITFN_DEDUCED_RESULT_TYPE(ct, sig, expr) \
   decltype expr
-# define BOOST_ASIO_INITFN_DEDUCED_RESULT_TYPE2(ct, sig0, sig1, expr) \
+# define ASIO_INITFN_DEDUCED_RESULT_TYPE2(ct, sig0, sig1, expr) \
   decltype expr
-# define BOOST_ASIO_INITFN_DEDUCED_RESULT_TYPE3(ct, sig0, sig1, sig2, expr) \
+# define ASIO_INITFN_DEDUCED_RESULT_TYPE3(ct, sig0, sig1, sig2, expr) \
   decltype expr
 #endif
 
@@ -632,7 +631,7 @@ void_or_deduced async_initiate(
 #else // defined(GENERATING_DOCUMENTATION)
 
 template <typename CompletionToken,
-    BOOST_ASIO_COMPLETION_SIGNATURE... Signatures,
+    ASIO_COMPLETION_SIGNATURE... Signatures,
     typename Initiation, typename... Args>
 inline auto async_initiate(Initiation&& initiation,
     type_identity_t<CompletionToken>& token, Args&&... args)
@@ -653,7 +652,7 @@ inline auto async_initiate(Initiation&& initiation,
 }
 
 template <
-    BOOST_ASIO_COMPLETION_SIGNATURE... Signatures,
+    ASIO_COMPLETION_SIGNATURE... Signatures,
     typename CompletionToken, typename Initiation, typename... Args>
 inline auto async_initiate(Initiation&& initiation,
     CompletionToken&& token, Args&&... args)
@@ -674,7 +673,7 @@ inline auto async_initiate(Initiation&& initiation,
 }
 
 template <typename CompletionToken,
-    BOOST_ASIO_COMPLETION_SIGNATURE... Signatures,
+    ASIO_COMPLETION_SIGNATURE... Signatures,
     typename Initiation, typename... Args>
 inline typename enable_if_t<
     !enable_if_t<
@@ -698,7 +697,7 @@ async_initiate(Initiation&& initiation,
   return completion.result.get();
 }
 
-template <BOOST_ASIO_COMPLETION_SIGNATURE... Signatures,
+template <ASIO_COMPLETION_SIGNATURE... Signatures,
     typename CompletionToken, typename Initiation, typename... Args>
 inline typename enable_if_t<
     !enable_if_t<
@@ -723,7 +722,7 @@ async_initiate(Initiation&& initiation, CompletionToken&& token, Args&&... args)
 
 #endif // defined(GENERATING_DOCUMENTATION)
 
-#if defined(BOOST_ASIO_HAS_CONCEPTS)
+#if defined(ASIO_HAS_CONCEPTS)
 
 namespace detail {
 
@@ -739,7 +738,7 @@ struct initiation_archetype
 } // namespace detail
 
 template <typename T, typename... Signatures>
-BOOST_ASIO_CONCEPT completion_token_for =
+ASIO_CONCEPT completion_token_for =
   detail::are_completion_signatures<Signatures...>::value
   &&
   requires(T&& t)
@@ -748,20 +747,20 @@ BOOST_ASIO_CONCEPT completion_token_for =
         detail::initiation_archetype<Signatures...>{}, t);
   };
 
-#define BOOST_ASIO_COMPLETION_TOKEN_FOR(sig) \
-  ::boost::asio::completion_token_for<sig>
-#define BOOST_ASIO_COMPLETION_TOKEN_FOR2(sig0, sig1) \
-  ::boost::asio::completion_token_for<sig0, sig1>
-#define BOOST_ASIO_COMPLETION_TOKEN_FOR3(sig0, sig1, sig2) \
-  ::boost::asio::completion_token_for<sig0, sig1, sig2>
+#define ASIO_COMPLETION_TOKEN_FOR(sig) \
+  ::asio::completion_token_for<sig>
+#define ASIO_COMPLETION_TOKEN_FOR2(sig0, sig1) \
+  ::asio::completion_token_for<sig0, sig1>
+#define ASIO_COMPLETION_TOKEN_FOR3(sig0, sig1, sig2) \
+  ::asio::completion_token_for<sig0, sig1, sig2>
 
-#else // defined(BOOST_ASIO_HAS_CONCEPTS)
+#else // defined(ASIO_HAS_CONCEPTS)
 
-#define BOOST_ASIO_COMPLETION_TOKEN_FOR(sig) typename
-#define BOOST_ASIO_COMPLETION_TOKEN_FOR2(sig0, sig1) typename
-#define BOOST_ASIO_COMPLETION_TOKEN_FOR3(sig0, sig1, sig2) typename
+#define ASIO_COMPLETION_TOKEN_FOR(sig) typename
+#define ASIO_COMPLETION_TOKEN_FOR2(sig0, sig1) typename
+#define ASIO_COMPLETION_TOKEN_FOR3(sig0, sig1, sig2) typename
 
-#endif // defined(BOOST_ASIO_HAS_CONCEPTS)
+#endif // defined(ASIO_HAS_CONCEPTS)
 
 namespace detail {
 
@@ -833,28 +832,28 @@ struct is_async_operation :
 
 #endif // defined(GENERATING_DOCUMENTATION)
 
-#if defined(BOOST_ASIO_HAS_CONCEPTS)
+#if defined(ASIO_HAS_CONCEPTS)
 
 template <typename T, typename... Args>
-BOOST_ASIO_CONCEPT async_operation = is_async_operation<T, Args...>::value;
+ASIO_CONCEPT async_operation = is_async_operation<T, Args...>::value;
 
-#define BOOST_ASIO_ASYNC_OPERATION \
-  ::boost::asio::async_operation
-#define BOOST_ASIO_ASYNC_OPERATION1(a0) \
-  ::boost::asio::async_operation<a0>
-#define BOOST_ASIO_ASYNC_OPERATION2(a0, a1) \
-  ::boost::asio::async_operation<a0, a1>
-#define BOOST_ASIO_ASYNC_OPERATION3(a0, a1, a2) \
-  ::boost::asio::async_operation<a0, a1, a2>
+#define ASIO_ASYNC_OPERATION \
+  ::asio::async_operation
+#define ASIO_ASYNC_OPERATION1(a0) \
+  ::asio::async_operation<a0>
+#define ASIO_ASYNC_OPERATION2(a0, a1) \
+  ::asio::async_operation<a0, a1>
+#define ASIO_ASYNC_OPERATION3(a0, a1, a2) \
+  ::asio::async_operation<a0, a1, a2>
 
-#else // defined(BOOST_ASIO_HAS_CONCEPTS)
+#else // defined(ASIO_HAS_CONCEPTS)
 
-#define BOOST_ASIO_ASYNC_OPERATION typename
-#define BOOST_ASIO_ASYNC_OPERATION1(a0) typename
-#define BOOST_ASIO_ASYNC_OPERATION2(a0, a1) typename
-#define BOOST_ASIO_ASYNC_OPERATION3(a0, a1, a2) typename
+#define ASIO_ASYNC_OPERATION typename
+#define ASIO_ASYNC_OPERATION1(a0) typename
+#define ASIO_ASYNC_OPERATION2(a0, a1) typename
+#define ASIO_ASYNC_OPERATION3(a0, a1, a2) typename
 
-#endif // defined(BOOST_ASIO_HAS_CONCEPTS)
+#endif // defined(ASIO_HAS_CONCEPTS)
 
 namespace detail {
 
@@ -961,10 +960,9 @@ using completion_signature_of_t =
   typename completion_signature_of<T, Args...>::type;
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#include <boost/asio/default_completion_token.hpp>
+#include "asio/default_completion_token.hpp"
 
-#endif // BOOST_ASIO_ASYNC_RESULT_HPP
+#endif // ASIO_ASYNC_RESULT_HPP

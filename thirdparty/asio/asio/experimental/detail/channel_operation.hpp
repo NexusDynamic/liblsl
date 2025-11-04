@@ -8,36 +8,35 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXPERIMENTAL_DETAIL_CHANNEL_OPERATION_HPP
-#define BOOST_ASIO_EXPERIMENTAL_DETAIL_CHANNEL_OPERATION_HPP
+#ifndef ASIO_EXPERIMENTAL_DETAIL_CHANNEL_OPERATION_HPP
+#define ASIO_EXPERIMENTAL_DETAIL_CHANNEL_OPERATION_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/associated_allocator.hpp>
-#include <boost/asio/associated_executor.hpp>
-#include <boost/asio/associated_immediate_executor.hpp>
-#include <boost/asio/detail/initiate_post.hpp>
-#include <boost/asio/detail/initiate_dispatch.hpp>
-#include <boost/asio/detail/op_queue.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/execution/executor.hpp>
-#include <boost/asio/execution/outstanding_work.hpp>
-#include <boost/asio/executor_work_guard.hpp>
-#include <boost/asio/prefer.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/associated_allocator.hpp"
+#include "asio/associated_executor.hpp"
+#include "asio/associated_immediate_executor.hpp"
+#include "asio/detail/initiate_post.hpp"
+#include "asio/detail/initiate_dispatch.hpp"
+#include "asio/detail/op_queue.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/execution/executor.hpp"
+#include "asio/execution/outstanding_work.hpp"
+#include "asio/executor_work_guard.hpp"
+#include "asio/prefer.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace experimental {
 namespace detail {
 
 // Base class for all channel operations. A function pointer is used instead of
 // virtual functions to avoid the associated overhead.
-class channel_operation BOOST_ASIO_INHERIT_TRACKED_HANDLER
+class channel_operation ASIO_INHERIT_TRACKED_HANDLER
 {
 public:
   template <typename Executor, typename = void, typename = void>
@@ -76,7 +75,7 @@ protected:
   {
   }
 
-  friend class boost::asio::detail::op_queue_access;
+  friend class asio::detail::op_queue_access;
   channel_operation* next_;
   func_type func_;
 
@@ -96,7 +95,7 @@ public:
     > executor_type;
 
   handler_work_base(int, const Executor& ex)
-    : executor_(boost::asio::prefer(ex, execution::outstanding_work.tracked))
+    : executor_(asio::prefer(ex, execution::outstanding_work.tracked))
   {
   }
 
@@ -108,7 +107,7 @@ public:
   template <typename IoExecutor, typename Function, typename Handler>
   void post(const IoExecutor& io_exec, Function& function, Handler&)
   {
-    (boost::asio::detail::initiate_post_with_executor<IoExecutor>(io_exec))(
+    (asio::detail::initiate_post_with_executor<IoExecutor>(io_exec))(
         static_cast<Function&&>(function));
   }
 
@@ -118,7 +117,7 @@ public:
     associated_allocator_t<Handler> allocator =
       (get_associated_allocator)(handler);
 
-    boost::asio::prefer(executor_,
+    asio::prefer(executor_,
         execution::allocator(allocator)
       ).execute(static_cast<Function&&>(function));
   }
@@ -145,7 +144,7 @@ public:
     > executor_type;
 
   handler_work_base(int, const Executor& ex)
-    : executor_(boost::asio::prefer(ex, execution::outstanding_work.tracked))
+    : executor_(asio::prefer(ex, execution::outstanding_work.tracked))
   {
   }
 
@@ -160,8 +159,8 @@ public:
     associated_allocator_t<Handler> allocator =
       (get_associated_allocator)(handler);
 
-    boost::asio::prefer(
-        boost::asio::require(executor_, execution::blocking.never),
+    asio::prefer(
+        asio::require(executor_, execution::blocking.never),
         execution::allocator(allocator)
       ).execute(static_cast<Function&&>(function));
   }
@@ -172,7 +171,7 @@ public:
     associated_allocator_t<Handler> allocator =
       (get_associated_allocator)(handler);
 
-    boost::asio::prefer(executor_,
+    asio::prefer(executor_,
         execution::allocator(allocator)
       ).execute(static_cast<Function&&>(function));
   }
@@ -181,7 +180,7 @@ private:
   executor_type executor_;
 };
 
-#if !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#if !defined(ASIO_NO_TS_EXECUTORS)
 
 template <typename Executor>
 class channel_operation::handler_work_base<Executor,
@@ -227,7 +226,7 @@ private:
   executor_work_guard<Executor> work_;
 };
 
-#endif // !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#endif // !defined(ASIO_NO_TS_EXECUTORS)
 
 template <typename Handler, typename IoExecutor, typename>
 class channel_operation::handler_work :
@@ -269,7 +268,7 @@ public:
     immediate_ex_type immediate_ex = (get_associated_immediate_executor)(
         handler, base1_type::get_executor());
 
-    (boost::asio::detail::initiate_dispatch_with_executor<immediate_ex_type>(
+    (asio::detail::initiate_dispatch_with_executor<immediate_ex_type>(
           immediate_ex))(static_cast<Function&&>(function));
   }
 
@@ -285,7 +284,7 @@ public:
         >::value
       >*)
   {
-    (boost::asio::detail::initiate_post_with_executor<
+    (asio::detail::initiate_post_with_executor<
         typename base1_type::executor_type>(
           base1_type::get_executor()))(
         static_cast<Function&&>(function));
@@ -333,7 +332,7 @@ public:
     immediate_ex_type immediate_ex = (get_associated_immediate_executor)(
         handler, base1_type::get_executor());
 
-    (boost::asio::detail::initiate_dispatch_with_executor<immediate_ex_type>(
+    (asio::detail::initiate_dispatch_with_executor<immediate_ex_type>(
           immediate_ex))(static_cast<Function&&>(function));
   }
 
@@ -356,8 +355,7 @@ public:
 } // namespace detail
 } // namespace experimental
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_EXPERIMENTAL_DETAIL_CHANNEL_OPERATION_HPP
+#endif // ASIO_EXPERIMENTAL_DETAIL_CHANNEL_OPERATION_HPP

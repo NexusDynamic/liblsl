@@ -8,36 +8,35 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_WINRT_RESOLVER_SERVICE_HPP
-#define BOOST_ASIO_DETAIL_WINRT_RESOLVER_SERVICE_HPP
+#ifndef ASIO_DETAIL_WINRT_RESOLVER_SERVICE_HPP
+#define ASIO_DETAIL_WINRT_RESOLVER_SERVICE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_WINDOWS_RUNTIME)
+#if defined(ASIO_WINDOWS_RUNTIME)
 
-#include <boost/asio/ip/basic_resolver_query.hpp>
-#include <boost/asio/ip/basic_resolver_results.hpp>
-#include <boost/asio/post.hpp>
-#include <boost/asio/detail/bind_handler.hpp>
-#include <boost/asio/detail/memory.hpp>
-#include <boost/asio/detail/socket_ops.hpp>
-#include <boost/asio/detail/winrt_async_manager.hpp>
-#include <boost/asio/detail/winrt_resolve_op.hpp>
-#include <boost/asio/detail/winrt_utils.hpp>
+#include "asio/ip/basic_resolver_query.hpp"
+#include "asio/ip/basic_resolver_results.hpp"
+#include "asio/post.hpp"
+#include "asio/detail/bind_handler.hpp"
+#include "asio/detail/memory.hpp"
+#include "asio/detail/socket_ops.hpp"
+#include "asio/detail/winrt_async_manager.hpp"
+#include "asio/detail/winrt_resolve_op.hpp"
+#include "asio/detail/winrt_utils.hpp"
 
-#if defined(BOOST_ASIO_HAS_IOCP)
-# include <boost/asio/detail/win_iocp_io_context.hpp>
-#else // defined(BOOST_ASIO_HAS_IOCP)
-# include <boost/asio/detail/scheduler.hpp>
-#endif // defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
+# include "asio/detail/win_iocp_io_context.hpp"
+#else // defined(ASIO_HAS_IOCP)
+# include "asio/detail/scheduler.hpp"
+#endif // defined(ASIO_HAS_IOCP)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -55,10 +54,10 @@ public:
   typedef typename Protocol::endpoint endpoint_type;
 
   // The query type.
-  typedef boost::asio::ip::basic_resolver_query<Protocol> query_type;
+  typedef asio::ip::basic_resolver_query<Protocol> query_type;
 
   // The results type.
-  typedef boost::asio::ip::basic_resolver_results<Protocol> results_type;
+  typedef asio::ip::basic_resolver_results<Protocol> results_type;
 
   // Constructor.
   winrt_resolver_service(execution_context& context)
@@ -113,7 +112,7 @@ public:
 
   // Resolve a query to a list of entries.
   results_type resolve(implementation_type&,
-      const query_type& query, boost::system::error_code& ec)
+      const query_type& query, asio::error_code& ec)
   {
     try
     {
@@ -132,8 +131,8 @@ public:
     }
     catch (Platform::Exception^ e)
     {
-      ec = boost::system::error_code(e->HResult,
-          boost::system::system_category());
+      ec = asio::error_code(e->HResult,
+          asio::system_category());
       return results_type();
     }
   }
@@ -144,15 +143,15 @@ public:
       Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      boost_asio_handler_cont_helpers::is_continuation(handler);
+      asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef winrt_resolve_op<Protocol, Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(query, handler, io_ex);
 
-    BOOST_ASIO_HANDLER_CREATION((scheduler_.context(),
+    ASIO_HANDLER_CREATION((scheduler_.context(),
           *p.p, "resolver", &impl, 0, "async_resolve"));
     (void)impl;
 
@@ -166,8 +165,8 @@ public:
     }
     catch (Platform::Exception^ e)
     {
-      p.p->ec_ = boost::system::error_code(
-          e->HResult, boost::system::system_category());
+      p.p->ec_ = asio::error_code(
+          e->HResult, asio::system_category());
       scheduler_.post_immediate_completion(p.p, is_continuation);
       p.v = p.p = 0;
     }
@@ -175,9 +174,9 @@ public:
 
   // Resolve an endpoint to a list of entries.
   results_type resolve(implementation_type&,
-      const endpoint_type&, boost::system::error_code& ec)
+      const endpoint_type&, asio::error_code& ec)
   {
-    ec = boost::asio::error::operation_not_supported;
+    ec = asio::error::operation_not_supported;
     return results_type();
   }
 
@@ -186,14 +185,14 @@ public:
   void async_resolve(implementation_type&, const endpoint_type&,
       Handler& handler, const IoExecutor& io_ex)
   {
-    boost::system::error_code ec = boost::asio::error::operation_not_supported;
+    asio::error_code ec = asio::error::operation_not_supported;
     const results_type results;
-    boost::asio::post(io_ex, detail::bind_handler(handler, ec, results));
+    asio::post(io_ex, detail::bind_handler(handler, ec, results));
   }
 
 private:
   // The scheduler implementation used for delivering completions.
-#if defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
   typedef class win_iocp_io_context scheduler_impl;
 #else
   typedef class scheduler scheduler_impl;
@@ -205,10 +204,9 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // defined(BOOST_ASIO_WINDOWS_RUNTIME)
+#endif // defined(ASIO_WINDOWS_RUNTIME)
 
-#endif // BOOST_ASIO_DETAIL_WINRT_RESOLVER_SERVICE_HPP
+#endif // ASIO_DETAIL_WINRT_RESOLVER_SERVICE_HPP

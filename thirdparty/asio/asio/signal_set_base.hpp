@@ -8,19 +8,18 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_SIGNAL_SET_BASE_HPP
-#define BOOST_ASIO_SIGNAL_SET_BASE_HPP
+#ifndef ASIO_SIGNAL_SET_BASE_HPP
+#define ASIO_SIGNAL_SET_BASE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/socket_types.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/socket_types.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 /// The signal_set_base class is used as a base for the basic_signal_set class
@@ -63,9 +62,9 @@ public:
   enum class flags : int
   {
     none = 0,
-    restart = BOOST_ASIO_OS_DEF(SA_RESTART),
-    no_child_stop = BOOST_ASIO_OS_DEF(SA_NOCLDSTOP),
-    no_child_wait = BOOST_ASIO_OS_DEF(SA_NOCLDWAIT),
+    restart = ASIO_OS_DEF(SA_RESTART),
+    no_child_stop = ASIO_OS_DEF(SA_NOCLDSTOP),
+    no_child_wait = ASIO_OS_DEF(SA_NOCLDWAIT),
     dont_care = -1
   };
 
@@ -166,8 +165,7 @@ inline signal_set_base::flags_t& operator^=(
 }
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_SIGNAL_SET_BASE_HPP
+#endif // ASIO_SIGNAL_SET_BASE_HPP

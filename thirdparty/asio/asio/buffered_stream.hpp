@@ -8,25 +8,24 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_BUFFERED_STREAM_HPP
-#define BOOST_ASIO_BUFFERED_STREAM_HPP
+#ifndef ASIO_BUFFERED_STREAM_HPP
+#define ASIO_BUFFERED_STREAM_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <cstddef>
-#include <boost/asio/async_result.hpp>
-#include <boost/asio/buffered_read_stream.hpp>
-#include <boost/asio/buffered_write_stream.hpp>
-#include <boost/asio/buffered_stream_fwd.hpp>
-#include <boost/asio/detail/noncopyable.hpp>
-#include <boost/asio/error.hpp>
+#include "asio/async_result.hpp"
+#include "asio/buffered_read_stream.hpp"
+#include "asio/buffered_write_stream.hpp"
+#include "asio/buffered_stream_fwd.hpp"
+#include "asio/detail/noncopyable.hpp"
+#include "asio/error.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 /// Adds buffering to the read- and write-related operations of a stream.
@@ -103,10 +102,10 @@ public:
   }
 
   /// Close the stream.
-  BOOST_ASIO_SYNC_OP_VOID close(boost::system::error_code& ec)
+  ASIO_SYNC_OP_VOID close(asio::error_code& ec)
   {
     stream_impl_.close(ec);
-    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
+    ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Flush all data from the buffer to the next layer. Returns the number of
@@ -120,7 +119,7 @@ public:
   /// Flush all data from the buffer to the next layer. Returns the number of
   /// bytes written to the next layer on the last write operation, or 0 if an
   /// error occurred.
-  std::size_t flush(boost::system::error_code& ec)
+  std::size_t flush(asio::error_code& ec)
   {
     return stream_impl_.next_layer().flush(ec);
   }
@@ -128,10 +127,10 @@ public:
   /// Start an asynchronous flush.
   /**
    * @par Completion Signature
-   * @code void(boost::system::error_code, std::size_t) @endcode
+   * @code void(asio::error_code, std::size_t) @endcode
    */
   template <
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
         std::size_t)) WriteHandler = default_completion_token_t<executor_type>>
   auto async_flush(
       WriteHandler&& handler = default_completion_token_t<executor_type>())
@@ -155,7 +154,7 @@ public:
   /// or 0 if an error occurred.
   template <typename ConstBufferSequence>
   std::size_t write_some(const ConstBufferSequence& buffers,
-      boost::system::error_code& ec)
+      asio::error_code& ec)
   {
     return stream_impl_.write_some(buffers, ec);
   }
@@ -164,10 +163,10 @@ public:
   /// lifetime of the asynchronous operation.
   /**
    * @par Completion Signature
-   * @code void(boost::system::error_code, std::size_t) @endcode
+   * @code void(asio::error_code, std::size_t) @endcode
    */
   template <typename ConstBufferSequence,
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
         std::size_t)) WriteHandler = default_completion_token_t<executor_type>>
   auto async_write_some(const ConstBufferSequence& buffers,
       WriteHandler&& handler = default_completion_token_t<executor_type>())
@@ -188,7 +187,7 @@ public:
 
   /// Fill the buffer with some data. Returns the number of bytes placed in the
   /// buffer as a result of the operation, or 0 if an error occurred.
-  std::size_t fill(boost::system::error_code& ec)
+  std::size_t fill(asio::error_code& ec)
   {
     return stream_impl_.fill(ec);
   }
@@ -196,10 +195,10 @@ public:
   /// Start an asynchronous fill.
   /**
    * @par Completion Signature
-   * @code void(boost::system::error_code, std::size_t) @endcode
+   * @code void(asio::error_code, std::size_t) @endcode
    */
   template <
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
         std::size_t)) ReadHandler = default_completion_token_t<executor_type>>
   auto async_fill(
       ReadHandler&& handler = default_completion_token_t<executor_type>())
@@ -223,7 +222,7 @@ public:
   /// an error occurred.
   template <typename MutableBufferSequence>
   std::size_t read_some(const MutableBufferSequence& buffers,
-      boost::system::error_code& ec)
+      asio::error_code& ec)
   {
     return stream_impl_.read_some(buffers, ec);
   }
@@ -232,10 +231,10 @@ public:
   /// must be valid for the lifetime of the asynchronous operation.
   /**
    * @par Completion Signature
-   * @code void(boost::system::error_code, std::size_t) @endcode
+   * @code void(asio::error_code, std::size_t) @endcode
    */
   template <typename MutableBufferSequence,
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
         std::size_t)) ReadHandler = default_completion_token_t<executor_type>>
   auto async_read_some(const MutableBufferSequence& buffers,
       ReadHandler&& handler = default_completion_token_t<executor_type>())
@@ -259,7 +258,7 @@ public:
   /// or 0 if an error occurred.
   template <typename MutableBufferSequence>
   std::size_t peek(const MutableBufferSequence& buffers,
-      boost::system::error_code& ec)
+      asio::error_code& ec)
   {
     return stream_impl_.peek(buffers, ec);
   }
@@ -271,7 +270,7 @@ public:
   }
 
   /// Determine the amount of data that may be read without blocking.
-  std::size_t in_avail(boost::system::error_code& ec)
+  std::size_t in_avail(asio::error_code& ec)
   {
     return stream_impl_.in_avail(ec);
   }
@@ -287,8 +286,7 @@ private:
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_BUFFERED_STREAM_HPP
+#endif // ASIO_BUFFERED_STREAM_HPP

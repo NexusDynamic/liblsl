@@ -8,21 +8,20 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_COMPLETION_CONDITION_HPP
-#define BOOST_ASIO_COMPLETION_CONDITION_HPP
+#ifndef ASIO_COMPLETION_CONDITION_HPP
+#define ASIO_COMPLETION_CONDITION_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <cstddef>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/system/error_code.hpp>
+#include "asio/detail/type_traits.hpp"
+#include "asio/error_code.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 namespace detail {
@@ -109,7 +108,7 @@ template <typename T>
 struct is_completion_condition_helper<T,
     enable_if_t<
       is_same<
-        result_of_t<T(boost::system::error_code, std::size_t)>,
+        result_of_t<T(asio::error_code, std::size_t)>,
         bool
       >::value
     >
@@ -121,7 +120,7 @@ template <typename T>
 struct is_completion_condition_helper<T,
     enable_if_t<
       is_same<
-        result_of_t<T(boost::system::error_code, std::size_t)>,
+        result_of_t<T(asio::error_code, std::size_t)>,
         std::size_t
       >::value
     >
@@ -168,10 +167,10 @@ struct is_completion_condition : detail::is_completion_condition_helper<T>
  * Reading until a buffer is full:
  * @code
  * boost::array<char, 128> buf;
- * boost::system::error_code ec;
- * std::size_t n = boost::asio::read(
- *     sock, boost::asio::buffer(buf),
- *     boost::asio::transfer_all(), ec);
+ * asio::error_code ec;
+ * std::size_t n = asio::read(
+ *     sock, asio::buffer(buf),
+ *     asio::transfer_all(), ec);
  * if (ec)
  * {
  *   // An error occurred.
@@ -202,10 +201,10 @@ inline detail::transfer_all_t transfer_all()
  * Reading until a buffer is full or contains at least 64 bytes:
  * @code
  * boost::array<char, 128> buf;
- * boost::system::error_code ec;
- * std::size_t n = boost::asio::read(
- *     sock, boost::asio::buffer(buf),
- *     boost::asio::transfer_at_least(64), ec);
+ * asio::error_code ec;
+ * std::size_t n = asio::read(
+ *     sock, asio::buffer(buf),
+ *     asio::transfer_at_least(64), ec);
  * if (ec)
  * {
  *   // An error occurred.
@@ -236,10 +235,10 @@ inline detail::transfer_at_least_t transfer_at_least(std::size_t minimum)
  * Reading until a buffer is full or contains exactly 64 bytes:
  * @code
  * boost::array<char, 128> buf;
- * boost::system::error_code ec;
- * std::size_t n = boost::asio::read(
- *     sock, boost::asio::buffer(buf),
- *     boost::asio::transfer_exactly(64), ec);
+ * asio::error_code ec;
+ * std::size_t n = asio::read(
+ *     sock, asio::buffer(buf),
+ *     asio::transfer_exactly(64), ec);
  * if (ec)
  * {
  *   // An error occurred.
@@ -262,8 +261,7 @@ inline detail::transfer_exactly_t transfer_exactly(std::size_t size)
 /*@}*/
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_COMPLETION_CONDITION_HPP
+#endif // ASIO_COMPLETION_CONDITION_HPP

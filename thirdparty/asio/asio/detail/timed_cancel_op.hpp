@@ -8,27 +8,26 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_TIMED_CANCEL_OP_HPP
-#define BOOST_ASIO_DETAIL_TIMED_CANCEL_OP_HPP
+#ifndef ASIO_DETAIL_TIMED_CANCEL_OP_HPP
+#define ASIO_DETAIL_TIMED_CANCEL_OP_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/associated_cancellation_slot.hpp>
-#include <boost/asio/associator.hpp>
-#include <boost/asio/basic_waitable_timer.hpp>
-#include <boost/asio/cancellation_signal.hpp>
-#include <boost/asio/detail/atomic_count.hpp>
-#include <boost/asio/detail/completion_payload.hpp>
-#include <boost/asio/detail/completion_payload_handler.hpp>
-#include <boost/asio/detail/handler_alloc_helpers.hpp>
-#include <boost/asio/detail/type_traits.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/associated_cancellation_slot.hpp"
+#include "asio/associator.hpp"
+#include "asio/basic_waitable_timer.hpp"
+#include "asio/cancellation_signal.hpp"
+#include "asio/detail/atomic_count.hpp"
+#include "asio/detail/completion_payload.hpp"
+#include "asio/detail/completion_payload_handler.hpp"
+#include "asio/detail/handler_alloc_helpers.hpp"
+#include "asio/detail/type_traits.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -44,7 +43,7 @@ class timed_cancel_op
 public:
   using handler_type = Handler;
 
-  BOOST_ASIO_DEFINE_TAGGED_HANDLER_PTR(
+  ASIO_DEFINE_TAGGED_HANDLER_PTR(
       thread_info_base::timed_cancel_tag, timed_cancel_op);
 
   timed_cancel_op(Handler& handler, Timer timer,
@@ -133,9 +132,9 @@ public:
   {
     if (--ref_count_ == 0)
     {
-      ptr p = { boost::asio::detail::addressof(handler_), this, this };
+      ptr p = { asio::detail::addressof(handler_), this, this };
       Handler handler(static_cast<Handler&&>(handler_));
-      p.h = boost::asio::detail::addressof(handler);
+      p.h = asio::detail::addressof(handler);
       p.reset();
     }
   }
@@ -144,10 +143,10 @@ public:
   {
     if (--ref_count_ == 0)
     {
-      ptr p = { boost::asio::detail::addressof(handler_), this, this };
+      ptr p = { asio::detail::addressof(handler_), this, this };
       completion_payload_handler<payload_type, Handler> handler(
           static_cast<payload_type&&>(payload_storage_.payload_), handler_);
-      p.h = boost::asio::detail::addressof(handler.handler());
+      p.h = asio::detail::addressof(handler.handler());
       p.reset();
       handler();
     }
@@ -296,7 +295,7 @@ public:
     return cancellation_slot_type();
   }
 
-  void operator()(const boost::system::error_code&)
+  void operator()(const asio::error_code&)
   {
     Op* op = op_;
     op_ = nullptr;
@@ -356,8 +355,7 @@ struct associator<Associator,
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_TIMED_CANCEL_OP_HPP
+#endif // ASIO_DETAIL_TIMED_CANCEL_OP_HPP

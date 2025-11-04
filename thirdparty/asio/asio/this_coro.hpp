@@ -8,19 +8,18 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_THIS_CORO_HPP
-#define BOOST_ASIO_THIS_CORO_HPP
+#ifndef ASIO_THIS_CORO_HPP
+#define ASIO_THIS_CORO_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/type_traits.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/type_traits.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace this_coro {
 
@@ -33,7 +32,7 @@ struct executor_t
 };
 
 /// Awaitable object that returns the executor of the current coroutine.
-BOOST_ASIO_INLINE_VARIABLE constexpr executor_t executor;
+ASIO_INLINE_VARIABLE constexpr executor_t executor;
 
 /// Awaitable type that returns the cancellation state of the current coroutine.
 struct cancellation_state_t
@@ -47,18 +46,18 @@ struct cancellation_state_t
 /// coroutine.
 /**
  * @par Example
- * @code boost::asio::awaitable<void> my_coroutine()
+ * @code asio::awaitable<void> my_coroutine()
  * {
- *   boost::asio::cancellation_state cs
- *     = co_await boost::asio::this_coro::cancellation_state;
+ *   asio::cancellation_state cs
+ *     = co_await asio::this_coro::cancellation_state;
  *
  *   // ...
  *
- *   if (cs.cancelled() != boost::asio::cancellation_type::none)
+ *   if (cs.cancelled() != asio::cancellation_type::none)
  *     // ...
  * } @endcode
  */
-BOOST_ASIO_INLINE_VARIABLE constexpr cancellation_state_t cancellation_state;
+ASIO_INLINE_VARIABLE constexpr cancellation_state_t cancellation_state;
 
 #if defined(GENERATING_DOCUMENTATION)
 
@@ -67,21 +66,21 @@ BOOST_ASIO_INLINE_VARIABLE constexpr cancellation_state_t cancellation_state;
 /**
  * Let <tt>P</tt> be the cancellation slot associated with the current
  * coroutine's @ref co_spawn completion handler. Assigns a new
- * boost::asio::cancellation_state object <tt>S</tt>, constructed as
+ * asio::cancellation_state object <tt>S</tt>, constructed as
  * <tt>S(P)</tt>, into the current coroutine's cancellation state object.
  *
  * @par Example
- * @code boost::asio::awaitable<void> my_coroutine()
+ * @code asio::awaitable<void> my_coroutine()
  * {
- *   co_await boost::asio::this_coro::reset_cancellation_state();
+ *   co_await asio::this_coro::reset_cancellation_state();
  *
  *   // ...
  * } @endcode
  *
  * @note The cancellation state is shared by all coroutines in the same "thread
- * of execution" that was created using boost::asio::co_spawn.
+ * of execution" that was created using asio::co_spawn.
  */
-BOOST_ASIO_NODISCARD constexpr unspecified
+ASIO_NODISCARD constexpr unspecified
 reset_cancellation_state();
 
 /// Returns an awaitable object that may be used to reset the cancellation state
@@ -89,24 +88,24 @@ reset_cancellation_state();
 /**
  * Let <tt>P</tt> be the cancellation slot associated with the current
  * coroutine's @ref co_spawn completion handler. Assigns a new
- * boost::asio::cancellation_state object <tt>S</tt>, constructed as <tt>S(P,
+ * asio::cancellation_state object <tt>S</tt>, constructed as <tt>S(P,
  * std::forward<Filter>(filter))</tt>, into the current coroutine's
  * cancellation state object.
  *
  * @par Example
- * @code boost::asio::awaitable<void> my_coroutine()
+ * @code asio::awaitable<void> my_coroutine()
  * {
- *   co_await boost::asio::this_coro::reset_cancellation_state(
- *       boost::asio::enable_partial_cancellation());
+ *   co_await asio::this_coro::reset_cancellation_state(
+ *       asio::enable_partial_cancellation());
  *
  *   // ...
  * } @endcode
  *
  * @note The cancellation state is shared by all coroutines in the same "thread
- * of execution" that was created using boost::asio::co_spawn.
+ * of execution" that was created using asio::co_spawn.
  */
 template <typename Filter>
-BOOST_ASIO_NODISCARD constexpr unspecified
+ASIO_NODISCARD constexpr unspecified
 reset_cancellation_state(Filter&& filter);
 
 /// Returns an awaitable object that may be used to reset the cancellation state
@@ -114,26 +113,26 @@ reset_cancellation_state(Filter&& filter);
 /**
  * Let <tt>P</tt> be the cancellation slot associated with the current
  * coroutine's @ref co_spawn completion handler. Assigns a new
- * boost::asio::cancellation_state object <tt>S</tt>, constructed as <tt>S(P,
+ * asio::cancellation_state object <tt>S</tt>, constructed as <tt>S(P,
  * std::forward<InFilter>(in_filter),
  * std::forward<OutFilter>(out_filter))</tt>, into the current coroutine's
  * cancellation state object.
  *
  * @par Example
- * @code boost::asio::awaitable<void> my_coroutine()
+ * @code asio::awaitable<void> my_coroutine()
  * {
- *   co_await boost::asio::this_coro::reset_cancellation_state(
- *       boost::asio::enable_partial_cancellation(),
- *       boost::asio::disable_cancellation());
+ *   co_await asio::this_coro::reset_cancellation_state(
+ *       asio::enable_partial_cancellation(),
+ *       asio::disable_cancellation());
  *
  *   // ...
  * } @endcode
  *
  * @note The cancellation state is shared by all coroutines in the same "thread
- * of execution" that was created using boost::asio::co_spawn.
+ * of execution" that was created using asio::co_spawn.
  */
 template <typename InFilter, typename OutFilter>
-BOOST_ASIO_NODISCARD constexpr unspecified
+ASIO_NODISCARD constexpr unspecified
 reset_cancellation_state(
     InFilter&& in_filter,
     OutFilter&& out_filter);
@@ -142,29 +141,29 @@ reset_cancellation_state(
 /// coroutine throws if trying to suspend when it has been cancelled.
 /**
  * @par Example
- * @code boost::asio::awaitable<void> my_coroutine()
+ * @code asio::awaitable<void> my_coroutine()
  * {
- *   if (co_await boost::asio::this_coro::throw_if_cancelled)
+ *   if (co_await asio::this_coro::throw_if_cancelled)
  *     // ...
  *
  *   // ...
  * } @endcode
  */
-BOOST_ASIO_NODISCARD constexpr unspecified
+ASIO_NODISCARD constexpr unspecified
 throw_if_cancelled();
 
 /// Returns an awaitable object that may be used to specify whether the
 /// coroutine throws if trying to suspend when it has been cancelled.
 /**
  * @par Example
- * @code boost::asio::awaitable<void> my_coroutine()
+ * @code asio::awaitable<void> my_coroutine()
  * {
- *   co_await boost::asio::this_coro::throw_if_cancelled(false);
+ *   co_await asio::this_coro::throw_if_cancelled(false);
  *
  *   // ...
  * } @endcode
  */
-BOOST_ASIO_NODISCARD constexpr unspecified
+ASIO_NODISCARD constexpr unspecified
 throw_if_cancelled(bool value);
 
 #else // defined(GENERATING_DOCUMENTATION)
@@ -176,7 +175,7 @@ struct reset_cancellation_state_0_t
   }
 };
 
-BOOST_ASIO_NODISCARD inline constexpr reset_cancellation_state_0_t
+ASIO_NODISCARD inline constexpr reset_cancellation_state_0_t
 reset_cancellation_state()
 {
   return reset_cancellation_state_0_t();
@@ -196,7 +195,7 @@ struct reset_cancellation_state_1_t
 };
 
 template <typename Filter>
-BOOST_ASIO_NODISCARD inline constexpr reset_cancellation_state_1_t<
+ASIO_NODISCARD inline constexpr reset_cancellation_state_1_t<
     decay_t<Filter>>
 reset_cancellation_state(Filter&& filter)
 {
@@ -220,7 +219,7 @@ struct reset_cancellation_state_2_t
 };
 
 template <typename InFilter, typename OutFilter>
-BOOST_ASIO_NODISCARD inline constexpr
+ASIO_NODISCARD inline constexpr
 reset_cancellation_state_2_t<decay_t<InFilter>, decay_t<OutFilter>>
 reset_cancellation_state(InFilter&& in_filter, OutFilter&& out_filter)
 {
@@ -236,7 +235,7 @@ struct throw_if_cancelled_0_t
   }
 };
 
-BOOST_ASIO_NODISCARD inline constexpr throw_if_cancelled_0_t
+ASIO_NODISCARD inline constexpr throw_if_cancelled_0_t
 throw_if_cancelled()
 {
   return throw_if_cancelled_0_t();
@@ -252,7 +251,7 @@ struct throw_if_cancelled_1_t
   bool value;
 };
 
-BOOST_ASIO_NODISCARD inline constexpr throw_if_cancelled_1_t
+ASIO_NODISCARD inline constexpr throw_if_cancelled_1_t
 throw_if_cancelled(bool value)
 {
   return throw_if_cancelled_1_t(value);
@@ -262,8 +261,7 @@ throw_if_cancelled(bool value)
 
 } // namespace this_coro
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_THIS_CORO_HPP
+#endif // ASIO_THIS_CORO_HPP

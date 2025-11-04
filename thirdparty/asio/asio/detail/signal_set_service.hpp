@@ -8,46 +8,45 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_SIGNAL_SET_SERVICE_HPP
-#define BOOST_ASIO_DETAIL_SIGNAL_SET_SERVICE_HPP
+#ifndef ASIO_DETAIL_SIGNAL_SET_SERVICE_HPP
+#define ASIO_DETAIL_SIGNAL_SET_SERVICE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
 #include <cstddef>
 #include <signal.h>
-#include <boost/asio/associated_cancellation_slot.hpp>
-#include <boost/asio/cancellation_type.hpp>
-#include <boost/asio/error.hpp>
-#include <boost/asio/execution_context.hpp>
-#include <boost/asio/signal_set_base.hpp>
-#include <boost/asio/detail/handler_alloc_helpers.hpp>
-#include <boost/asio/detail/memory.hpp>
-#include <boost/asio/detail/op_queue.hpp>
-#include <boost/asio/detail/signal_handler.hpp>
-#include <boost/asio/detail/signal_op.hpp>
-#include <boost/asio/detail/socket_types.hpp>
+#include "asio/associated_cancellation_slot.hpp"
+#include "asio/cancellation_type.hpp"
+#include "asio/error.hpp"
+#include "asio/execution_context.hpp"
+#include "asio/signal_set_base.hpp"
+#include "asio/detail/handler_alloc_helpers.hpp"
+#include "asio/detail/memory.hpp"
+#include "asio/detail/op_queue.hpp"
+#include "asio/detail/signal_handler.hpp"
+#include "asio/detail/signal_op.hpp"
+#include "asio/detail/socket_types.hpp"
 
-#if defined(BOOST_ASIO_HAS_IOCP)
-# include <boost/asio/detail/win_iocp_io_context.hpp>
-#else // defined(BOOST_ASIO_HAS_IOCP)
-# include <boost/asio/detail/scheduler.hpp>
-#endif // defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
+# include "asio/detail/win_iocp_io_context.hpp"
+#else // defined(ASIO_HAS_IOCP)
+# include "asio/detail/scheduler.hpp"
+#endif // defined(ASIO_HAS_IOCP)
 
-#if !defined(BOOST_ASIO_WINDOWS) && !defined(__CYGWIN__)
-# if defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
-#  include <boost/asio/detail/io_uring_service.hpp>
-# else // defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
-#  include <boost/asio/detail/reactor.hpp>
-# endif // defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
-#endif // !defined(BOOST_ASIO_WINDOWS) && !defined(__CYGWIN__)
+#if !defined(ASIO_WINDOWS) && !defined(__CYGWIN__)
+# if defined(ASIO_HAS_IO_URING_AS_DEFAULT)
+#  include "asio/detail/io_uring_service.hpp"
+# else // defined(ASIO_HAS_IO_URING_AS_DEFAULT)
+#  include "asio/detail/reactor.hpp"
+# endif // defined(ASIO_HAS_IO_URING_AS_DEFAULT)
+#endif // !defined(ASIO_WINDOWS) && !defined(__CYGWIN__)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -57,9 +56,9 @@ enum { max_signal_number = NSIG };
 enum { max_signal_number = 128 };
 #endif
 
-extern BOOST_ASIO_DECL struct signal_state* get_signal_state();
+extern ASIO_DECL struct signal_state* get_signal_state();
 
-extern "C" BOOST_ASIO_DECL void boost_asio_signal_handler(int signal_number);
+extern "C" ASIO_DECL void asio_signal_handler(int signal_number);
 
 class signal_set_service :
   public execution_context_service_base<signal_set_service>
@@ -123,50 +122,50 @@ public:
   };
 
   // Constructor.
-  BOOST_ASIO_DECL signal_set_service(execution_context& context);
+  ASIO_DECL signal_set_service(execution_context& context);
 
   // Destructor.
-  BOOST_ASIO_DECL ~signal_set_service();
+  ASIO_DECL ~signal_set_service();
 
   // Destroy all user-defined handler objects owned by the service.
-  BOOST_ASIO_DECL void shutdown();
+  ASIO_DECL void shutdown();
 
   // Perform fork-related housekeeping.
-  BOOST_ASIO_DECL void notify_fork(
-      boost::asio::execution_context::fork_event fork_ev);
+  ASIO_DECL void notify_fork(
+      asio::execution_context::fork_event fork_ev);
 
   // Construct a new signal_set implementation.
-  BOOST_ASIO_DECL void construct(implementation_type& impl);
+  ASIO_DECL void construct(implementation_type& impl);
 
   // Destroy a signal_set implementation.
-  BOOST_ASIO_DECL void destroy(implementation_type& impl);
+  ASIO_DECL void destroy(implementation_type& impl);
 
   // Add a signal to a signal_set.
-  boost::system::error_code add(implementation_type& impl,
-      int signal_number, boost::system::error_code& ec)
+  asio::error_code add(implementation_type& impl,
+      int signal_number, asio::error_code& ec)
   {
     return add(impl, signal_number, signal_set_base::flags::dont_care, ec);
   }
 
   // Add a signal to a signal_set with the specified flags.
-  BOOST_ASIO_DECL boost::system::error_code add(implementation_type& impl,
+  ASIO_DECL asio::error_code add(implementation_type& impl,
       int signal_number, signal_set_base::flags_t f,
-      boost::system::error_code& ec);
+      asio::error_code& ec);
 
   // Remove a signal to a signal_set.
-  BOOST_ASIO_DECL boost::system::error_code remove(implementation_type& impl,
-      int signal_number, boost::system::error_code& ec);
+  ASIO_DECL asio::error_code remove(implementation_type& impl,
+      int signal_number, asio::error_code& ec);
 
   // Remove all signals from a signal_set.
-  BOOST_ASIO_DECL boost::system::error_code clear(implementation_type& impl,
-      boost::system::error_code& ec);
+  ASIO_DECL asio::error_code clear(implementation_type& impl,
+      asio::error_code& ec);
 
   // Cancel all operations associated with the signal set.
-  BOOST_ASIO_DECL boost::system::error_code cancel(implementation_type& impl,
-      boost::system::error_code& ec);
+  ASIO_DECL asio::error_code cancel(implementation_type& impl,
+      asio::error_code& ec);
 
   // Cancel a specific operation associated with the signal set.
-  BOOST_ASIO_DECL void cancel_ops_by_key(implementation_type& impl,
+  ASIO_DECL void cancel_ops_by_key(implementation_type& impl,
       void* cancellation_key);
 
   // Start an asynchronous operation to wait for a signal to be delivered.
@@ -175,11 +174,11 @@ public:
       Handler& handler, const IoExecutor& io_ex)
   {
     associated_cancellation_slot_t<Handler> slot
-      = boost::asio::get_associated_cancellation_slot(handler);
+      = asio::get_associated_cancellation_slot(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef signal_handler<Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(handler, io_ex);
 
@@ -190,7 +189,7 @@ public:
         &slot.template emplace<signal_op_cancellation>(this, &impl);
     }
 
-    BOOST_ASIO_HANDLER_CREATION((scheduler_.context(),
+    ASIO_HANDLER_CREATION((scheduler_.context(),
           *p.p, "signal_set", &impl, 0, "async_wait"));
 
     start_wait_op(impl, p.p);
@@ -198,23 +197,23 @@ public:
   }
 
   // Deliver notification that a particular signal occurred.
-  BOOST_ASIO_DECL static void deliver_signal(int signal_number);
+  ASIO_DECL static void deliver_signal(int signal_number);
 
 private:
   // Helper function to add a service to the global signal state.
-  BOOST_ASIO_DECL static void add_service(signal_set_service* service);
+  ASIO_DECL static void add_service(signal_set_service* service);
 
   // Helper function to remove a service from the global signal state.
-  BOOST_ASIO_DECL static void remove_service(signal_set_service* service);
+  ASIO_DECL static void remove_service(signal_set_service* service);
 
   // Helper function to create the pipe descriptors.
-  BOOST_ASIO_DECL static void open_descriptors();
+  ASIO_DECL static void open_descriptors();
 
   // Helper function to close the pipe descriptors.
-  BOOST_ASIO_DECL static void close_descriptors();
+  ASIO_DECL static void close_descriptors();
 
   // Helper function to start a wait operation.
-  BOOST_ASIO_DECL void start_wait_op(implementation_type& impl, signal_op* op);
+  ASIO_DECL void start_wait_op(implementation_type& impl, signal_op* op);
 
   // Helper class used to implement per-operation cancellation
   class signal_op_cancellation
@@ -243,34 +242,34 @@ private:
   };
 
   // The scheduler used for dispatching handlers.
-#if defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
   typedef class win_iocp_io_context scheduler_impl;
 #else
   typedef class scheduler scheduler_impl;
 #endif
   scheduler_impl& scheduler_;
 
-#if !defined(BOOST_ASIO_WINDOWS) \
-  && !defined(BOOST_ASIO_WINDOWS_RUNTIME) \
+#if !defined(ASIO_WINDOWS) \
+  && !defined(ASIO_WINDOWS_RUNTIME) \
   && !defined(__CYGWIN__)
   // The type used for processing pipe readiness notifications.
   class pipe_read_op;
 
-# if defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+# if defined(ASIO_HAS_IO_URING_AS_DEFAULT)
   // The io_uring service used for waiting for pipe readiness.
   io_uring_service& io_uring_service_;
 
   // The per I/O object data used for the pipe.
   io_uring_service::per_io_object_data io_object_data_;
-# else // defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+# else // defined(ASIO_HAS_IO_URING_AS_DEFAULT)
   // The reactor used for waiting for pipe readiness.
   reactor& reactor_;
 
   // The per-descriptor reactor data used for the pipe.
   reactor::per_descriptor_data reactor_data_;
-# endif // defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
-#endif // !defined(BOOST_ASIO_WINDOWS)
-       //   && !defined(BOOST_ASIO_WINDOWS_RUNTIME)
+# endif // defined(ASIO_HAS_IO_URING_AS_DEFAULT)
+#endif // !defined(ASIO_WINDOWS)
+       //   && !defined(ASIO_WINDOWS_RUNTIME)
        //   && !defined(__CYGWIN__)
 
   // A mapping from signal number to the registered signal sets.
@@ -283,12 +282,11 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#if defined(BOOST_ASIO_HEADER_ONLY)
-# include <boost/asio/detail/impl/signal_set_service.ipp>
-#endif // defined(BOOST_ASIO_HEADER_ONLY)
+#if defined(ASIO_HEADER_ONLY)
+# include "asio/detail/impl/signal_set_service.ipp"
+#endif // defined(ASIO_HEADER_ONLY)
 
-#endif // BOOST_ASIO_DETAIL_SIGNAL_SET_SERVICE_HPP
+#endif // ASIO_DETAIL_SIGNAL_SET_SERVICE_HPP

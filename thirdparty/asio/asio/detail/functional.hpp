@@ -8,17 +8,16 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_FUNCTIONAL_HPP
-#define BOOST_ASIO_DETAIL_FUNCTIONAL_HPP
+#ifndef ASIO_DETAIL_FUNCTIONAL_HPP
+#define ASIO_DETAIL_FUNCTIONAL_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <functional>
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -30,6 +29,5 @@ using std::ref;
 using std::reference_wrapper;
 
 } // namespace asio
-} // namespace boost
 
-#endif // BOOST_ASIO_DETAIL_FUNCTIONAL_HPP
+#endif // ASIO_DETAIL_FUNCTIONAL_HPP

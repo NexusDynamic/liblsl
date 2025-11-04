@@ -8,23 +8,22 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXPERIMENTAL_DETAIL_CHANNEL_RECEIVE_OP_HPP
-#define BOOST_ASIO_EXPERIMENTAL_DETAIL_CHANNEL_RECEIVE_OP_HPP
+#ifndef ASIO_EXPERIMENTAL_DETAIL_CHANNEL_RECEIVE_OP_HPP
+#define ASIO_EXPERIMENTAL_DETAIL_CHANNEL_RECEIVE_OP_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/bind_handler.hpp>
-#include <boost/asio/detail/completion_handler.hpp>
-#include <boost/asio/detail/handler_alloc_helpers.hpp>
-#include <boost/asio/error.hpp>
-#include <boost/asio/experimental/detail/channel_operation.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/bind_handler.hpp"
+#include "asio/detail/completion_handler.hpp"
+#include "asio/detail/handler_alloc_helpers.hpp"
+#include "asio/error.hpp"
+#include "asio/experimental/detail/channel_operation.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace experimental {
 namespace detail {
@@ -59,7 +58,7 @@ template <typename Payload, typename Handler, typename IoExecutor>
 class channel_receive_op : public channel_receive<Payload>
 {
 public:
-  BOOST_ASIO_DEFINE_HANDLER_PTR(channel_receive_op);
+  ASIO_DEFINE_HANDLER_PTR(channel_receive_op);
 
   template <typename... Args>
   channel_receive_op(Handler& handler, const IoExecutor& io_ex)
@@ -74,9 +73,9 @@ public:
   {
     // Take ownership of the operation object.
     channel_receive_op* o(static_cast<channel_receive_op*>(base));
-    ptr p = { boost::asio::detail::addressof(o->handler_), o, o };
+    ptr p = { asio::detail::addressof(o->handler_), o, o };
 
-    BOOST_ASIO_HANDLER_COMPLETION((*o));
+    ASIO_HANDLER_COMPLETION((*o));
 
     // Take ownership of the operation's outstanding work.
     channel_operation::handler_work<Handler, IoExecutor> w(
@@ -92,23 +91,23 @@ public:
     if (a != channel_operation::destroy_op)
     {
       Payload* payload = static_cast<Payload*>(v);
-      boost::asio::detail::completion_payload_handler<Payload, Handler> handler(
+      asio::detail::completion_payload_handler<Payload, Handler> handler(
           static_cast<Payload&&>(*payload), o->handler_);
-      p.h = boost::asio::detail::addressof(handler.handler_);
+      p.h = asio::detail::addressof(handler.handler_);
       p.reset();
-      BOOST_ASIO_HANDLER_INVOCATION_BEGIN(());
+      ASIO_HANDLER_INVOCATION_BEGIN(());
       if (a == channel_operation::immediate_op)
         w.immediate(handler, handler.handler_, 0);
       else if (a == channel_operation::dispatch_op)
         w.dispatch(handler, handler.handler_);
       else
         w.post(handler, handler.handler_);
-      BOOST_ASIO_HANDLER_INVOCATION_END;
+      ASIO_HANDLER_INVOCATION_END;
     }
     else
     {
-      boost::asio::detail::binder0<Handler> handler(o->handler_);
-      p.h = boost::asio::detail::addressof(handler.handler_);
+      asio::detail::binder0<Handler> handler(o->handler_);
+      p.h = asio::detail::addressof(handler.handler_);
       p.reset();
     }
   }
@@ -121,8 +120,7 @@ private:
 } // namespace detail
 } // namespace experimental
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_EXPERIMENTAL_DETAIL_CHANNEL_RECEIVE_OP_HPP
+#endif // ASIO_EXPERIMENTAL_DETAIL_CHANNEL_RECEIVE_OP_HPP

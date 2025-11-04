@@ -8,20 +8,19 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETACHED_HPP
-#define BOOST_ASIO_DETACHED_HPP
+#ifndef ASIO_DETACHED_HPP
+#define ASIO_DETACHED_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <memory>
-#include <boost/asio/detail/type_traits.hpp>
+#include "asio/detail/type_traits.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 /// A @ref completion_token type used to specify that an asynchronous operation
@@ -31,9 +30,9 @@ namespace asio {
  * detached. That is, there is no completion handler waiting for the
  * operation's result. A detached_t object may be passed as a handler to an
  * asynchronous operation, typically using the special value
- * @c boost::asio::detached. For example:
+ * @c asio::detached. For example:
  *
- * @code my_socket.async_send(my_buffer, boost::asio::detached);
+ * @code my_socket.async_send(my_buffer, asio::detached);
  * @endcode
  */
 class detached_t
@@ -93,15 +92,14 @@ public:
 /// A @ref completion_token object used to specify that an asynchronous
 /// operation is detached.
 /**
- * See the documentation for boost::asio::detached_t for a usage example.
+ * See the documentation for asio::detached_t for a usage example.
  */
-BOOST_ASIO_INLINE_VARIABLE constexpr detached_t detached;
+ASIO_INLINE_VARIABLE constexpr detached_t detached;
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#include <boost/asio/impl/detached.hpp>
+#include "asio/impl/detached.hpp"
 
-#endif // BOOST_ASIO_DETACHED_HPP
+#endif // ASIO_DETACHED_HPP

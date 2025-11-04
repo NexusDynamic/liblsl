@@ -8,22 +8,21 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_ASSOCIATED_CANCELLATION_SLOT_HPP
-#define BOOST_ASIO_ASSOCIATED_CANCELLATION_SLOT_HPP
+#ifndef ASIO_ASSOCIATED_CANCELLATION_SLOT_HPP
+#define ASIO_ASSOCIATED_CANCELLATION_SLOT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/associator.hpp>
-#include <boost/asio/cancellation_signal.hpp>
-#include <boost/asio/detail/functional.hpp>
-#include <boost/asio/detail/type_traits.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/associator.hpp"
+#include "asio/cancellation_signal.hpp"
+#include "asio/detail/functional.hpp"
+#include "asio/detail/type_traits.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 template <typename T, typename CancellationSlot>
@@ -141,7 +140,7 @@ struct associated_cancellation_slot
  * @returns <tt>associated_cancellation_slot<T>::get(t)</tt>
  */
 template <typename T>
-BOOST_ASIO_NODISCARD inline typename associated_cancellation_slot<T>::type
+ASIO_NODISCARD inline typename associated_cancellation_slot<T>::type
 get_associated_cancellation_slot(const T& t) noexcept
 {
   return associated_cancellation_slot<T>::get(t);
@@ -153,7 +152,7 @@ get_associated_cancellation_slot(const T& t) noexcept
  * CancellationSlot>::get(t, st)</tt>
  */
 template <typename T, typename CancellationSlot>
-BOOST_ASIO_NODISCARD inline auto get_associated_cancellation_slot(
+ASIO_NODISCARD inline auto get_associated_cancellation_slot(
     const T& t, const CancellationSlot& st) noexcept
   -> decltype(associated_cancellation_slot<T, CancellationSlot>::get(t, st))
 {
@@ -216,8 +215,7 @@ struct associated_cancellation_slot<reference_wrapper<T>, CancellationSlot>
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_ASSOCIATED_CANCELLATION_SLOT_HPP
+#endif // ASIO_ASSOCIATED_CANCELLATION_SLOT_HPP

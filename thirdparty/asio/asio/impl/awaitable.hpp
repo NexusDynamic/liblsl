@@ -8,39 +8,38 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IMPL_AWAITABLE_HPP
-#define BOOST_ASIO_IMPL_AWAITABLE_HPP
+#ifndef ASIO_IMPL_AWAITABLE_HPP
+#define ASIO_IMPL_AWAITABLE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <exception>
 #include <new>
 #include <tuple>
-#include <boost/asio/cancellation_signal.hpp>
-#include <boost/asio/cancellation_state.hpp>
-#include <boost/asio/detail/memory.hpp>
-#include <boost/asio/detail/thread_context.hpp>
-#include <boost/asio/detail/thread_info_base.hpp>
-#include <boost/asio/detail/throw_error.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/disposition.hpp>
-#include <boost/asio/error.hpp>
-#include <boost/asio/post.hpp>
-#include <boost/system/system_error.hpp>
-#include <boost/asio/this_coro.hpp>
+#include "asio/cancellation_signal.hpp"
+#include "asio/cancellation_state.hpp"
+#include "asio/detail/memory.hpp"
+#include "asio/detail/thread_context.hpp"
+#include "asio/detail/thread_info_base.hpp"
+#include "asio/detail/throw_error.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/disposition.hpp"
+#include "asio/error.hpp"
+#include "asio/post.hpp"
+#include "asio/system_error.hpp"
+#include "asio/this_coro.hpp"
 
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
-# if defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#  include <boost/asio/detail/source_location.hpp>
-# endif // defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
+# if defined(ASIO_HAS_SOURCE_LOCATION)
+#  include "asio/detail/source_location.hpp"
+# endif // defined(ASIO_HAS_SOURCE_LOCATION)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -86,8 +85,8 @@ template <typename, typename, typename> class awaitable_async_op;
 class awaitable_launch_context
 {
 public:
-  BOOST_ASIO_DECL void launch(void (*pump_fn)(void*), void* arg);
-  BOOST_ASIO_DECL bool is_launching();
+  ASIO_DECL void launch(void (*pump_fn)(void*), void* arg);
+  ASIO_DECL bool is_launching();
 };
 
 struct awaitable_thread_is_launching {};
@@ -96,23 +95,23 @@ template <typename Executor>
 class awaitable_frame_base : public awaitable_launch_context
 {
 public:
-#if !defined(BOOST_ASIO_DISABLE_AWAITABLE_FRAME_RECYCLING)
+#if !defined(ASIO_DISABLE_AWAITABLE_FRAME_RECYCLING)
   void* operator new(std::size_t size)
   {
-    return boost::asio::detail::thread_info_base::allocate(
-        boost::asio::detail::thread_info_base::awaitable_frame_tag(),
-        boost::asio::detail::thread_context::top_of_thread_call_stack(),
+    return asio::detail::thread_info_base::allocate(
+        asio::detail::thread_info_base::awaitable_frame_tag(),
+        asio::detail::thread_context::top_of_thread_call_stack(),
         size);
   }
 
   void operator delete(void* pointer, std::size_t size)
   {
-    boost::asio::detail::thread_info_base::deallocate(
-        boost::asio::detail::thread_info_base::awaitable_frame_tag(),
-        boost::asio::detail::thread_context::top_of_thread_call_stack(),
+    asio::detail::thread_info_base::deallocate(
+        asio::detail::thread_info_base::awaitable_frame_tag(),
+        asio::detail::thread_context::top_of_thread_call_stack(),
         pointer, size);
   }
-#endif // !defined(BOOST_ASIO_DISABLE_AWAITABLE_FRAME_RECYCLING)
+#endif // !defined(ASIO_DISABLE_AWAITABLE_FRAME_RECYCLING)
 
   // The frame starts in a suspended state until the awaitable_thread object
   // pumps the stack.
@@ -176,32 +175,32 @@ public:
   {
     if (attached_thread_->entry_point()->throw_if_cancelled_)
       if (!!attached_thread_->get_cancellation_state().cancelled())
-        throw_error(boost::asio::error::operation_aborted, "co_await");
+        throw_error(asio::error::operation_aborted, "co_await");
     return a;
   }
 
   template <typename Op>
   auto await_transform(Op&& op,
       constraint_t<is_async_operation<Op>::value> = 0
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
-# if defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
+# if defined(ASIO_HAS_SOURCE_LOCATION)
       , detail::source_location location = detail::source_location::current()
-# endif // defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+# endif // defined(ASIO_HAS_SOURCE_LOCATION)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
     )
   {
     if (attached_thread_->entry_point()->throw_if_cancelled_)
       if (!!attached_thread_->get_cancellation_state().cancelled())
-        throw_error(boost::asio::error::operation_aborted, "co_await");
+        throw_error(asio::error::operation_aborted, "co_await");
 
     return awaitable_async_op<
       completion_signature_of_t<Op>, decay_t<Op>, Executor>{
         std::forward<Op>(op), this
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
-# if defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
+# if defined(ASIO_HAS_SOURCE_LOCATION)
         , location
-# endif // defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+# endif // defined(ASIO_HAS_SOURCE_LOCATION)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
       };
   }
 
@@ -653,8 +652,8 @@ private:
   } u_;
 
   awaitable_frame_base<Executor>* top_of_stack_;
-  boost::asio::cancellation_slot parent_cancellation_slot_;
-  boost::asio::cancellation_state cancellation_state_;
+  asio::cancellation_slot parent_cancellation_slot_;
+  asio::cancellation_state cancellation_state_;
   bool has_executor_;
   bool throw_if_cancelled_;
 };
@@ -878,7 +877,7 @@ public:
     if (*result != no_error)
     {
       Disposition d = std::exchange(*result, Disposition());
-      boost::asio::throw_exception(static_cast<Disposition&&>(d));
+      asio::throw_exception(static_cast<Disposition&&>(d));
     }
   }
 
@@ -919,7 +918,7 @@ public:
     if (*result.disposition_ != no_error)
     {
       Disposition d = std::exchange(*result.disposition_, Disposition());
-      boost::asio::throw_exception(static_cast<Disposition&&>(d));
+      asio::throw_exception(static_cast<Disposition&&>(d));
     }
     return std::move(*result.value_);
   }
@@ -997,7 +996,7 @@ public:
     if (*result.disposition_ != no_error)
     {
       Disposition d = std::exchange(*result.disposition_, Disposition());
-      boost::asio::throw_exception(static_cast<Disposition&&>(d));
+      asio::throw_exception(static_cast<Disposition&&>(d));
     }
     return std::move(*result.value_);
   }
@@ -1013,20 +1012,20 @@ public:
   typedef awaitable_async_op_handler<Signature, Executor> handler_type;
 
   awaitable_async_op(Op&& o, awaitable_frame_base<Executor>* frame
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
-# if defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
+# if defined(ASIO_HAS_SOURCE_LOCATION)
       , const detail::source_location& location
-# endif // defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+# endif // defined(ASIO_HAS_SOURCE_LOCATION)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
     )
     : op_(std::forward<Op>(o)),
       frame_(frame),
       result_()
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
-# if defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
+# if defined(ASIO_HAS_SOURCE_LOCATION)
     , location_(location)
-# endif // defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+# endif // defined(ASIO_HAS_SOURCE_LOCATION)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
   {
   }
 
@@ -1041,12 +1040,12 @@ public:
         [](void* arg)
         {
           awaitable_async_op* self = static_cast<awaitable_async_op*>(arg);
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
-# if defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-          BOOST_ASIO_HANDLER_LOCATION((self->location_.file_name(),
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
+# if defined(ASIO_HAS_SOURCE_LOCATION)
+          ASIO_HANDLER_LOCATION((self->location_.file_name(),
               self->location_.line(), self->location_.function_name()));
-# endif // defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+# endif // defined(ASIO_HAS_SOURCE_LOCATION)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
           std::forward<Op&&>(self->op_)(
               handler_type(self->frame_->detach_thread(), self->result_));
         }, this);
@@ -1061,45 +1060,44 @@ private:
   Op&& op_;
   awaitable_frame_base<Executor>* frame_;
   typename handler_type::result_type result_;
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
-# if defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
+# if defined(ASIO_HAS_SOURCE_LOCATION)
   detail::source_location location_;
-# endif // defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+# endif // defined(ASIO_HAS_SOURCE_LOCATION)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
 };
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
 #if !defined(GENERATING_DOCUMENTATION)
-# if defined(BOOST_ASIO_HAS_STD_COROUTINE)
+# if defined(ASIO_HAS_STD_COROUTINE)
 
 namespace std {
 
 template <typename T, typename Executor, typename... Args>
-struct coroutine_traits<boost::asio::awaitable<T, Executor>, Args...>
+struct coroutine_traits<asio::awaitable<T, Executor>, Args...>
 {
-  typedef boost::asio::detail::awaitable_frame<T, Executor> promise_type;
+  typedef asio::detail::awaitable_frame<T, Executor> promise_type;
 };
 
 } // namespace std
 
-# else // defined(BOOST_ASIO_HAS_STD_COROUTINE)
+# else // defined(ASIO_HAS_STD_COROUTINE)
 
 namespace std { namespace experimental {
 
 template <typename T, typename Executor, typename... Args>
-struct coroutine_traits<boost::asio::awaitable<T, Executor>, Args...>
+struct coroutine_traits<asio::awaitable<T, Executor>, Args...>
 {
-  typedef boost::asio::detail::awaitable_frame<T, Executor> promise_type;
+  typedef asio::detail::awaitable_frame<T, Executor> promise_type;
 };
 
 }} // namespace std::experimental
 
-# endif // defined(BOOST_ASIO_HAS_STD_COROUTINE)
+# endif // defined(ASIO_HAS_STD_COROUTINE)
 #endif // !defined(GENERATING_DOCUMENTATION)
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_IMPL_AWAITABLE_HPP
+#endif // ASIO_IMPL_AWAITABLE_HPP

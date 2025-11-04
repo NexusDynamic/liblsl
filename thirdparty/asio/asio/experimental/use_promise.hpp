@@ -9,20 +9,19 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXPERIMENTAL_USE_PROMISE_HPP
-#define BOOST_ASIO_EXPERIMENTAL_USE_PROMISE_HPP
+#ifndef ASIO_EXPERIMENTAL_USE_PROMISE_HPP
+#define ASIO_EXPERIMENTAL_USE_PROMISE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <memory>
-#include <boost/asio/detail/type_traits.hpp>
+#include "asio/detail/type_traits.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace experimental {
 
@@ -100,14 +99,13 @@ private:
   Allocator allocator_;
 };
 
-BOOST_ASIO_INLINE_VARIABLE constexpr use_promise_t<> use_promise;
+ASIO_INLINE_VARIABLE constexpr use_promise_t<> use_promise;
 
 } // namespace experimental
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#include <boost/asio/experimental/impl/use_promise.hpp>
+#include "asio/experimental/impl/use_promise.hpp"
 
-#endif // BOOST_ASIO_EXPERIMENTAL_USE_CORO_HPP
+#endif // ASIO_EXPERIMENTAL_USE_CORO_HPP

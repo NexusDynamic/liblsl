@@ -8,24 +8,23 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXPERIMENTAL_CONCURRENT_CHANNEL_HPP
-#define BOOST_ASIO_EXPERIMENTAL_CONCURRENT_CHANNEL_HPP
+#ifndef ASIO_EXPERIMENTAL_CONCURRENT_CHANNEL_HPP
+#define ASIO_EXPERIMENTAL_CONCURRENT_CHANNEL_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/any_io_executor.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/execution/executor.hpp>
-#include <boost/asio/is_executor.hpp>
-#include <boost/asio/experimental/basic_concurrent_channel.hpp>
-#include <boost/asio/experimental/channel_traits.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/any_io_executor.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/execution/executor.hpp"
+#include "asio/is_executor.hpp"
+#include "asio/experimental/basic_concurrent_channel.hpp"
+#include "asio/experimental/channel_traits.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace experimental {
 namespace detail {
@@ -71,8 +70,7 @@ using concurrent_channel = typename detail::concurrent_channel_type<
 
 } // namespace experimental
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_EXPERIMENTAL_CONCURRENT_CHANNEL_HPP
+#endif // ASIO_EXPERIMENTAL_CONCURRENT_CHANNEL_HPP

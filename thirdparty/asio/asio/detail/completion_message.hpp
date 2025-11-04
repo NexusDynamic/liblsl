@@ -8,21 +8,20 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_COMPLETION_MESSAGE_HPP
-#define BOOST_ASIO_DETAIL_COMPLETION_MESSAGE_HPP
+#ifndef ASIO_DETAIL_COMPLETION_MESSAGE_HPP
+#define ASIO_DETAIL_COMPLETION_MESSAGE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <tuple>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/detail/utility.hpp>
+#include "asio/detail/type_traits.hpp"
+#include "asio/detail/utility.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -105,12 +104,12 @@ public:
   template <typename Handler>
   void receive(Handler& h)
   {
-    this->do_receive(h, boost::asio::detail::index_sequence_for<Args...>());
+    this->do_receive(h, asio::detail::index_sequence_for<Args...>());
   }
 
 private:
   template <typename Handler, std::size_t... I>
-  void do_receive(Handler& h, boost::asio::detail::index_sequence<I...>)
+  void do_receive(Handler& h, asio::detail::index_sequence<I...>)
   {
     static_cast<Handler&&>(h)(
         std::get<I>(static_cast<args_type&&>(args_))...);
@@ -122,8 +121,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_COMPLETION_MESSAGE_HPP
+#endif // ASIO_DETAIL_COMPLETION_MESSAGE_HPP

@@ -8,37 +8,36 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IP_BASIC_RESOLVER_ITERATOR_HPP
-#define BOOST_ASIO_IP_BASIC_RESOLVER_ITERATOR_HPP
+#ifndef ASIO_IP_BASIC_RESOLVER_ITERATOR_HPP
+#define ASIO_IP_BASIC_RESOLVER_ITERATOR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <cstddef>
 #include <cstring>
 #include <iterator>
 #include <string>
 #include <vector>
-#include <boost/asio/detail/memory.hpp>
-#include <boost/asio/detail/socket_ops.hpp>
-#include <boost/asio/detail/socket_types.hpp>
-#include <boost/asio/ip/basic_resolver_entry.hpp>
+#include "asio/detail/memory.hpp"
+#include "asio/detail/socket_ops.hpp"
+#include "asio/detail/socket_types.hpp"
+#include "asio/ip/basic_resolver_entry.hpp"
 
-#if defined(BOOST_ASIO_WINDOWS_RUNTIME)
-# include <boost/asio/detail/winrt_utils.hpp>
-#endif // defined(BOOST_ASIO_WINDOWS_RUNTIME)
+#if defined(ASIO_WINDOWS_RUNTIME)
+# include "asio/detail/winrt_utils.hpp"
+#endif // defined(ASIO_WINDOWS_RUNTIME)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace ip {
 
 /// An iterator over the entries produced by a resolver.
 /**
- * The boost::asio::ip::basic_resolver_iterator class template is used to define
+ * The asio::ip::basic_resolver_iterator class template is used to define
  * iterators over the results returned by a resolver.
  *
  * The iterator's value_type, obtained when the iterator is dereferenced, is:
@@ -176,15 +175,14 @@ protected:
   }
 
   typedef std::vector<basic_resolver_entry<InternetProtocol>> values_type;
-  typedef boost::asio::detail::shared_ptr<values_type> values_ptr_type;
+  typedef asio::detail::shared_ptr<values_type> values_ptr_type;
   values_ptr_type values_;
   std::size_t index_;
 };
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_IP_BASIC_RESOLVER_ITERATOR_HPP
+#endif // ASIO_IP_BASIC_RESOLVER_ITERATOR_HPP

@@ -8,20 +8,18 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_BUFFERED_READ_STREAM_FWD_HPP
-#define BOOST_ASIO_BUFFERED_READ_STREAM_FWD_HPP
+#ifndef ASIO_BUFFERED_READ_STREAM_FWD_HPP
+#define ASIO_BUFFERED_READ_STREAM_FWD_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-namespace boost {
 namespace asio {
 
 template <typename Stream>
 class buffered_read_stream;
 
 } // namespace asio
-} // namespace boost
 
-#endif // BOOST_ASIO_BUFFERED_READ_STREAM_FWD_HPP
+#endif // ASIO_BUFFERED_READ_STREAM_FWD_HPP

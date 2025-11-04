@@ -8,28 +8,27 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IMPL_USE_FUTURE_HPP
-#define BOOST_ASIO_IMPL_USE_FUTURE_HPP
+#ifndef ASIO_IMPL_USE_FUTURE_HPP
+#define ASIO_IMPL_USE_FUTURE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <tuple>
-#include <boost/asio/async_result.hpp>
-#include <boost/asio/detail/memory.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/dispatch.hpp>
-#include <boost/asio/disposition.hpp>
-#include <boost/asio/execution.hpp>
-#include <boost/asio/packaged_task.hpp>
-#include <boost/system/system_error.hpp>
-#include <boost/asio/system_executor.hpp>
+#include "asio/async_result.hpp"
+#include "asio/detail/memory.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/dispatch.hpp"
+#include "asio/disposition.hpp"
+#include "asio/execution.hpp"
+#include "asio/packaged_task.hpp"
+#include "asio/system_error.hpp"
+#include "asio/system_executor.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -37,37 +36,37 @@ template <typename T, typename F, typename... Args>
 inline void promise_invoke_and_set(std::promise<T>& p,
     F& f, Args&&... args)
 {
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
   try
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
   {
     p.set_value(f(static_cast<Args&&>(args)...));
   }
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
   catch (...)
   {
     p.set_exception(std::current_exception());
   }
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
 }
 
 template <typename F, typename... Args>
 inline void promise_invoke_and_set(std::promise<void>& p,
     F& f, Args&&... args)
 {
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
   try
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
   {
     f(static_cast<Args&&>(args)...);
     p.set_value();
   }
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
   catch (...)
   {
     p.set_exception(std::current_exception());
   }
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
 }
 
 // A function object adapter to invoke a nullary function object and capture
@@ -84,18 +83,18 @@ public:
 
   void operator()()
   {
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
     try
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
     {
       f_();
     }
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
     catch (...)
     {
       p_->set_exception(std::current_exception());
     }
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
   }
 
 private:
@@ -116,7 +115,7 @@ public:
 
   execution_context& query(execution::context_t) const noexcept
   {
-    return boost::asio::query(system_executor(), execution::context);
+    return asio::query(system_executor(), execution::context);
   }
 
   static constexpr Blocking query(execution::blocking_t)
@@ -139,11 +138,11 @@ public:
   template <typename F>
   void execute(F&& f) const
   {
-    boost::asio::require(system_executor(), Blocking()).execute(
+    asio::require(system_executor(), Blocking()).execute(
         promise_invoker<T, F>(p_, static_cast<F&&>(f)));
   }
 
-#if !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#if !defined(ASIO_NO_TS_EXECUTORS)
   execution_context& context() const noexcept
   {
     return system_executor().context();
@@ -171,7 +170,7 @@ public:
     system_executor().defer(
         promise_invoker<T, F>(p_, static_cast<F&&>(f)), a);
   }
-#endif // !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#endif // !defined(ASIO_NO_TS_EXECUTORS)
 
   friend bool operator==(const promise_executor& a,
       const promise_executor& b) noexcept
@@ -212,7 +211,7 @@ protected:
   template <typename Allocator>
   void create_promise(const Allocator& a)
   {
-    BOOST_ASIO_REBIND_ALLOC(Allocator, char) b(a);
+    ASIO_REBIND_ALLOC(Allocator, char) b(a);
     p_ = std::allocate_shared<std::promise<T>>(b, std::allocator_arg, b);
   }
 
@@ -538,41 +537,41 @@ public:
 
 namespace traits {
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
 
 template <typename T, typename Blocking>
 struct equality_comparable<
-    boost::asio::detail::promise_executor<T, Blocking>>
+    asio::detail::promise_executor<T, Blocking>>
 {
   static constexpr bool is_valid = true;
   static constexpr bool is_noexcept = true;
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT)
 
 template <typename T, typename Blocking, typename Function>
 struct execute_member<
-    boost::asio::detail::promise_executor<T, Blocking>, Function>
+    asio::detail::promise_executor<T, Blocking>, Function>
 {
   static constexpr bool is_valid = true;
   static constexpr bool is_noexcept = false;
   typedef void result_type;
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT)
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
 
 template <typename T, typename Blocking, typename Property>
 struct query_static_constexpr_member<
-    boost::asio::detail::promise_executor<T, Blocking>,
+    asio::detail::promise_executor<T, Blocking>,
     Property,
-    typename boost::asio::enable_if<
-      boost::asio::is_convertible<
+    typename asio::enable_if<
+      asio::is_convertible<
         Property,
-        boost::asio::execution::blocking_t
+        asio::execution::blocking_t
       >::value
     >::type
   >
@@ -587,58 +586,57 @@ struct query_static_constexpr_member<
   }
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
 
 template <typename T, typename Blocking>
 struct query_member<
-    boost::asio::detail::promise_executor<T, Blocking>,
+    asio::detail::promise_executor<T, Blocking>,
     execution::context_t
   >
 {
   static constexpr bool is_valid = true;
   static constexpr bool is_noexcept = true;
-  typedef boost::asio::system_context& result_type;
+  typedef asio::system_context& result_type;
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_REQUIRE_MEMBER_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_REQUIRE_MEMBER_TRAIT)
 
 template <typename T, typename Blocking>
 struct require_member<
-    boost::asio::detail::promise_executor<T, Blocking>,
+    asio::detail::promise_executor<T, Blocking>,
     execution::blocking_t::possibly_t
   >
 {
   static constexpr bool is_valid = true;
   static constexpr bool is_noexcept = true;
-  typedef boost::asio::detail::promise_executor<T,
+  typedef asio::detail::promise_executor<T,
       execution::blocking_t::possibly_t> result_type;
 };
 
 template <typename T, typename Blocking>
 struct require_member<
-    boost::asio::detail::promise_executor<T, Blocking>,
+    asio::detail::promise_executor<T, Blocking>,
     execution::blocking_t::never_t
   >
 {
   static constexpr bool is_valid = true;
   static constexpr bool is_noexcept = true;
-  typedef boost::asio::detail::promise_executor<T,
+  typedef asio::detail::promise_executor<T,
       execution::blocking_t::never_t> result_type;
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_REQUIRE_MEMBER_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_REQUIRE_MEMBER_TRAIT)
 
 } // namespace traits
 
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_IMPL_USE_FUTURE_HPP
+#endif // ASIO_IMPL_USE_FUTURE_HPP

@@ -8,24 +8,23 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_IMPL_POSIX_THREAD_IPP
-#define BOOST_ASIO_DETAIL_IMPL_POSIX_THREAD_IPP
+#ifndef ASIO_DETAIL_IMPL_POSIX_THREAD_IPP
+#define ASIO_DETAIL_IMPL_POSIX_THREAD_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_PTHREADS)
+#if defined(ASIO_HAS_PTHREADS)
 
-#include <boost/asio/detail/posix_thread.hpp>
-#include <boost/asio/detail/throw_error.hpp>
-#include <boost/asio/error.hpp>
+#include "asio/detail/posix_thread.hpp"
+#include "asio/detail/throw_error.hpp"
+#include "asio/error.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -58,18 +57,18 @@ std::size_t posix_thread::hardware_concurrency()
 posix_thread::func_base* posix_thread::start_thread(func_base* arg)
 {
   int error = ::pthread_create(&arg->thread_, 0,
-        boost_asio_detail_posix_thread_function, arg);
+        asio_detail_posix_thread_function, arg);
   if (error != 0)
   {
     arg->destroy();
-    boost::system::error_code ec(error,
-        boost::asio::error::get_system_category());
-    boost::asio::detail::throw_error(ec, "thread");
+    asio::error_code ec(error,
+        asio::error::get_system_category());
+    asio::detail::throw_error(ec, "thread");
   }
   return arg;
 }
 
-void* boost_asio_detail_posix_thread_function(void* arg)
+void* asio_detail_posix_thread_function(void* arg)
 {
   static_cast<posix_thread::func_base*>(arg)->run();
   return 0;
@@ -77,10 +76,9 @@ void* boost_asio_detail_posix_thread_function(void* arg)
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // defined(BOOST_ASIO_HAS_PTHREADS)
+#endif // defined(ASIO_HAS_PTHREADS)
 
-#endif // BOOST_ASIO_DETAIL_IMPL_POSIX_THREAD_IPP
+#endif // ASIO_DETAIL_IMPL_POSIX_THREAD_IPP

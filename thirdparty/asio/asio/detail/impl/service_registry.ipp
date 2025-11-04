@@ -8,21 +8,20 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_IMPL_SERVICE_REGISTRY_IPP
-#define BOOST_ASIO_DETAIL_IMPL_SERVICE_REGISTRY_IPP
+#ifndef ASIO_DETAIL_IMPL_SERVICE_REGISTRY_IPP
+#define ASIO_DETAIL_IMPL_SERVICE_REGISTRY_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <vector>
-#include <boost/asio/detail/service_registry.hpp>
-#include <boost/asio/detail/throw_exception.hpp>
+#include "asio/detail/service_registry.hpp"
+#include "asio/detail/throw_exception.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -63,7 +62,7 @@ void service_registry::notify_fork(execution_context::fork_event fork_ev)
   // back into this class.
   std::vector<execution_context::service*> services;
   {
-    boost::asio::detail::mutex::scoped_lock lock(mutex_);
+    asio::detail::mutex::scoped_lock lock(mutex_);
     execution_context::service* service = first_service_;
     while (service)
     {
@@ -120,7 +119,7 @@ execution_context::service* service_registry::do_use_service(
     const execution_context::service::key& key,
     factory_type factory, void* owner)
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  asio::detail::mutex::scoped_lock lock(mutex_);
 
   // First see if there is an existing service object with the given key.
   execution_context::service* service = first_service_;
@@ -161,16 +160,16 @@ void service_registry::do_add_service(
     execution_context::service* new_service)
 {
   if (&owner_ != &new_service->context())
-    boost::asio::detail::throw_exception(invalid_service_owner());
+    asio::detail::throw_exception(invalid_service_owner());
 
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  asio::detail::mutex::scoped_lock lock(mutex_);
 
   // Check if there is an existing service object with the given key.
   execution_context::service* service = first_service_;
   while (service)
   {
     if (keys_match(service->key_, key))
-      boost::asio::detail::throw_exception(service_already_exists());
+      asio::detail::throw_exception(service_already_exists());
     service = service->next_;
   }
 
@@ -185,7 +184,7 @@ void service_registry::do_add_service(
 bool service_registry::do_has_service(
     const execution_context::service::key& key) const
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  asio::detail::mutex::scoped_lock lock(mutex_);
 
   execution_context::service* service = first_service_;
   while (service)
@@ -200,8 +199,7 @@ bool service_registry::do_has_service(
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_IMPL_SERVICE_REGISTRY_IPP
+#endif // ASIO_DETAIL_IMPL_SERVICE_REGISTRY_IPP

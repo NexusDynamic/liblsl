@@ -8,25 +8,24 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_FILE_BASE_HPP
-#define BOOST_ASIO_FILE_BASE_HPP
+#ifndef ASIO_FILE_BASE_HPP
+#define ASIO_FILE_BASE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_FILE) \
+#if defined(ASIO_HAS_FILE) \
   || defined(GENERATING_DOCUMENTATION)
 
-#if !defined(BOOST_ASIO_WINDOWS)
+#if !defined(ASIO_WINDOWS)
 # include <fcntl.h>
-#endif // !defined(BOOST_ASIO_WINDOWS)
+#endif // !defined(ASIO_WINDOWS)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 /// The file_base class is used as a base for the basic_stream_file and
@@ -66,7 +65,7 @@ public:
 #else
   enum flags
   {
-#if defined(BOOST_ASIO_WINDOWS)
+#if defined(ASIO_WINDOWS)
     read_only = 1,
     write_only = 2,
     read_write = 4,
@@ -75,7 +74,7 @@ public:
     exclusive = 32,
     truncate = 64,
     sync_all_on_write = 128
-#else // defined(BOOST_ASIO_WINDOWS)
+#else // defined(ASIO_WINDOWS)
     read_only = O_RDONLY,
     write_only = O_WRONLY,
     read_write = O_RDWR,
@@ -84,7 +83,7 @@ public:
     exclusive = O_EXCL,
     truncate = O_TRUNC,
     sync_all_on_write = O_SYNC
-#endif // defined(BOOST_ASIO_WINDOWS)
+#endif // defined(ASIO_WINDOWS)
   };
 
   // Implement bitmask operations as shown in C++ Std [lib.bitmask.types].
@@ -158,11 +157,10 @@ protected:
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // defined(BOOST_ASIO_HAS_FILE)
+#endif // defined(ASIO_HAS_FILE)
        //   || defined(GENERATING_DOCUMENTATION)
 
-#endif // BOOST_ASIO_FILE_BASE_HPP
+#endif // ASIO_FILE_BASE_HPP

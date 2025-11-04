@@ -8,29 +8,28 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_RESOLVER_THREAD_POOL_HPP
-#define BOOST_ASIO_DETAIL_RESOLVER_THREAD_POOL_HPP
+#ifndef ASIO_DETAIL_RESOLVER_THREAD_POOL_HPP
+#define ASIO_DETAIL_RESOLVER_THREAD_POOL_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/execution_context.hpp>
-#include <boost/asio/detail/mutex.hpp>
-#include <boost/asio/detail/resolve_op.hpp>
-#include <boost/asio/detail/scheduler.hpp>
-#include <boost/asio/detail/thread_group.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/execution_context.hpp"
+#include "asio/detail/mutex.hpp"
+#include "asio/detail/resolve_op.hpp"
+#include "asio/detail/scheduler.hpp"
+#include "asio/detail/thread_group.hpp"
 
-#if defined(BOOST_ASIO_HAS_IOCP)
-# include <boost/asio/detail/win_iocp_io_context.hpp>
-#else // defined(BOOST_ASIO_HAS_IOCP)
-# include <boost/asio/detail/scheduler.hpp>
-#endif // defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
+# include "asio/detail/win_iocp_io_context.hpp"
+#else // defined(ASIO_HAS_IOCP)
+# include "asio/detail/scheduler.hpp"
+#endif // defined(ASIO_HAS_IOCP)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -38,26 +37,26 @@ class resolver_thread_pool :
   public execution_context_service_base<resolver_thread_pool>
 {
 public:
-#if defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
   typedef class win_iocp_io_context scheduler_impl;
 #else
   typedef class scheduler scheduler_impl;
 #endif
 
   // Constructor.
-  BOOST_ASIO_DECL resolver_thread_pool(execution_context& context);
+  ASIO_DECL resolver_thread_pool(execution_context& context);
 
   // Destructor.
-  BOOST_ASIO_DECL ~resolver_thread_pool();
+  ASIO_DECL ~resolver_thread_pool();
 
   // Destroy all user-defined handler objects owned by the service.
-  BOOST_ASIO_DECL void shutdown();
+  ASIO_DECL void shutdown();
 
   // Perform any fork-related housekeeping.
-  BOOST_ASIO_DECL void notify_fork(execution_context::fork_event fork_ev);
+  ASIO_DECL void notify_fork(execution_context::fork_event fork_ev);
 
   // Helper function to start an asynchronous resolve operation.
-  BOOST_ASIO_DECL void start_resolve_op(resolve_op* op);
+  ASIO_DECL void start_resolve_op(resolve_op* op);
 
   // Get the underlying scheduler implementation.
   scheduler_impl& scheduler()
@@ -70,13 +69,13 @@ private:
   class work_scheduler_runner;
 
   // Start the work scheduler if it's not already running.
-  BOOST_ASIO_DECL void start_work_threads();
+  ASIO_DECL void start_work_threads();
 
   // The scheduler implementation used to post completions.
   scheduler_impl& scheduler_;
 
   // Mutex to protect access to internal data.
-  boost::asio::detail::mutex mutex_;
+  asio::detail::mutex mutex_;
 
   // Private scheduler used for performing asynchronous host resolution.
   scheduler_impl work_scheduler_;
@@ -96,12 +95,11 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#if defined(BOOST_ASIO_HEADER_ONLY)
-# include <boost/asio/detail/impl/resolver_thread_pool.ipp>
-#endif // defined(BOOST_ASIO_HEADER_ONLY)
+#if defined(ASIO_HEADER_ONLY)
+# include "asio/detail/impl/resolver_thread_pool.ipp"
+#endif // defined(ASIO_HEADER_ONLY)
 
-#endif // BOOST_ASIO_DETAIL_RESOLVER_THREAD_POOL_HPP
+#endif // ASIO_DETAIL_RESOLVER_THREAD_POOL_HPP

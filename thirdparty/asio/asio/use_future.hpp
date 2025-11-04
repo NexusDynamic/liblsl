@@ -8,25 +8,24 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_USE_FUTURE_HPP
-#define BOOST_ASIO_USE_FUTURE_HPP
+#ifndef ASIO_USE_FUTURE_HPP
+#define ASIO_USE_FUTURE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/future.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/future.hpp"
 
-#if defined(BOOST_ASIO_HAS_STD_FUTURE_CLASS) \
+#if defined(ASIO_HAS_STD_FUTURE_CLASS) \
   || defined(GENERATING_DOCUMENTATION)
 
 #include <memory>
-#include <boost/asio/detail/type_traits.hpp>
+#include "asio/detail/type_traits.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -44,11 +43,11 @@ class packaged_handler;
  * The use_future_t class is a completion token type that is used to indicate
  * that an asynchronous operation should return a std::future object. A
  * use_future_t object may be passed as a completion token to an asynchronous
- * operation, typically using the special value @c boost::asio::use_future. For
+ * operation, typically using the special value @c asio::use_future. For
  * example:
  *
  * @code std::future<std::size_t> my_future
- *   = my_socket.async_read_some(my_buffer, boost::asio::use_future); @endcode
+ *   = my_socket.async_read_some(my_buffer, asio::use_future); @endcode
  *
  * The initiating function (async_read_some in the above example) returns a
  * future that will receive the result of the operation. If the operation
@@ -97,7 +96,7 @@ public:
    *
    * @code std::future<std::size_t> fut =
    *   my_socket.async_read_some(buffer,
-   *     use_future([](boost::system::error_code ec, std::size_t n)
+   *     use_future([](asio::error_code ec, std::size_t n)
    *       {
    *         return ec ? 0 : n;
    *       }));
@@ -135,18 +134,17 @@ private:
 /// A @ref completion_token object that causes an asynchronous operation to
 /// return a future.
 /**
- * See the documentation for boost::asio::use_future_t for a usage example.
+ * See the documentation for asio::use_future_t for a usage example.
  */
-BOOST_ASIO_INLINE_VARIABLE constexpr use_future_t<> use_future;
+ASIO_INLINE_VARIABLE constexpr use_future_t<> use_future;
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#include <boost/asio/impl/use_future.hpp>
+#include "asio/impl/use_future.hpp"
 
-#endif // defined(BOOST_ASIO_HAS_STD_FUTURE_CLASS)
+#endif // defined(ASIO_HAS_STD_FUTURE_CLASS)
        //   || defined(GENERATING_DOCUMENTATION)
 
-#endif // BOOST_ASIO_USE_FUTURE_HPP
+#endif // ASIO_USE_FUTURE_HPP

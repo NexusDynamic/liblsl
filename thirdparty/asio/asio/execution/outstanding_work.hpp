@@ -8,27 +8,26 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXECUTION_OUTSTANDING_WORK_HPP
-#define BOOST_ASIO_EXECUTION_OUTSTANDING_WORK_HPP
+#ifndef ASIO_EXECUTION_OUTSTANDING_WORK_HPP
+#define ASIO_EXECUTION_OUTSTANDING_WORK_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/execution/executor.hpp>
-#include <boost/asio/is_applicable_property.hpp>
-#include <boost/asio/query.hpp>
-#include <boost/asio/traits/query_free.hpp>
-#include <boost/asio/traits/query_member.hpp>
-#include <boost/asio/traits/query_static_constexpr_member.hpp>
-#include <boost/asio/traits/static_query.hpp>
-#include <boost/asio/traits/static_require.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/execution/executor.hpp"
+#include "asio/is_applicable_property.hpp"
+#include "asio/query.hpp"
+#include "asio/traits/query_free.hpp"
+#include "asio/traits/query_member.hpp"
+#include "asio/traits/query_static_constexpr_member.hpp"
+#include "asio/traits/static_query.hpp"
+#include "asio/traits/static_require.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 #if defined(GENERATING_DOCUMENTATION)
@@ -150,10 +149,10 @@ template <int I> struct tracked_t;
 template <int I = 0>
 struct outstanding_work_t
 {
-#if defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr bool is_applicable_property_v = is_executor<T>::value;
-#endif // defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
   static constexpr bool is_requirable = false;
   static constexpr bool is_preferable = false;
@@ -180,7 +179,7 @@ struct outstanding_work_t
   template <typename T>
   struct proxy
   {
-#if defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#if defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
     struct type
     {
       template <typename P>
@@ -194,15 +193,15 @@ struct outstanding_work_t
           declval<conditional_t<true, T, P>>().query(static_cast<P&&>(p))
         );
     };
-#else // defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#else // defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
     typedef T type;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#endif // defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
   };
 
   template <typename T>
   struct static_proxy
   {
-#if defined(BOOST_ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
+#if defined(ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
     struct type
     {
       template <typename P>
@@ -219,9 +218,9 @@ struct outstanding_work_t
         return T::query(static_cast<P&&>(p));
       }
     };
-#else // defined(BOOST_ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
+#else // defined(ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
     typedef T type;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
+#endif // defined(ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
   };
 
   template <typename T>
@@ -233,8 +232,8 @@ struct outstanding_work_t
     traits::query_static_constexpr_member<
       typename static_proxy<T>::type, outstanding_work_t> {};
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr
   typename query_static_constexpr_member<T>::result_type
@@ -285,8 +284,8 @@ struct outstanding_work_t
       typename T = decltype(outstanding_work_t::static_query<E>())>
   static constexpr const T static_query_v
     = outstanding_work_t::static_query<E>();
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
   friend constexpr bool operator==(
       const outstanding_work_t& a, const outstanding_work_t& b)
@@ -314,15 +313,15 @@ struct outstanding_work_t
         can_query<const Executor&, untracked_t>::value
       >* = 0)
 #if !defined(__clang__) // Clang crashes if noexcept is used here.
-#if defined(BOOST_ASIO_MSVC) // Visual C++ wants the type to be qualified.
+#if defined(ASIO_MSVC) // Visual C++ wants the type to be qualified.
     noexcept(is_nothrow_query<const Executor&,
         outstanding_work_t<>::untracked_t>::value)
-#else // defined(BOOST_ASIO_MSVC)
+#else // defined(ASIO_MSVC)
     noexcept(is_nothrow_query<const Executor&, untracked_t>::value)
-#endif // defined(BOOST_ASIO_MSVC)
+#endif // defined(ASIO_MSVC)
 #endif // !defined(__clang__)
   {
-    return boost::asio::query(ex, untracked_t());
+    return asio::query(ex, untracked_t());
   }
 
   template <typename Executor>
@@ -335,30 +334,30 @@ struct outstanding_work_t
         can_query<const Executor&, tracked_t>::value
       >* = 0)
 #if !defined(__clang__) // Clang crashes if noexcept is used here.
-#if defined(BOOST_ASIO_MSVC) // Visual C++ wants the type to be qualified.
+#if defined(ASIO_MSVC) // Visual C++ wants the type to be qualified.
     noexcept(is_nothrow_query<const Executor&,
         outstanding_work_t<>::tracked_t>::value)
-#else // defined(BOOST_ASIO_MSVC)
+#else // defined(ASIO_MSVC)
     noexcept(is_nothrow_query<const Executor&, tracked_t>::value)
-#endif // defined(BOOST_ASIO_MSVC)
+#endif // defined(ASIO_MSVC)
 #endif // !defined(__clang__)
   {
-    return boost::asio::query(ex, tracked_t());
+    return asio::query(ex, tracked_t());
   }
 
-  BOOST_ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(untracked_t, untracked);
-  BOOST_ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(tracked_t, tracked);
+  ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(untracked_t, untracked);
+  ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(tracked_t, tracked);
 
 private:
   int value_;
 };
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 template <int I> template <typename E, typename T>
 const T outstanding_work_t<I>::static_query_v;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 template <int I>
 const typename outstanding_work_t<I>::untracked_t
@@ -373,10 +372,10 @@ namespace outstanding_work {
 template <int I = 0>
 struct untracked_t
 {
-#if defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr bool is_applicable_property_v = is_executor<T>::value;
-#endif // defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
   static constexpr bool is_requirable = true;
   static constexpr bool is_preferable = true;
@@ -397,8 +396,8 @@ struct untracked_t
       typename outstanding_work_t<I>::template static_proxy<T>::type,
         untracked_t> {};
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr
   typename query_static_constexpr_member<T>::result_type
@@ -428,8 +427,8 @@ struct untracked_t
 
   template <typename E, typename T = decltype(untracked_t::static_query<E>())>
   static constexpr const T static_query_v = untracked_t::static_query<E>();
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
   static constexpr outstanding_work_t<I> value()
   {
@@ -457,20 +456,20 @@ struct untracked_t
   }
 };
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 template <int I> template <typename E, typename T>
 const T untracked_t<I>::static_query_v;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 template <int I = 0>
 struct tracked_t
 {
-#if defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr bool is_applicable_property_v = is_executor<T>::value;
-#endif // defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
   static constexpr bool is_requirable = true;
   static constexpr bool is_preferable = true;
@@ -491,8 +490,8 @@ struct tracked_t
       typename outstanding_work_t<I>::template static_proxy<T>::type,
         tracked_t> {};
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr
   typename query_static_constexpr_member<T>::result_type
@@ -504,8 +503,8 @@ struct tracked_t
 
   template <typename E, typename T = decltype(tracked_t::static_query<E>())>
   static constexpr const T static_query_v = tracked_t::static_query<E>();
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
   static constexpr outstanding_work_t<I> value()
   {
@@ -533,23 +532,23 @@ struct tracked_t
   }
 };
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 template <int I> template <typename E, typename T>
 const T tracked_t<I>::static_query_v;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 } // namespace outstanding_work
 } // namespace detail
 
 typedef detail::outstanding_work_t<> outstanding_work_t;
 
-BOOST_ASIO_INLINE_VARIABLE constexpr outstanding_work_t outstanding_work;
+ASIO_INLINE_VARIABLE constexpr outstanding_work_t outstanding_work;
 
 } // namespace execution
 
-#if !defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#if !defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
 template <typename T>
 struct is_applicable_property<T, execution::outstanding_work_t>
@@ -569,11 +568,11 @@ struct is_applicable_property<T, execution::outstanding_work_t::tracked_t>
 {
 };
 
-#endif // !defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // !defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
 namespace traits {
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_FREE_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_QUERY_FREE_TRAIT)
 
 template <typename T>
 struct query_free_default<T, execution::outstanding_work_t,
@@ -602,10 +601,10 @@ struct query_free_default<T, execution::outstanding_work_t,
   typedef execution::outstanding_work_t result_type;
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_FREE_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_QUERY_FREE_TRAIT)
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  || !defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if !defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  || !defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 template <typename T>
 struct static_query<T, execution::outstanding_work_t,
@@ -740,16 +739,15 @@ struct static_query<T, execution::outstanding_work_t::tracked_t,
   }
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   || !defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // !defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   || !defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 } // namespace traits
 
 #endif // defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_EXECUTION_OUTSTANDING_WORK_HPP
+#endif // ASIO_EXECUTION_OUTSTANDING_WORK_HPP

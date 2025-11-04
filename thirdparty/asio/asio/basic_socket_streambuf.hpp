@@ -8,30 +8,29 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_BASIC_SOCKET_STREAMBUF_HPP
-#define BOOST_ASIO_BASIC_SOCKET_STREAMBUF_HPP
+#ifndef ASIO_BASIC_SOCKET_STREAMBUF_HPP
+#define ASIO_BASIC_SOCKET_STREAMBUF_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if !defined(BOOST_ASIO_NO_IOSTREAM)
+#if !defined(ASIO_NO_IOSTREAM)
 
 #include <streambuf>
 #include <vector>
-#include <boost/asio/basic_socket.hpp>
-#include <boost/asio/basic_stream_socket.hpp>
-#include <boost/asio/detail/buffer_sequence_adapter.hpp>
-#include <boost/asio/detail/memory.hpp>
-#include <boost/asio/detail/throw_error.hpp>
-#include <boost/asio/io_context.hpp>
-#include <boost/asio/steady_timer.hpp>
+#include "asio/basic_socket.hpp"
+#include "asio/basic_stream_socket.hpp"
+#include "asio/detail/buffer_sequence_adapter.hpp"
+#include "asio/detail/memory.hpp"
+#include "asio/detail/throw_error.hpp"
+#include "asio/io_context.hpp"
+#include "asio/steady_timer.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -69,8 +68,8 @@ protected:
 
 } // namespace detail
 
-#if !defined(BOOST_ASIO_BASIC_SOCKET_STREAMBUF_FWD_DECL)
-#define BOOST_ASIO_BASIC_SOCKET_STREAMBUF_FWD_DECL
+#if !defined(ASIO_BASIC_SOCKET_STREAMBUF_FWD_DECL)
+#define ASIO_BASIC_SOCKET_STREAMBUF_FWD_DECL
 
 // Forward declaration with defaulted arguments.
 template <typename Protocol,
@@ -78,7 +77,7 @@ template <typename Protocol,
     typename WaitTraits = wait_traits<Clock>>
 class basic_socket_streambuf;
 
-#endif // !defined(BOOST_ASIO_BASIC_SOCKET_STREAMBUF_FWD_DECL)
+#endif // !defined(ASIO_BASIC_SOCKET_STREAMBUF_FWD_DECL)
 
 /// Iostream streambuf for a socket.
 #if defined(GENERATING_DOCUMENTATION)
@@ -147,7 +146,7 @@ public:
     put_buffer_.swap(other.put_buffer_);
     setg(other.eback(), other.gptr(), other.egptr());
     setp(other.pptr(), other.epptr());
-    other.ec_ = boost::system::error_code();
+    other.ec_ = asio::error_code();
     other.expiry_time_ = max_expiry_time();
     other.init_buffers();
   }
@@ -164,7 +163,7 @@ public:
     put_buffer_.swap(other.put_buffer_);
     setg(other.eback(), other.gptr(), other.egptr());
     setp(other.pptr(), other.epptr());
-    other.ec_ = boost::system::error_code();
+    other.ec_ = asio::error_code();
     other.expiry_time_ = max_expiry_time();
     other.put_buffer_.resize(buffer_size);
     other.init_buffers();
@@ -188,7 +187,7 @@ public:
   basic_socket_streambuf* connect(const endpoint_type& endpoint)
   {
     init_buffers();
-    ec_ = boost::system::error_code();
+    ec_ = asio::error_code();
     this->connect_to_endpoints(&endpoint, &endpoint + 1);
     return !ec_ ? this : 0;
   }
@@ -237,7 +236,7 @@ public:
    * @return An \c error_code corresponding to the last error from the stream
    * buffer.
    */
-  const boost::system::error_code& error() const
+  const asio::error_code& error() const
   {
     return ec_;
   }
@@ -257,7 +256,7 @@ public:
    * This function sets the expiry time associated with the stream. Stream
    * operations performed after this time (where the operations cannot be
    * completed using the internal buffers) will fail with the error
-   * boost::asio::error::operation_aborted.
+   * asio::error::operation_aborted.
    *
    * @param expiry_time The expiry time to be used for the stream.
    */
@@ -271,7 +270,7 @@ public:
    * This function sets the expiry time associated with the stream. Stream
    * operations performed after this time (where the operations cannot be
    * completed using the internal buffers) will fail with the error
-   * boost::asio::error::operation_aborted.
+   * asio::error::operation_aborted.
    *
    * @param expiry_time The expiry time to be used for the timer.
    */
@@ -283,10 +282,10 @@ public:
 protected:
   int_type underflow()
   {
-#if defined(BOOST_ASIO_WINDOWS_RUNTIME)
-    ec_ = boost::asio::error::operation_not_supported;
+#if defined(ASIO_WINDOWS_RUNTIME)
+    ec_ = asio::error::operation_not_supported;
     return traits_type::eof();
-#else // defined(BOOST_ASIO_WINDOWS_RUNTIME)
+#else // defined(ASIO_WINDOWS_RUNTIME)
     if (gptr() != egptr())
       return traits_type::eof();
 
@@ -295,7 +294,7 @@ protected:
       // Check if we are past the expiry time.
       if (traits_helper::less_than(expiry_time_, traits_helper::now()))
       {
-        ec_ = boost::asio::error::timed_out;
+        ec_ = asio::error::timed_out;
         return traits_type::eof();
       }
 
@@ -303,7 +302,7 @@ protected:
       if (!socket().native_non_blocking())
         socket().native_non_blocking(true, ec_);
       detail::buffer_sequence_adapter<mutable_buffer, mutable_buffer>
-        bufs(boost::asio::buffer(get_buffer_) + putback_max);
+        bufs(asio::buffer(get_buffer_) + putback_max);
       detail::signed_size_type bytes = detail::socket_ops::recv(
           socket().native_handle(), bufs.buffers(), bufs.count(), 0, ec_);
 
@@ -318,13 +317,13 @@ protected:
       // Check for EOF.
       if (bytes == 0)
       {
-        ec_ = boost::asio::error::eof;
+        ec_ = asio::error::eof;
         return traits_type::eof();
       }
 
       // Operation failed.
-      if (ec_ != boost::asio::error::would_block
-          && ec_ != boost::asio::error::try_again)
+      if (ec_ != asio::error::would_block
+          && ec_ != asio::error::try_again)
         return traits_type::eof();
 
       // Wait for socket to become ready.
@@ -332,15 +331,15 @@ protected:
             socket().native_handle(), 0, timeout(), ec_) < 0)
         return traits_type::eof();
     }
-#endif // defined(BOOST_ASIO_WINDOWS_RUNTIME)
+#endif // defined(ASIO_WINDOWS_RUNTIME)
   }
 
   int_type overflow(int_type c)
   {
-#if defined(BOOST_ASIO_WINDOWS_RUNTIME)
-    ec_ = boost::asio::error::operation_not_supported;
+#if defined(ASIO_WINDOWS_RUNTIME)
+    ec_ = asio::error::operation_not_supported;
     return traits_type::eof();
-#else // defined(BOOST_ASIO_WINDOWS_RUNTIME)
+#else // defined(ASIO_WINDOWS_RUNTIME)
     char_type ch = traits_type::to_char_type(c);
 
     // Determine what needs to be sent.
@@ -349,11 +348,11 @@ protected:
     {
       if (traits_type::eq_int_type(c, traits_type::eof()))
         return traits_type::not_eof(c); // Nothing to do.
-      output_buffer = boost::asio::buffer(&ch, sizeof(char_type));
+      output_buffer = asio::buffer(&ch, sizeof(char_type));
     }
     else
     {
-      output_buffer = boost::asio::buffer(pbase(),
+      output_buffer = asio::buffer(pbase(),
           (pptr() - pbase()) * sizeof(char_type));
     }
 
@@ -362,7 +361,7 @@ protected:
       // Check if we are past the expiry time.
       if (traits_helper::less_than(expiry_time_, traits_helper::now()))
       {
-        ec_ = boost::asio::error::timed_out;
+        ec_ = asio::error::timed_out;
         return traits_type::eof();
       }
 
@@ -382,8 +381,8 @@ protected:
       }
 
       // Operation failed.
-      if (ec_ != boost::asio::error::would_block
-          && ec_ != boost::asio::error::try_again)
+      if (ec_ != asio::error::would_block
+          && ec_ != asio::error::try_again)
         return traits_type::eof();
 
       // Wait for socket to become ready.
@@ -406,7 +405,7 @@ protected:
     }
 
     return c;
-#endif // defined(BOOST_ASIO_WINDOWS_RUNTIME)
+#endif // defined(ASIO_WINDOWS_RUNTIME)
   }
 
   int sync()
@@ -466,19 +465,19 @@ private:
   template <typename EndpointIterator>
   void connect_to_endpoints(EndpointIterator begin, EndpointIterator end)
   {
-#if defined(BOOST_ASIO_WINDOWS_RUNTIME)
-    ec_ = boost::asio::error::operation_not_supported;
-#else // defined(BOOST_ASIO_WINDOWS_RUNTIME)
+#if defined(ASIO_WINDOWS_RUNTIME)
+    ec_ = asio::error::operation_not_supported;
+#else // defined(ASIO_WINDOWS_RUNTIME)
     if (ec_)
       return;
 
-    ec_ = boost::asio::error::not_found;
+    ec_ = asio::error::not_found;
     for (EndpointIterator i = begin; i != end; ++i)
     {
       // Check if we are past the expiry time.
       if (traits_helper::less_than(expiry_time_, traits_helper::now()))
       {
-        ec_ = boost::asio::error::timed_out;
+        ec_ = asio::error::timed_out;
         return;
       }
 
@@ -500,8 +499,8 @@ private:
         return;
 
       // Operation failed.
-      if (ec_ != boost::asio::error::in_progress
-          && ec_ != boost::asio::error::would_block)
+      if (ec_ != asio::error::in_progress
+          && ec_ != asio::error::would_block)
         continue;
 
       // Wait for socket to become ready.
@@ -518,12 +517,12 @@ private:
         return;
 
       // Check the result of the connect operation.
-      ec_ = boost::system::error_code(connect_error,
-          boost::asio::error::get_system_category());
+      ec_ = asio::error_code(connect_error,
+          asio::error::get_system_category());
       if (!ec_)
         return;
     }
-#endif // defined(BOOST_ASIO_WINDOWS_RUNTIME)
+#endif // defined(ASIO_WINDOWS_RUNTIME)
   }
 
   // Helper function to get the maximum expiry time.
@@ -533,15 +532,14 @@ private:
   }
 
   enum { putback_max = 8 };
-  boost::system::error_code ec_;
+  asio::error_code ec_;
   time_point expiry_time_;
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // !defined(BOOST_ASIO_NO_IOSTREAM)
+#endif // !defined(ASIO_NO_IOSTREAM)
 
-#endif // BOOST_ASIO_BASIC_SOCKET_STREAMBUF_HPP
+#endif // ASIO_BASIC_SOCKET_STREAMBUF_HPP

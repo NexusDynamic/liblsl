@@ -8,30 +8,29 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_IMPL_IO_URING_DESCRIPTOR_SERVICE_IPP
-#define BOOST_ASIO_DETAIL_IMPL_IO_URING_DESCRIPTOR_SERVICE_IPP
+#ifndef ASIO_DETAIL_IMPL_IO_URING_DESCRIPTOR_SERVICE_IPP
+#define ASIO_DETAIL_IMPL_IO_URING_DESCRIPTOR_SERVICE_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_IO_URING)
+#if defined(ASIO_HAS_IO_URING)
 
-#include <boost/asio/error.hpp>
-#include <boost/asio/detail/io_uring_descriptor_service.hpp>
+#include "asio/error.hpp"
+#include "asio/detail/io_uring_descriptor_service.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
 io_uring_descriptor_service::io_uring_descriptor_service(
     execution_context& context)
   : execution_context_service_base<io_uring_descriptor_service>(context),
-    io_uring_service_(boost::asio::use_service<io_uring_service>(context))
+    io_uring_service_(asio::use_service<io_uring_service>(context))
 {
   io_uring_service_.init_task();
 }
@@ -85,24 +84,24 @@ void io_uring_descriptor_service::destroy(
 {
   if (is_open(impl))
   {
-    BOOST_ASIO_HANDLER_OPERATION((io_uring_service_.context(),
+    ASIO_HANDLER_OPERATION((io_uring_service_.context(),
           "descriptor", &impl, impl.descriptor_, "close"));
 
     io_uring_service_.deregister_io_object(impl.io_object_data_);
-    boost::system::error_code ignored_ec;
+    asio::error_code ignored_ec;
     descriptor_ops::close(impl.descriptor_, impl.state_, ignored_ec);
     io_uring_service_.cleanup_io_object(impl.io_object_data_);
   }
 }
 
-boost::system::error_code io_uring_descriptor_service::assign(
+asio::error_code io_uring_descriptor_service::assign(
     io_uring_descriptor_service::implementation_type& impl,
-    const native_handle_type& native_descriptor, boost::system::error_code& ec)
+    const native_handle_type& native_descriptor, asio::error_code& ec)
 {
   if (is_open(impl))
   {
-    ec = boost::asio::error::already_open;
-    BOOST_ASIO_ERROR_LOCATION(ec);
+    ec = asio::error::already_open;
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -114,13 +113,13 @@ boost::system::error_code io_uring_descriptor_service::assign(
   return ec;
 }
 
-boost::system::error_code io_uring_descriptor_service::close(
+asio::error_code io_uring_descriptor_service::close(
     io_uring_descriptor_service::implementation_type& impl,
-    boost::system::error_code& ec)
+    asio::error_code& ec)
 {
   if (is_open(impl))
   {
-    BOOST_ASIO_HANDLER_OPERATION((io_uring_service_.context(),
+    ASIO_HANDLER_OPERATION((io_uring_service_.context(),
           "descriptor", &impl, impl.descriptor_, "close"));
 
     io_uring_service_.deregister_io_object(impl.io_object_data_);
@@ -139,7 +138,7 @@ boost::system::error_code io_uring_descriptor_service::close(
   //   http://lkml.org/lkml/2005/9/10/129
   construct(impl);
 
-  BOOST_ASIO_ERROR_LOCATION(ec);
+  ASIO_ERROR_LOCATION(ec);
   return ec;
 }
 
@@ -151,7 +150,7 @@ io_uring_descriptor_service::release(
 
   if (is_open(impl))
   {
-    BOOST_ASIO_HANDLER_OPERATION((io_uring_service_.context(),
+    ASIO_HANDLER_OPERATION((io_uring_service_.context(),
           "descriptor", &impl, impl.descriptor_, "release"));
 
     io_uring_service_.deregister_io_object(impl.io_object_data_);
@@ -162,18 +161,18 @@ io_uring_descriptor_service::release(
   return descriptor;
 }
 
-boost::system::error_code io_uring_descriptor_service::cancel(
+asio::error_code io_uring_descriptor_service::cancel(
     io_uring_descriptor_service::implementation_type& impl,
-    boost::system::error_code& ec)
+    asio::error_code& ec)
 {
   if (!is_open(impl))
   {
-    ec = boost::asio::error::bad_descriptor;
-    BOOST_ASIO_ERROR_LOCATION(ec);
+    ec = asio::error::bad_descriptor;
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
-  BOOST_ASIO_HANDLER_OPERATION((io_uring_service_.context(),
+  ASIO_HANDLER_OPERATION((io_uring_service_.context(),
         "descriptor", &impl, impl.descriptor_, "cancel"));
 
   io_uring_service_.cancel_ops(impl.io_object_data_);
@@ -198,10 +197,9 @@ void io_uring_descriptor_service::start_op(
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // defined(BOOST_ASIO_HAS_IO_URING)
+#endif // defined(ASIO_HAS_IO_URING)
 
-#endif // BOOST_ASIO_DETAIL_IMPL_IO_URING_DESCRIPTOR_SERVICE_IPP
+#endif // ASIO_DETAIL_IMPL_IO_URING_DESCRIPTOR_SERVICE_IPP

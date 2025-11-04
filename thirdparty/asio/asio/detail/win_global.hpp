@@ -8,20 +8,19 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_WIN_GLOBAL_HPP
-#define BOOST_ASIO_DETAIL_WIN_GLOBAL_HPP
+#ifndef ASIO_DETAIL_WIN_GLOBAL_HPP
+#define ASIO_DETAIL_WIN_GLOBAL_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/static_mutex.hpp>
-#include <boost/asio/detail/tss_ptr.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/static_mutex.hpp"
+#include "asio/detail/tss_ptr.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -44,7 +43,7 @@ template <typename T>
 win_global_impl<T> win_global_impl<T>::instance_ = { 0 };
 
 template <typename T>
-static_mutex win_global_impl<T>::mutex_ = BOOST_ASIO_STATIC_MUTEX_INIT;
+static_mutex win_global_impl<T>::mutex_ = ASIO_STATIC_MUTEX_INIT;
 
 template <typename T>
 tss_ptr<T> win_global_impl<T>::tss_ptr_;
@@ -66,8 +65,7 @@ T& win_global()
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_WIN_GLOBAL_HPP
+#endif // ASIO_DETAIL_WIN_GLOBAL_HPP

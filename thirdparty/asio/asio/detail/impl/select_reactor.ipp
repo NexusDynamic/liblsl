@@ -8,39 +8,38 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_IMPL_SELECT_REACTOR_IPP
-#define BOOST_ASIO_DETAIL_IMPL_SELECT_REACTOR_IPP
+#ifndef ASIO_DETAIL_IMPL_SELECT_REACTOR_IPP
+#define ASIO_DETAIL_IMPL_SELECT_REACTOR_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_IOCP) \
-  || (!defined(BOOST_ASIO_HAS_DEV_POLL) \
-      && !defined(BOOST_ASIO_HAS_EPOLL) \
-      && !defined(BOOST_ASIO_HAS_KQUEUE) \
-      && !defined(BOOST_ASIO_WINDOWS_RUNTIME))
+#if defined(ASIO_HAS_IOCP) \
+  || (!defined(ASIO_HAS_DEV_POLL) \
+      && !defined(ASIO_HAS_EPOLL) \
+      && !defined(ASIO_HAS_KQUEUE) \
+      && !defined(ASIO_WINDOWS_RUNTIME))
 
-#include <boost/asio/detail/fd_set_adapter.hpp>
-#include <boost/asio/detail/select_reactor.hpp>
-#include <boost/asio/detail/signal_blocker.hpp>
-#include <boost/asio/detail/socket_ops.hpp>
+#include "asio/detail/fd_set_adapter.hpp"
+#include "asio/detail/select_reactor.hpp"
+#include "asio/detail/signal_blocker.hpp"
+#include "asio/detail/socket_ops.hpp"
 
-#if defined(BOOST_ASIO_HAS_IOCP)
-# include <boost/asio/detail/win_iocp_io_context.hpp>
-#else // defined(BOOST_ASIO_HAS_IOCP)
-# include <boost/asio/detail/scheduler.hpp>
-#endif // defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
+# include "asio/detail/win_iocp_io_context.hpp"
+#else // defined(ASIO_HAS_IOCP)
+# include "asio/detail/scheduler.hpp"
+#endif // defined(ASIO_HAS_IOCP)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
-#if defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
 class select_reactor::thread_function
 {
 public:
@@ -57,24 +56,24 @@ public:
 private:
   select_reactor* this_;
 };
-#endif // defined(BOOST_ASIO_HAS_IOCP)
+#endif // defined(ASIO_HAS_IOCP)
 
-select_reactor::select_reactor(boost::asio::execution_context& ctx)
+select_reactor::select_reactor(asio::execution_context& ctx)
   : execution_context_service_base<select_reactor>(ctx),
     scheduler_(use_service<scheduler_type>(ctx)),
     mutex_(),
     interrupter_(),
-#if defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
     stop_thread_(false),
     thread_(),
     restart_reactor_(this),
-#endif // defined(BOOST_ASIO_HAS_IOCP)
+#endif // defined(ASIO_HAS_IOCP)
     shutdown_(false)
 {
-#if defined(BOOST_ASIO_HAS_IOCP)
-  boost::asio::detail::signal_blocker sb;
+#if defined(ASIO_HAS_IOCP)
+  asio::detail::signal_blocker sb;
   thread_ = thread(thread_function(this));
-#endif // defined(BOOST_ASIO_HAS_IOCP)
+#endif // defined(ASIO_HAS_IOCP)
 }
 
 select_reactor::~select_reactor()
@@ -84,18 +83,18 @@ select_reactor::~select_reactor()
 
 void select_reactor::shutdown()
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  asio::detail::mutex::scoped_lock lock(mutex_);
   shutdown_ = true;
-#if defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
   stop_thread_ = true;
   if (thread_.joinable())
     interrupter_.interrupt();
-#endif // defined(BOOST_ASIO_HAS_IOCP)
+#endif // defined(ASIO_HAS_IOCP)
   lock.unlock();
 
-#if defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
   thread_.join();
-#endif // defined(BOOST_ASIO_HAS_IOCP)
+#endif // defined(ASIO_HAS_IOCP)
 
   op_queue<operation> ops;
 
@@ -108,14 +107,14 @@ void select_reactor::shutdown()
 }
 
 void select_reactor::notify_fork(
-    boost::asio::execution_context::fork_event fork_ev)
+    asio::execution_context::fork_event fork_ev)
 {
-#if defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
   (void)fork_ev;
-#else // defined(BOOST_ASIO_HAS_IOCP)
-  if (fork_ev == boost::asio::execution_context::fork_child)
+#else // defined(ASIO_HAS_IOCP)
+  if (fork_ev == asio::execution_context::fork_child)
     interrupter_.recreate();
-#endif // defined(BOOST_ASIO_HAS_IOCP)
+#endif // defined(ASIO_HAS_IOCP)
 }
 
 void select_reactor::init_task()
@@ -133,7 +132,7 @@ int select_reactor::register_internal_descriptor(
     int op_type, socket_type descriptor,
     select_reactor::per_descriptor_data&, reactor_op* op)
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  asio::detail::mutex::scoped_lock lock(mutex_);
 
   op_queue_[op_type].enqueue_operation(descriptor, op);
   interrupter_.interrupt();
@@ -159,7 +158,7 @@ void select_reactor::start_op(int op_type, socket_type descriptor,
     bool, void (*on_immediate)(operation*, bool, const void*),
     const void* immediate_arg)
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  asio::detail::mutex::scoped_lock lock(mutex_);
 
   if (shutdown_)
   {
@@ -176,18 +175,18 @@ void select_reactor::start_op(int op_type, socket_type descriptor,
 void select_reactor::cancel_ops(socket_type descriptor,
     select_reactor::per_descriptor_data&)
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
-  cancel_ops_unlocked(descriptor, boost::asio::error::operation_aborted);
+  asio::detail::mutex::scoped_lock lock(mutex_);
+  cancel_ops_unlocked(descriptor, asio::error::operation_aborted);
 }
 
 void select_reactor::cancel_ops_by_key(socket_type descriptor,
     select_reactor::per_descriptor_data&,
     int op_type, void* cancellation_key)
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  asio::detail::mutex::scoped_lock lock(mutex_);
   op_queue<operation> ops;
   bool need_interrupt = op_queue_[op_type].cancel_operations_by_key(
-      descriptor, ops, cancellation_key, boost::asio::error::operation_aborted);
+      descriptor, ops, cancellation_key, asio::error::operation_aborted);
   scheduler_.post_deferred_completions(ops);
   if (need_interrupt)
     interrupter_.interrupt();
@@ -196,14 +195,14 @@ void select_reactor::cancel_ops_by_key(socket_type descriptor,
 void select_reactor::deregister_descriptor(socket_type descriptor,
     select_reactor::per_descriptor_data&, bool)
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
-  cancel_ops_unlocked(descriptor, boost::asio::error::operation_aborted);
+  asio::detail::mutex::scoped_lock lock(mutex_);
+  cancel_ops_unlocked(descriptor, asio::error::operation_aborted);
 }
 
 void select_reactor::deregister_internal_descriptor(
     socket_type descriptor, select_reactor::per_descriptor_data&)
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  asio::detail::mutex::scoped_lock lock(mutex_);
   op_queue<operation> ops;
   for (int i = 0; i < max_ops; ++i)
     op_queue_[i].cancel_operations(descriptor, ops);
@@ -216,13 +215,13 @@ void select_reactor::cleanup_descriptor_data(
 
 void select_reactor::run(long usec, op_queue<operation>& ops)
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  asio::detail::mutex::scoped_lock lock(mutex_);
 
-#if defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
   // Check if the thread is supposed to stop.
   if (stop_thread_)
     return;
-#endif // defined(BOOST_ASIO_HAS_IOCP)
+#endif // defined(ASIO_HAS_IOCP)
 
   // Set up the descriptor sets.
   for (int i = 0; i < max_select_ops; ++i)
@@ -238,7 +237,7 @@ void select_reactor::run(long usec, op_queue<operation>& ops)
       max_fd = fd_sets_[i].max_descriptor();
   }
 
-#if defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
+#if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
   // Connection operations on Windows use both except and write fd_sets.
   have_work_to_do = have_work_to_do || !op_queue_[connect_op].empty();
   fd_sets_[write_op].set(op_queue_[connect_op], ops);
@@ -247,7 +246,7 @@ void select_reactor::run(long usec, op_queue<operation>& ops)
   fd_sets_[except_op].set(op_queue_[connect_op], ops);
   if (fd_sets_[except_op].max_descriptor() > max_fd)
     max_fd = fd_sets_[except_op].max_descriptor();
-#endif // defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
+#endif // defined(ASIO_WINDOWS) || defined(__CYGWIN__)
 
   // We can return immediately if there's no work to do and the reactor is
   // not supposed to block.
@@ -261,7 +260,7 @@ void select_reactor::run(long usec, op_queue<operation>& ops)
   lock.unlock();
 
   // Block on the select call until descriptors become ready.
-  boost::system::error_code ec;
+  asio::error_code ec;
   int retval = socket_ops::select(static_cast<int>(max_fd + 1),
       fd_sets_[read_op], fd_sets_[write_op], fd_sets_[except_op], tv, ec);
 
@@ -271,12 +270,12 @@ void select_reactor::run(long usec, op_queue<operation>& ops)
     if (!interrupter_.reset())
     {
       lock.lock();
-#if defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
       stop_thread_ = true;
       scheduler_.post_immediate_completion(&restart_reactor_, false);
-#else // defined(BOOST_ASIO_HAS_IOCP)
+#else // defined(ASIO_HAS_IOCP)
       interrupter_.recreate();
-#endif // defined(BOOST_ASIO_HAS_IOCP)
+#endif // defined(ASIO_HAS_IOCP)
     }
     --retval;
   }
@@ -286,11 +285,11 @@ void select_reactor::run(long usec, op_queue<operation>& ops)
   // Dispatch all ready operations.
   if (retval > 0)
   {
-#if defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
+#if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
     // Connection operations on Windows use both except and write fd_sets.
     fd_sets_[except_op].perform(op_queue_[connect_op], ops);
     fd_sets_[write_op].perform(op_queue_[connect_op], ops);
-#endif // defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
+#endif // defined(ASIO_WINDOWS) || defined(__CYGWIN__)
 
     // Exception operations must be processed first to ensure that any
     // out-of-band data is read before normal data.
@@ -305,10 +304,10 @@ void select_reactor::interrupt()
   interrupter_.interrupt();
 }
 
-#if defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
 void select_reactor::run_thread()
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  asio::detail::mutex::scoped_lock lock(mutex_);
   while (!stop_thread_)
   {
     lock.unlock();
@@ -320,7 +319,7 @@ void select_reactor::run_thread()
 }
 
 void select_reactor::restart_reactor::do_complete(void* owner, operation* base,
-    const boost::system::error_code& /*ec*/, std::size_t /*bytes_transferred*/)
+    const asio::error_code& /*ec*/, std::size_t /*bytes_transferred*/)
 {
   if (owner)
   {
@@ -328,16 +327,16 @@ void select_reactor::restart_reactor::do_complete(void* owner, operation* base,
 
     reactor->thread_.join();
 
-    boost::asio::detail::mutex::scoped_lock lock(reactor->mutex_);
+    asio::detail::mutex::scoped_lock lock(reactor->mutex_);
     reactor->interrupter_.recreate();
     reactor->stop_thread_ = false;
     lock.unlock();
 
-    boost::asio::detail::signal_blocker sb;
+    asio::detail::signal_blocker sb;
     reactor->thread_ = thread(thread_function(reactor));
   }
 }
-#endif // defined(BOOST_ASIO_HAS_IOCP)
+#endif // defined(ASIO_HAS_IOCP)
 
 void select_reactor::do_add_timer_queue(timer_queue_base& queue)
 {
@@ -364,7 +363,7 @@ timeval* select_reactor::get_timeout(long usec, timeval& tv)
 }
 
 void select_reactor::cancel_ops_unlocked(socket_type descriptor,
-    const boost::system::error_code& ec)
+    const asio::error_code& ec)
 {
   bool need_interrupt = false;
   op_queue<operation> ops;
@@ -378,14 +377,13 @@ void select_reactor::cancel_ops_unlocked(socket_type descriptor,
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // defined(BOOST_ASIO_HAS_IOCP)
-       //   || (!defined(BOOST_ASIO_HAS_DEV_POLL)
-       //       && !defined(BOOST_ASIO_HAS_EPOLL)
-       //       && !defined(BOOST_ASIO_HAS_KQUEUE))
-       //       && !defined(BOOST_ASIO_WINDOWS_RUNTIME))
+#endif // defined(ASIO_HAS_IOCP)
+       //   || (!defined(ASIO_HAS_DEV_POLL)
+       //       && !defined(ASIO_HAS_EPOLL)
+       //       && !defined(ASIO_HAS_KQUEUE))
+       //       && !defined(ASIO_WINDOWS_RUNTIME))
 
-#endif // BOOST_ASIO_DETAIL_IMPL_SELECT_REACTOR_IPP
+#endif // ASIO_DETAIL_IMPL_SELECT_REACTOR_IPP

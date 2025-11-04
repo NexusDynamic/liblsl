@@ -8,17 +8,16 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IS_APPLICABLE_PROPERTY_HPP
-#define BOOST_ASIO_IS_APPLICABLE_PROPERTY_HPP
+#ifndef ASIO_IS_APPLICABLE_PROPERTY_HPP
+#define ASIO_IS_APPLICABLE_PROPERTY_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/type_traits.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/type_traits.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -27,7 +26,7 @@ struct is_applicable_property_trait : false_type
 {
 };
 
-#if defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
 template <typename T, typename Property>
 struct is_applicable_property_trait<T, Property,
@@ -39,7 +38,7 @@ struct is_applicable_property_trait<T, Property,
 {
 };
 
-#endif // defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
 } // namespace detail
 
@@ -49,15 +48,14 @@ struct is_applicable_property :
 {
 };
 
-#if defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
 template <typename T, typename Property>
 constexpr const bool is_applicable_property_v
   = is_applicable_property<T, Property>::value;
 
-#endif // defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
 } // namespace asio
-} // namespace boost
 
-#endif // BOOST_ASIO_IS_APPLICABLE_PROPERTY_HPP
+#endif // ASIO_IS_APPLICABLE_PROPERTY_HPP

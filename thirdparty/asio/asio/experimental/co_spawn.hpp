@@ -8,25 +8,24 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-#ifndef BOOST_ASIO_EXPERIMENTAL_CO_SPAWN_HPP
-#define BOOST_ASIO_EXPERIMENTAL_CO_SPAWN_HPP
+#ifndef ASIO_EXPERIMENTAL_CO_SPAWN_HPP
+#define ASIO_EXPERIMENTAL_CO_SPAWN_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <utility>
-#include <boost/asio/compose.hpp>
-#include <boost/asio/deferred.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/experimental/coro.hpp>
-#include <boost/asio/prepend.hpp>
-#include <boost/asio/redirect_error.hpp>
+#include "asio/compose.hpp"
+#include "asio/deferred.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/experimental/coro.hpp"
+#include "asio/prepend.hpp"
+#include "asio/redirect_error.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace experimental {
 namespace detail {
@@ -62,7 +61,7 @@ struct coro_spawn_op
  * @returns Implementation defined
  */
 template <typename T, typename Executor, typename CompletionToken>
-BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(
+ASIO_INITFN_AUTO_RESULT_TYPE(
     CompletionToken, void(std::exception_ptr, T))
 co_spawn(coro<void, T, Executor> c, CompletionToken&& token)
 {
@@ -84,7 +83,7 @@ co_spawn(coro<void, T, Executor> c, CompletionToken&& token)
  * @returns Implementation defined
  */
 template <typename T, typename Executor, typename CompletionToken>
-BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(
+ASIO_INITFN_AUTO_RESULT_TYPE(
     CompletionToken, void(std::exception_ptr, T))
 co_spawn(coro<void(), T, Executor> c, CompletionToken&& token)
 {
@@ -106,7 +105,7 @@ co_spawn(coro<void(), T, Executor> c, CompletionToken&& token)
  * @returns Implementation defined
  */
 template <typename T, typename Executor, typename CompletionToken>
-BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(CompletionToken, void(T))
+ASIO_INITFN_AUTO_RESULT_TYPE(CompletionToken, void(T))
 co_spawn(coro<void() noexcept, T, Executor> c, CompletionToken&& token)
 {
   auto exec = c.get_executor();
@@ -127,7 +126,7 @@ co_spawn(coro<void() noexcept, T, Executor> c, CompletionToken&& token)
  * @returns Implementation defined
  */
 template <typename Executor, typename CompletionToken>
-BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(
+ASIO_INITFN_AUTO_RESULT_TYPE(
     CompletionToken, void(std::exception_ptr))
 co_spawn(coro<void, void, Executor> c, CompletionToken&& token)
 {
@@ -149,7 +148,7 @@ co_spawn(coro<void, void, Executor> c, CompletionToken&& token)
  * @returns Implementation defined
  */
 template <typename Executor, typename CompletionToken>
-BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(
+ASIO_INITFN_AUTO_RESULT_TYPE(
     CompletionToken, void(std::exception_ptr))
 co_spawn(coro<void(), void, Executor> c, CompletionToken&& token)
 {
@@ -171,7 +170,7 @@ co_spawn(coro<void(), void, Executor> c, CompletionToken&& token)
  * @returns Implementation defined
  */
 template <typename Executor, typename CompletionToken>
-BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(CompletionToken, void())
+ASIO_INITFN_AUTO_RESULT_TYPE(CompletionToken, void())
 co_spawn(coro<void() noexcept, void, Executor> c, CompletionToken&& token)
 {
   auto exec = c.get_executor();
@@ -182,8 +181,7 @@ co_spawn(coro<void() noexcept, void, Executor> c, CompletionToken&& token)
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif //BOOST_ASIO_EXPERIMENTAL_CO_SPAWN_HPP
+#endif //ASIO_EXPERIMENTAL_CO_SPAWN_HPP

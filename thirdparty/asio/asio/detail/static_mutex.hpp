@@ -8,45 +8,43 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_STATIC_MUTEX_HPP
-#define BOOST_ASIO_DETAIL_STATIC_MUTEX_HPP
+#ifndef ASIO_DETAIL_STATIC_MUTEX_HPP
+#define ASIO_DETAIL_STATIC_MUTEX_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if !defined(BOOST_ASIO_HAS_THREADS)
-# include <boost/asio/detail/null_static_mutex.hpp>
-#elif defined(BOOST_ASIO_WINDOWS)
-# include <boost/asio/detail/win_static_mutex.hpp>
-#elif defined(BOOST_ASIO_HAS_PTHREADS)
-# include <boost/asio/detail/posix_static_mutex.hpp>
+#if !defined(ASIO_HAS_THREADS)
+# include "asio/detail/null_static_mutex.hpp"
+#elif defined(ASIO_WINDOWS)
+# include "asio/detail/win_static_mutex.hpp"
+#elif defined(ASIO_HAS_PTHREADS)
+# include "asio/detail/posix_static_mutex.hpp"
 #else
-# include <boost/asio/detail/std_static_mutex.hpp>
+# include "asio/detail/std_static_mutex.hpp"
 #endif
 
-namespace boost {
 namespace asio {
 namespace detail {
 
-#if !defined(BOOST_ASIO_HAS_THREADS)
+#if !defined(ASIO_HAS_THREADS)
 typedef null_static_mutex static_mutex;
-# define BOOST_ASIO_STATIC_MUTEX_INIT BOOST_ASIO_NULL_STATIC_MUTEX_INIT
-#elif defined(BOOST_ASIO_WINDOWS)
+# define ASIO_STATIC_MUTEX_INIT ASIO_NULL_STATIC_MUTEX_INIT
+#elif defined(ASIO_WINDOWS)
 typedef win_static_mutex static_mutex;
-# define BOOST_ASIO_STATIC_MUTEX_INIT BOOST_ASIO_WIN_STATIC_MUTEX_INIT
-#elif defined(BOOST_ASIO_HAS_PTHREADS)
+# define ASIO_STATIC_MUTEX_INIT ASIO_WIN_STATIC_MUTEX_INIT
+#elif defined(ASIO_HAS_PTHREADS)
 typedef posix_static_mutex static_mutex;
-# define BOOST_ASIO_STATIC_MUTEX_INIT BOOST_ASIO_POSIX_STATIC_MUTEX_INIT
+# define ASIO_STATIC_MUTEX_INIT ASIO_POSIX_STATIC_MUTEX_INIT
 #else
 typedef std_static_mutex static_mutex;
-# define BOOST_ASIO_STATIC_MUTEX_INIT BOOST_ASIO_STD_STATIC_MUTEX_INIT
+# define ASIO_STATIC_MUTEX_INIT ASIO_STD_STATIC_MUTEX_INIT
 #endif
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#endif // BOOST_ASIO_DETAIL_STATIC_MUTEX_HPP
+#endif // ASIO_DETAIL_STATIC_MUTEX_HPP

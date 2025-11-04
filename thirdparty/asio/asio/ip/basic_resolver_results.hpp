@@ -8,33 +8,32 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IP_BASIC_RESOLVER_RESULTS_HPP
-#define BOOST_ASIO_IP_BASIC_RESOLVER_RESULTS_HPP
+#ifndef ASIO_IP_BASIC_RESOLVER_RESULTS_HPP
+#define ASIO_IP_BASIC_RESOLVER_RESULTS_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <cstddef>
 #include <cstring>
-#include <boost/asio/detail/socket_ops.hpp>
-#include <boost/asio/detail/socket_types.hpp>
-#include <boost/asio/ip/basic_resolver_iterator.hpp>
+#include "asio/detail/socket_ops.hpp"
+#include "asio/detail/socket_types.hpp"
+#include "asio/ip/basic_resolver_iterator.hpp"
 
-#if defined(BOOST_ASIO_WINDOWS_RUNTIME)
-# include <boost/asio/detail/winrt_utils.hpp>
-#endif // defined(BOOST_ASIO_WINDOWS_RUNTIME)
+#if defined(ASIO_WINDOWS_RUNTIME)
+# include "asio/detail/winrt_utils.hpp"
+#endif // defined(ASIO_WINDOWS_RUNTIME)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace ip {
 
 /// A range of entries produced by a resolver.
 /**
- * The boost::asio::ip::basic_resolver_results class template is used to define
+ * The asio::ip::basic_resolver_results class template is used to define
  * a range over the results returned by a resolver.
  *
  * The iterator's value_type, obtained when a results iterator is dereferenced,
@@ -115,7 +114,7 @@ public:
 #if !defined(GENERATING_DOCUMENTATION)
   // Create results from an addrinfo list returned by getaddrinfo.
   static basic_resolver_results create(
-      boost::asio::detail::addrinfo_type* address_info,
+      asio::detail::addrinfo_type* address_info,
       const std::string& host_name, const std::string& service_name)
   {
     basic_resolver_results results;
@@ -130,8 +129,8 @@ public:
 
     while (address_info)
     {
-      if (address_info->ai_family == BOOST_ASIO_OS_DEF(AF_INET)
-          || address_info->ai_family == BOOST_ASIO_OS_DEF(AF_INET6))
+      if (address_info->ai_family == ASIO_OS_DEF(AF_INET)
+          || address_info->ai_family == ASIO_OS_DEF(AF_INET6))
       {
         using namespace std; // For memcpy.
         typename InternetProtocol::endpoint endpoint;
@@ -180,12 +179,12 @@ public:
     return results;
   }
 
-# if defined(BOOST_ASIO_WINDOWS_RUNTIME)
+# if defined(ASIO_WINDOWS_RUNTIME)
   // Create results from a Windows Runtime list of EndpointPair objects.
   static basic_resolver_results create(
       Windows::Foundation::Collections::IVectorView<
         Windows::Networking::EndpointPair^>^ endpoints,
-      const boost::asio::detail::addrinfo_type& hints,
+      const asio::detail::addrinfo_type& hints,
       const std::string& host_name, const std::string& service_name)
   {
     basic_resolver_results results;
@@ -196,12 +195,12 @@ public:
       {
         auto pair = endpoints->GetAt(i);
 
-        if (hints.ai_family == BOOST_ASIO_OS_DEF(AF_INET)
+        if (hints.ai_family == ASIO_OS_DEF(AF_INET)
             && pair->RemoteHostName->Type
               != Windows::Networking::HostNameType::Ipv4)
           continue;
 
-        if (hints.ai_family == BOOST_ASIO_OS_DEF(AF_INET6)
+        if (hints.ai_family == ASIO_OS_DEF(AF_INET6)
             && pair->RemoteHostName->Type
               != Windows::Networking::HostNameType::Ipv6)
           continue;
@@ -210,16 +209,16 @@ public:
             basic_resolver_entry<InternetProtocol>(
               typename InternetProtocol::endpoint(
                 ip::make_address(
-                  boost::asio::detail::winrt_utils::string(
+                  asio::detail::winrt_utils::string(
                     pair->RemoteHostName->CanonicalName)),
-                boost::asio::detail::winrt_utils::integer(
+                asio::detail::winrt_utils::integer(
                   pair->RemoteServiceName)),
               host_name, service_name));
       }
     }
     return results;
   }
-# endif // defined(BOOST_ASIO_WINDOWS_RUNTIME)
+# endif // defined(ASIO_WINDOWS_RUNTIME)
 #endif // !defined(GENERATING_DOCUMENTATION)
 
   /// Get the number of entries in the results range.
@@ -298,8 +297,7 @@ private:
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_IP_BASIC_RESOLVER_RESULTS_HPP
+#endif // ASIO_IP_BASIC_RESOLVER_RESULTS_HPP

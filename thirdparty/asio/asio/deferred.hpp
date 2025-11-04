@@ -8,23 +8,22 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DEFERRED_HPP
-#define BOOST_ASIO_DEFERRED_HPP
+#ifndef ASIO_DEFERRED_HPP
+#define ASIO_DEFERRED_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <tuple>
-#include <boost/asio/associator.hpp>
-#include <boost/asio/async_result.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/detail/utility.hpp>
+#include "asio/associator.hpp"
+#include "asio/async_result.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/detail/utility.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 /// Trait for detecting objects that are usable as deferred operations.
@@ -107,7 +106,7 @@ public:
   {
   }
 
-  template <BOOST_ASIO_COMPLETION_TOKEN_FOR(Signatures...) CompletionToken>
+  template <ASIO_COMPLETION_TOKEN_FOR(Signatures...) CompletionToken>
   auto operator()(CompletionToken&& token) &&
     -> decltype(
       async_initiate<CompletionToken, Signatures...>(
@@ -118,7 +117,7 @@ public:
         token, static_cast<Head&&>(head_), static_cast<Tail&&>(tail_));
   }
 
-  template <BOOST_ASIO_COMPLETION_TOKEN_FOR(Signatures...) CompletionToken>
+  template <ASIO_COMPLETION_TOKEN_FOR(Signatures...) CompletionToken>
   auto operator()(CompletionToken&& token) const &
     -> decltype(
       async_initiate<CompletionToken, Signatures...>(
@@ -221,7 +220,7 @@ struct is_deferred<deferred_function<Function>> : true_type
 
 /// Encapsulates deferred values.
 template <typename... Values>
-class BOOST_ASIO_NODISCARD deferred_values
+class ASIO_NODISCARD deferred_values
 {
 private:
   std::tuple<Values...> values_;
@@ -267,7 +266,7 @@ public:
   }
 
   /// Initiate the deferred operation using the supplied completion token.
-  template <BOOST_ASIO_COMPLETION_TOKEN_FOR(void(Values...)) CompletionToken>
+  template <ASIO_COMPLETION_TOKEN_FOR(void(Values...)) CompletionToken>
   auto operator()(CompletionToken&& token) &&
     -> decltype(
       this->invoke_helper(
@@ -279,7 +278,7 @@ public:
         detail::index_sequence_for<Values...>());
   }
 
-  template <BOOST_ASIO_COMPLETION_TOKEN_FOR(void(Values...)) CompletionToken>
+  template <ASIO_COMPLETION_TOKEN_FOR(void(Values...)) CompletionToken>
   auto operator()(CompletionToken&& token) const &
     -> decltype(
       this->const_invoke_helper(
@@ -301,7 +300,7 @@ struct is_deferred<deferred_values<Values...>> : true_type
 
 /// Encapsulates a deferred asynchronous operation.
 template <typename Signature, typename Initiation, typename... InitArgs>
-class BOOST_ASIO_NODISCARD deferred_async_operation
+class ASIO_NODISCARD deferred_async_operation
 {
 private:
   typedef decay_t<Initiation> initiation_t;
@@ -345,7 +344,7 @@ public:
   }
 
   /// Initiate the asynchronous operation using the supplied completion token.
-  template <BOOST_ASIO_COMPLETION_TOKEN_FOR(Signature) CompletionToken>
+  template <ASIO_COMPLETION_TOKEN_FOR(Signature) CompletionToken>
   auto operator()(CompletionToken&& token) &&
     -> decltype(
       this->invoke_helper(
@@ -357,7 +356,7 @@ public:
         detail::index_sequence_for<InitArgs...>());
   }
 
-  template <BOOST_ASIO_COMPLETION_TOKEN_FOR(Signature) CompletionToken>
+  template <ASIO_COMPLETION_TOKEN_FOR(Signature) CompletionToken>
   auto operator()(CompletionToken&& token) const &
     -> decltype(
       this->const_invoke_helper(
@@ -373,7 +372,7 @@ public:
 /// Encapsulates a deferred asynchronous operation thas has multiple completion
 /// signatures.
 template <typename... Signatures, typename Initiation, typename... InitArgs>
-class BOOST_ASIO_NODISCARD deferred_async_operation<
+class ASIO_NODISCARD deferred_async_operation<
     deferred_signatures<Signatures...>, Initiation, InitArgs...>
 {
 private:
@@ -417,7 +416,7 @@ public:
   }
 
   /// Initiate the asynchronous operation using the supplied completion token.
-  template <BOOST_ASIO_COMPLETION_TOKEN_FOR(Signatures...) CompletionToken>
+  template <ASIO_COMPLETION_TOKEN_FOR(Signatures...) CompletionToken>
   auto operator()(CompletionToken&& token) &&
     -> decltype(
       this->invoke_helper(
@@ -429,7 +428,7 @@ public:
         detail::index_sequence_for<InitArgs...>());
   }
 
-  template <BOOST_ASIO_COMPLETION_TOKEN_FOR(Signatures...) CompletionToken>
+  template <ASIO_COMPLETION_TOKEN_FOR(Signatures...) CompletionToken>
   auto operator()(CompletionToken&& token) const &
     -> decltype(
       this->const_invoke_helper(
@@ -452,7 +451,7 @@ struct is_deferred<
 
 /// Defines a link between two consecutive operations in a sequence.
 template <typename Head, typename Tail>
-class BOOST_ASIO_NODISCARD deferred_sequence :
+class ASIO_NODISCARD deferred_sequence :
   public detail::deferred_sequence_types<Head, Tail>::base
 {
 public:
@@ -481,7 +480,7 @@ struct is_deferred<deferred_sequence<Head, Tail>> : true_type
 
 /// Used to represent a deferred conditional branch.
 template <typename OnTrue = deferred_noop, typename OnFalse = deferred_noop>
-class BOOST_ASIO_NODISCARD deferred_conditional
+class ASIO_NODISCARD deferred_conditional
 {
 private:
   template <typename T, typename F> friend class deferred_conditional;
@@ -598,11 +597,11 @@ struct is_deferred<deferred_conditional<OnTrue, OnFalse>> : true_type
  *
  * @code auto my_deferred_op = my_socket.async_read_some(my_buffer); @endcode
  *
- * or by explicitly passing the special value @c boost::asio::deferred:
+ * or by explicitly passing the special value @c asio::deferred:
  *
  * @code auto my_deferred_op
  *   = my_socket.async_read_some(my_buffer,
- *       boost::asio::deferred); @endcode
+ *       asio::deferred); @endcode
  *
  * The initiating function (async_read_some in the above example) returns a
  * function object that will lazily initiate the operation.
@@ -707,15 +706,14 @@ inline auto operator|(Head head, Tail&& tail)
 /// A @ref completion_token object used to specify that an asynchronous
 /// operation should return a function object to lazily launch the operation.
 /**
- * See the documentation for boost::asio::deferred_t for a usage example.
+ * See the documentation for asio::deferred_t for a usage example.
  */
-BOOST_ASIO_INLINE_VARIABLE constexpr deferred_t deferred;
+ASIO_INLINE_VARIABLE constexpr deferred_t deferred;
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#include <boost/asio/impl/deferred.hpp>
+#include "asio/impl/deferred.hpp"
 
-#endif // BOOST_ASIO_DEFERRED_HPP
+#endif // ASIO_DEFERRED_HPP

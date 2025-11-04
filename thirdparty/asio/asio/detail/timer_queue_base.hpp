@@ -8,21 +8,20 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_TIMER_QUEUE_BASE_HPP
-#define BOOST_ASIO_DETAIL_TIMER_QUEUE_BASE_HPP
+#ifndef ASIO_DETAIL_TIMER_QUEUE_BASE_HPP
+#define ASIO_DETAIL_TIMER_QUEUE_BASE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/noncopyable.hpp>
-#include <boost/asio/detail/op_queue.hpp>
-#include <boost/asio/detail/operation.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/noncopyable.hpp"
+#include "asio/detail/op_queue.hpp"
+#include "asio/detail/operation.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -63,8 +62,7 @@ class timer_queue;
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_TIMER_QUEUE_BASE_HPP
+#endif // ASIO_DETAIL_TIMER_QUEUE_BASE_HPP

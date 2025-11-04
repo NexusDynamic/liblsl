@@ -8,23 +8,22 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_TRAITS_REQUIRE_FREE_HPP
-#define BOOST_ASIO_TRAITS_REQUIRE_FREE_HPP
+#ifndef ASIO_TRAITS_REQUIRE_FREE_HPP
+#define ASIO_TRAITS_REQUIRE_FREE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/type_traits.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/type_traits.hpp"
 
-#if defined(BOOST_ASIO_HAS_WORKING_EXPRESSION_SFINAE)
-# define BOOST_ASIO_HAS_DEDUCED_REQUIRE_FREE_TRAIT 1
-#endif // defined(BOOST_ASIO_HAS_WORKING_EXPRESSION_SFINAE)
+#if defined(ASIO_HAS_WORKING_EXPRESSION_SFINAE)
+# define ASIO_HAS_DEDUCED_REQUIRE_FREE_TRAIT 1
+#endif // defined(ASIO_HAS_WORKING_EXPRESSION_SFINAE)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace traits {
 
@@ -43,7 +42,7 @@ struct no_require_free
   static constexpr bool is_noexcept = false;
 };
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_REQUIRE_FREE_TRAIT)
+#if defined(ASIO_HAS_DEDUCED_REQUIRE_FREE_TRAIT)
 
 template <typename T, typename Property, typename = void>
 struct require_free_trait : no_require_free
@@ -65,7 +64,7 @@ struct require_free_trait<T, Property,
     noexcept(require(declval<T>(), declval<Property>()));
 };
 
-#else // defined(BOOST_ASIO_HAS_DEDUCED_REQUIRE_FREE_TRAIT)
+#else // defined(ASIO_HAS_DEDUCED_REQUIRE_FREE_TRAIT)
 
 template <typename T, typename Property, typename = void>
 struct require_free_trait :
@@ -80,7 +79,7 @@ struct require_free_trait :
 {
 };
 
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_REQUIRE_FREE_TRAIT)
+#endif // defined(ASIO_HAS_DEDUCED_REQUIRE_FREE_TRAIT)
 
 } // namespace detail
 namespace traits {
@@ -99,8 +98,7 @@ struct require_free :
 
 } // namespace traits
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_TRAITS_REQUIRE_FREE_HPP
+#endif // ASIO_TRAITS_REQUIRE_FREE_HPP

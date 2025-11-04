@@ -8,26 +8,25 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_POST_HPP
-#define BOOST_ASIO_POST_HPP
+#ifndef ASIO_POST_HPP
+#define ASIO_POST_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/async_result.hpp>
-#include <boost/asio/detail/initiate_post.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/execution_context.hpp>
-#include <boost/asio/execution/blocking.hpp>
-#include <boost/asio/execution/executor.hpp>
-#include <boost/asio/is_executor.hpp>
-#include <boost/asio/require.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/async_result.hpp"
+#include "asio/detail/initiate_post.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/execution_context.hpp"
+#include "asio/execution/blocking.hpp"
+#include "asio/execution/executor.hpp"
+#include "asio/is_executor.hpp"
+#include "asio/require.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 /// Submits a completion token or function object for execution.
@@ -77,7 +76,7 @@ namespace asio {
  * @par Completion Signature
  * @code void() @endcode
  */
-template <BOOST_ASIO_COMPLETION_TOKEN_FOR(void()) NullaryToken>
+template <ASIO_COMPLETION_TOKEN_FOR(void()) NullaryToken>
 inline auto post(NullaryToken&& token)
   -> decltype(
     async_initiate<NullaryToken, void()>(
@@ -157,7 +156,7 @@ inline auto post(NullaryToken&& token)
  * @code void() @endcode
  */
 template <typename Executor,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void()) NullaryToken
+    ASIO_COMPLETION_TOKEN_FOR(void()) NullaryToken
       = default_completion_token_t<Executor>>
 inline auto post(const Executor& ex,
     NullaryToken&& token = default_completion_token_t<Executor>(),
@@ -188,7 +187,7 @@ inline auto post(const Executor& ex,
  * @code void() @endcode
  */
 template <typename ExecutionContext,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void()) NullaryToken
+    ASIO_COMPLETION_TOKEN_FOR(void()) NullaryToken
       = default_completion_token_t<typename ExecutionContext::executor_type>>
 inline auto post(ExecutionContext& ctx,
     NullaryToken&& token = default_completion_token_t<
@@ -208,8 +207,7 @@ inline auto post(ExecutionContext& ctx,
 }
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_POST_HPP
+#endif // ASIO_POST_HPP

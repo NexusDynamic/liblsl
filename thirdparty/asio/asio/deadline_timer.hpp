@@ -8,26 +8,25 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DEADLINE_TIMER_HPP
-#define BOOST_ASIO_DEADLINE_TIMER_HPP
+#ifndef ASIO_DEADLINE_TIMER_HPP
+#define ASIO_DEADLINE_TIMER_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if !defined(BOOST_ASIO_NO_DEPRECATED)
+#if !defined(ASIO_NO_DEPRECATED)
 
-#if defined(BOOST_ASIO_HAS_BOOST_DATE_TIME) \
+#if defined(ASIO_HAS_BOOST_DATE_TIME) \
   || defined(GENERATING_DOCUMENTATION)
 
-#include <boost/asio/detail/socket_types.hpp> // Must come before posix_time.
-#include <boost/asio/basic_deadline_timer.hpp>
+#include "asio/detail/socket_types.hpp" // Must come before posix_time.
+#include "asio/basic_deadline_timer.hpp"
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
-namespace boost {
 namespace asio {
 
 /// (Deprecated: Use system_timer.) Typedef for the typical usage of timer. Uses
@@ -35,11 +34,10 @@ namespace asio {
 typedef basic_deadline_timer<boost::posix_time::ptime> deadline_timer;
 
 } // namespace asio
-} // namespace boost
 
-#endif // defined(BOOST_ASIO_HAS_BOOST_DATE_TIME)
+#endif // defined(ASIO_HAS_BOOST_DATE_TIME)
        // || defined(GENERATING_DOCUMENTATION)
 
-#endif // !defined(BOOST_ASIO_NO_DEPRECATED)
+#endif // !defined(ASIO_NO_DEPRECATED)
 
-#endif // BOOST_ASIO_DEADLINE_TIMER_HPP
+#endif // ASIO_DEADLINE_TIMER_HPP

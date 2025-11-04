@@ -9,24 +9,23 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_IMPL_POSIX_SERIAL_PORT_SERVICE_IPP
-#define BOOST_ASIO_DETAIL_IMPL_POSIX_SERIAL_PORT_SERVICE_IPP
+#ifndef ASIO_DETAIL_IMPL_POSIX_SERIAL_PORT_SERVICE_IPP
+#define ASIO_DETAIL_IMPL_POSIX_SERIAL_PORT_SERVICE_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_SERIAL_PORT)
-#if !defined(BOOST_ASIO_WINDOWS) && !defined(__CYGWIN__)
+#if defined(ASIO_HAS_SERIAL_PORT)
+#if !defined(ASIO_WINDOWS) && !defined(__CYGWIN__)
 
 #include <cstring>
-#include <boost/asio/detail/posix_serial_port_service.hpp>
+#include "asio/detail/posix_serial_port_service.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -42,14 +41,14 @@ void posix_serial_port_service::shutdown()
   descriptor_service_.shutdown();
 }
 
-boost::system::error_code posix_serial_port_service::open(
+asio::error_code posix_serial_port_service::open(
     posix_serial_port_service::implementation_type& impl,
-    const std::string& device, boost::system::error_code& ec)
+    const std::string& device, asio::error_code& ec)
 {
   if (is_open(impl))
   {
-    ec = boost::asio::error::already_open;
-    BOOST_ASIO_ERROR_LOCATION(ec);
+    ec = asio::error::already_open;
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -58,7 +57,7 @@ boost::system::error_code posix_serial_port_service::open(
       O_RDWR | O_NONBLOCK | O_NOCTTY, ec);
   if (fd < 0)
   {
-    BOOST_ASIO_ERROR_LOCATION(ec);
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -67,9 +66,9 @@ boost::system::error_code posix_serial_port_service::open(
     s = descriptor_ops::fcntl(fd, F_SETFL, s | O_NONBLOCK, ec);
   if (s < 0)
   {
-    boost::system::error_code ignored_ec;
+    asio::error_code ignored_ec;
     descriptor_ops::close(fd, state, ignored_ec);
-    BOOST_ASIO_ERROR_LOCATION(ec);
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -96,75 +95,74 @@ boost::system::error_code posix_serial_port_service::open(
   }
   if (s < 0)
   {
-    boost::system::error_code ignored_ec;
+    asio::error_code ignored_ec;
     descriptor_ops::close(fd, state, ignored_ec);
-    BOOST_ASIO_ERROR_LOCATION(ec);
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
   // We're done. Take ownership of the serial port descriptor.
   if (descriptor_service_.assign(impl, fd, ec))
   {
-    boost::system::error_code ignored_ec;
+    asio::error_code ignored_ec;
     descriptor_ops::close(fd, state, ignored_ec);
   }
 
-  BOOST_ASIO_ERROR_LOCATION(ec);
+  ASIO_ERROR_LOCATION(ec);
   return ec;
 }
 
-boost::system::error_code posix_serial_port_service::do_set_option(
+asio::error_code posix_serial_port_service::do_set_option(
     posix_serial_port_service::implementation_type& impl,
     posix_serial_port_service::store_function_type store,
-    const void* option, boost::system::error_code& ec)
+    const void* option, asio::error_code& ec)
 {
   termios ios;
   int s = ::tcgetattr(descriptor_service_.native_handle(impl), &ios);
   descriptor_ops::get_last_error(ec, s < 0);
   if (s < 0)
   {
-    BOOST_ASIO_ERROR_LOCATION(ec);
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
   if (store(option, ios, ec))
   {
-    BOOST_ASIO_ERROR_LOCATION(ec);
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
   s = ::tcsetattr(descriptor_service_.native_handle(impl), TCSANOW, &ios);
   descriptor_ops::get_last_error(ec, s < 0);
-  BOOST_ASIO_ERROR_LOCATION(ec);
+  ASIO_ERROR_LOCATION(ec);
   return ec;
 }
 
-boost::system::error_code posix_serial_port_service::do_get_option(
+asio::error_code posix_serial_port_service::do_get_option(
     const posix_serial_port_service::implementation_type& impl,
     posix_serial_port_service::load_function_type load,
-    void* option, boost::system::error_code& ec) const
+    void* option, asio::error_code& ec) const
 {
   termios ios;
   int s = ::tcgetattr(descriptor_service_.native_handle(impl), &ios);
   descriptor_ops::get_last_error(ec, s < 0);
   if (s < 0)
   {
-    BOOST_ASIO_ERROR_LOCATION(ec);
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
   load(option, ios, ec);
-  BOOST_ASIO_ERROR_LOCATION(ec);
+  ASIO_ERROR_LOCATION(ec);
   return ec;
 }
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // !defined(BOOST_ASIO_WINDOWS) && !defined(__CYGWIN__)
-#endif // defined(BOOST_ASIO_HAS_SERIAL_PORT)
+#endif // !defined(ASIO_WINDOWS) && !defined(__CYGWIN__)
+#endif // defined(ASIO_HAS_SERIAL_PORT)
 
-#endif // BOOST_ASIO_DETAIL_IMPL_POSIX_SERIAL_PORT_SERVICE_IPP
+#endif // ASIO_DETAIL_IMPL_POSIX_SERIAL_PORT_SERVICE_IPP

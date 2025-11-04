@@ -8,22 +8,21 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_SSL_DETAIL_STREAM_CORE_HPP
-#define BOOST_ASIO_SSL_DETAIL_STREAM_CORE_HPP
+#ifndef ASIO_SSL_DETAIL_STREAM_CORE_HPP
+#define ASIO_SSL_DETAIL_STREAM_CORE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#include <boost/asio/ssl/detail/engine.hpp>
-#include <boost/asio/buffer.hpp>
-#include <boost/asio/steady_timer.hpp>
+#include "asio/ssl/detail/engine.hpp"
+#include "asio/buffer.hpp"
+#include "asio/steady_timer.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace ssl {
 namespace detail {
@@ -40,9 +39,9 @@ struct stream_core
       pending_read_(ex),
       pending_write_(ex),
       output_buffer_space_(max_tls_record_size),
-      output_buffer_(boost::asio::buffer(output_buffer_space_)),
+      output_buffer_(asio::buffer(output_buffer_space_)),
       input_buffer_space_(max_tls_record_size),
-      input_buffer_(boost::asio::buffer(input_buffer_space_))
+      input_buffer_(asio::buffer(input_buffer_space_))
   {
     pending_read_.expires_at(neg_infin());
     pending_write_.expires_at(neg_infin());
@@ -54,9 +53,9 @@ struct stream_core
       pending_read_(ex),
       pending_write_(ex),
       output_buffer_space_(max_tls_record_size),
-      output_buffer_(boost::asio::buffer(output_buffer_space_)),
+      output_buffer_(asio::buffer(output_buffer_space_)),
       input_buffer_space_(max_tls_record_size),
-      input_buffer_(boost::asio::buffer(input_buffer_space_))
+      input_buffer_(asio::buffer(input_buffer_space_))
   {
     pending_read_.expires_at(neg_infin());
     pending_write_.expires_at(neg_infin());
@@ -65,10 +64,10 @@ struct stream_core
   stream_core(stream_core&& other)
     : engine_(static_cast<engine&&>(other.engine_)),
       pending_read_(
-         static_cast<boost::asio::steady_timer&&>(
+         static_cast<asio::steady_timer&&>(
            other.pending_read_)),
       pending_write_(
-         static_cast<boost::asio::steady_timer&&>(
+         static_cast<asio::steady_timer&&>(
            other.pending_write_)),
       output_buffer_space_(
           static_cast<std::vector<unsigned char>&&>(
@@ -80,9 +79,9 @@ struct stream_core
       input_buffer_(other.input_buffer_),
       input_(other.input_)
   {
-    other.output_buffer_ = boost::asio::mutable_buffer(0, 0);
-    other.input_buffer_ = boost::asio::mutable_buffer(0, 0);
-    other.input_ = boost::asio::const_buffer(0, 0);
+    other.output_buffer_ = asio::mutable_buffer(0, 0);
+    other.input_buffer_ = asio::mutable_buffer(0, 0);
+    other.input_ = asio::const_buffer(0, 0);
   }
 
   ~stream_core()
@@ -95,10 +94,10 @@ struct stream_core
     {
       engine_ = static_cast<engine&&>(other.engine_);
       pending_read_ =
-        static_cast<boost::asio::steady_timer&&>(
+        static_cast<asio::steady_timer&&>(
           other.pending_read_);
       pending_write_ =
-        static_cast<boost::asio::steady_timer&&>(
+        static_cast<asio::steady_timer&&>(
           other.pending_write_);
       output_buffer_space_ =
         static_cast<std::vector<unsigned char>&&>(
@@ -109,9 +108,9 @@ struct stream_core
           other.input_buffer_space_);
       input_buffer_ = other.input_buffer_;
       input_ = other.input_;
-      other.output_buffer_ = boost::asio::mutable_buffer(0, 0);
-      other.input_buffer_ = boost::asio::mutable_buffer(0, 0);
-      other.input_ = boost::asio::const_buffer(0, 0);
+      other.output_buffer_ = asio::mutable_buffer(0, 0);
+      other.input_buffer_ = asio::mutable_buffer(0, 0);
+      other.input_ = asio::const_buffer(0, 0);
     }
     return *this;
   }
@@ -120,26 +119,26 @@ struct stream_core
   engine engine_;
 
   // Timer used for storing queued read operations.
-  boost::asio::steady_timer pending_read_;
+  asio::steady_timer pending_read_;
 
   // Timer used for storing queued write operations.
-  boost::asio::steady_timer pending_write_;
+  asio::steady_timer pending_write_;
 
   // Helper function for obtaining a time value that always fires.
-  static boost::asio::steady_timer::time_point neg_infin()
+  static asio::steady_timer::time_point neg_infin()
   {
-    return (boost::asio::steady_timer::time_point::min)();
+    return (asio::steady_timer::time_point::min)();
   }
 
   // Helper function for obtaining a time value that never fires.
-  static boost::asio::steady_timer::time_point pos_infin()
+  static asio::steady_timer::time_point pos_infin()
   {
-    return (boost::asio::steady_timer::time_point::max)();
+    return (asio::steady_timer::time_point::max)();
   }
 
   // Helper function to get a timer's expiry time.
-  static boost::asio::steady_timer::time_point expiry(
-      const boost::asio::steady_timer& timer)
+  static asio::steady_timer::time_point expiry(
+      const asio::steady_timer& timer)
   {
     return timer.expiry();
   }
@@ -148,23 +147,22 @@ struct stream_core
   std::vector<unsigned char> output_buffer_space_;
 
   // A buffer that may be used to prepare output intended for the transport.
-  boost::asio::mutable_buffer output_buffer_;
+  asio::mutable_buffer output_buffer_;
 
   // Buffer space used to read input intended for the engine.
   std::vector<unsigned char> input_buffer_space_;
 
   // A buffer that may be used to read input intended for the engine.
-  boost::asio::mutable_buffer input_buffer_;
+  asio::mutable_buffer input_buffer_;
 
   // The buffer pointing to the engine's unconsumed input.
-  boost::asio::const_buffer input_;
+  asio::const_buffer input_;
 };
 
 } // namespace detail
 } // namespace ssl
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_SSL_DETAIL_STREAM_CORE_HPP
+#endif // ASIO_SSL_DETAIL_STREAM_CORE_HPP

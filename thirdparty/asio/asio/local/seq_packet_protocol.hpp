@@ -8,32 +8,31 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_LOCAL_SEQ_PACKET_PROTOCOL_HPP
-#define BOOST_ASIO_LOCAL_SEQ_PACKET_PROTOCOL_HPP
+#ifndef ASIO_LOCAL_SEQ_PACKET_PROTOCOL_HPP
+#define ASIO_LOCAL_SEQ_PACKET_PROTOCOL_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_LOCAL_SOCKETS) \
+#if defined(ASIO_HAS_LOCAL_SOCKETS) \
   || defined(GENERATING_DOCUMENTATION)
 
-#include <boost/asio/basic_socket_acceptor.hpp>
-#include <boost/asio/basic_seq_packet_socket.hpp>
-#include <boost/asio/detail/socket_types.hpp>
-#include <boost/asio/local/basic_endpoint.hpp>
+#include "asio/basic_socket_acceptor.hpp"
+#include "asio/basic_seq_packet_socket.hpp"
+#include "asio/detail/socket_types.hpp"
+#include "asio/local/basic_endpoint.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace local {
 
 /// Encapsulates the flags needed for seq_packet UNIX sockets.
 /**
- * The boost::asio::local::seq_packet_protocol class contains flags necessary
+ * The asio::local::seq_packet_protocol class contains flags necessary
  * for sequenced packet UNIX domain sockets.
  *
  * @par Thread Safety
@@ -76,11 +75,10 @@ public:
 
 } // namespace local
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)
+#endif // defined(ASIO_HAS_LOCAL_SOCKETS)
        //   || defined(GENERATING_DOCUMENTATION)
 
-#endif // BOOST_ASIO_LOCAL_SEQ_PACKET_PROTOCOL_HPP
+#endif // ASIO_LOCAL_SEQ_PACKET_PROTOCOL_HPP

@@ -8,22 +8,21 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_SYSTEM_CONTEXT_HPP
-#define BOOST_ASIO_SYSTEM_CONTEXT_HPP
+#ifndef ASIO_SYSTEM_CONTEXT_HPP
+#define ASIO_SYSTEM_CONTEXT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/scheduler.hpp>
-#include <boost/asio/detail/thread_group.hpp>
-#include <boost/asio/execution.hpp>
-#include <boost/asio/execution_context.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/scheduler.hpp"
+#include "asio/detail/thread_group.hpp"
+#include "asio/execution.hpp"
+#include "asio/execution_context.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 template <typename Blocking, typename Relationship, typename Allocator>
@@ -41,25 +40,25 @@ public:
     > executor_type;
 
   /// Destructor shuts down all threads in the system thread pool.
-  BOOST_ASIO_DECL ~system_context();
+  ASIO_DECL ~system_context();
 
   /// Obtain an executor for the context.
   executor_type get_executor() noexcept;
 
   /// Signal all threads in the system thread pool to stop.
-  BOOST_ASIO_DECL void stop();
+  ASIO_DECL void stop();
 
   /// Determine whether the system thread pool has been stopped.
-  BOOST_ASIO_DECL bool stopped() const noexcept;
+  ASIO_DECL bool stopped() const noexcept;
 
   /// Join all threads in the system thread pool.
-  BOOST_ASIO_DECL void join();
+  ASIO_DECL void join();
 
 #if defined(GENERATING_DOCUMENTATION)
 private:
 #endif // defined(GENERATING_DOCUMENTATION)
   // Constructor creates all threads in the system thread pool.
-  BOOST_ASIO_DECL system_context();
+  ASIO_DECL system_context();
 
 private:
   template <typename, typename, typename> friend class basic_system_executor;
@@ -67,7 +66,7 @@ private:
   struct thread_function;
 
   // Helper function to create the underlying scheduler.
-  BOOST_ASIO_DECL detail::scheduler& add_scheduler(detail::scheduler* s);
+  ASIO_DECL detail::scheduler& add_scheduler(detail::scheduler* s);
 
   // The underlying scheduler.
   detail::scheduler& scheduler_;
@@ -80,13 +79,12 @@ private:
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#include <boost/asio/impl/system_context.hpp>
-#if defined(BOOST_ASIO_HEADER_ONLY)
-# include <boost/asio/impl/system_context.ipp>
-#endif // defined(BOOST_ASIO_HEADER_ONLY)
+#include "asio/impl/system_context.hpp"
+#if defined(ASIO_HEADER_ONLY)
+# include "asio/impl/system_context.ipp"
+#endif // defined(ASIO_HEADER_ONLY)
 
-#endif // BOOST_ASIO_SYSTEM_CONTEXT_HPP
+#endif // ASIO_SYSTEM_CONTEXT_HPP

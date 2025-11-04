@@ -9,39 +9,38 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_BASIC_SERIAL_PORT_HPP
-#define BOOST_ASIO_BASIC_SERIAL_PORT_HPP
+#ifndef ASIO_BASIC_SERIAL_PORT_HPP
+#define ASIO_BASIC_SERIAL_PORT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_SERIAL_PORT) \
+#if defined(ASIO_HAS_SERIAL_PORT) \
   || defined(GENERATING_DOCUMENTATION)
 
 #include <string>
 #include <utility>
-#include <boost/asio/any_io_executor.hpp>
-#include <boost/asio/async_result.hpp>
-#include <boost/asio/detail/handler_type_requirements.hpp>
-#include <boost/asio/detail/io_object_impl.hpp>
-#include <boost/asio/detail/non_const_lvalue.hpp>
-#include <boost/asio/detail/throw_error.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/error.hpp>
-#include <boost/asio/execution_context.hpp>
-#include <boost/asio/serial_port_base.hpp>
-#if defined(BOOST_ASIO_HAS_IOCP)
-# include <boost/asio/detail/win_iocp_serial_port_service.hpp>
+#include "asio/any_io_executor.hpp"
+#include "asio/async_result.hpp"
+#include "asio/detail/handler_type_requirements.hpp"
+#include "asio/detail/io_object_impl.hpp"
+#include "asio/detail/non_const_lvalue.hpp"
+#include "asio/detail/throw_error.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/error.hpp"
+#include "asio/execution_context.hpp"
+#include "asio/serial_port_base.hpp"
+#if defined(ASIO_HAS_IOCP)
+# include "asio/detail/win_iocp_serial_port_service.hpp"
 #else
-# include <boost/asio/detail/posix_serial_port_service.hpp>
+# include "asio/detail/posix_serial_port_service.hpp"
 #endif
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 /// Provides serial port functionality.
@@ -76,7 +75,7 @@ public:
   /// The native representation of a serial port.
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined native_handle_type;
-#elif defined(BOOST_ASIO_HAS_IOCP)
+#elif defined(ASIO_HAS_IOCP)
   typedef detail::win_iocp_serial_port_service::native_handle_type
     native_handle_type;
 #else
@@ -133,9 +132,9 @@ public:
   basic_serial_port(const executor_type& ex, const char* device)
     : impl_(0, ex)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().open(impl_.get_implementation(), device, ec);
-    boost::asio::detail::throw_error(ec, "open");
+    asio::detail::throw_error(ec, "open");
   }
 
   /// Construct and open a basic_serial_port.
@@ -157,9 +156,9 @@ public:
       > = 0)
     : impl_(0, 0, context)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().open(impl_.get_implementation(), device, ec);
-    boost::asio::detail::throw_error(ec, "open");
+    asio::detail::throw_error(ec, "open");
   }
 
   /// Construct and open a basic_serial_port.
@@ -177,9 +176,9 @@ public:
   basic_serial_port(const executor_type& ex, const std::string& device)
     : impl_(0, ex)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().open(impl_.get_implementation(), device, ec);
-    boost::asio::detail::throw_error(ec, "open");
+    asio::detail::throw_error(ec, "open");
   }
 
   /// Construct and open a basic_serial_port.
@@ -201,9 +200,9 @@ public:
       > = 0)
     : impl_(0, 0, context)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().open(impl_.get_implementation(), device, ec);
-    boost::asio::detail::throw_error(ec, "open");
+    asio::detail::throw_error(ec, "open");
   }
 
   /// Construct a basic_serial_port on an existing native serial port.
@@ -217,16 +216,16 @@ public:
    *
    * @param native_serial_port A native serial port.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    */
   basic_serial_port(const executor_type& ex,
       const native_handle_type& native_serial_port)
     : impl_(0, ex)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(),
         native_serial_port, ec);
-    boost::asio::detail::throw_error(ec, "assign");
+    asio::detail::throw_error(ec, "assign");
   }
 
   /// Construct a basic_serial_port on an existing native serial port.
@@ -240,7 +239,7 @@ public:
    *
    * @param native_serial_port A native serial port.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    */
   template <typename ExecutionContext>
   basic_serial_port(ExecutionContext& context,
@@ -250,10 +249,10 @@ public:
       > = 0)
     : impl_(0, 0, context)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(),
         native_serial_port, ec);
-    boost::asio::detail::throw_error(ec, "assign");
+    asio::detail::throw_error(ec, "assign");
   }
 
   /// Move-construct a basic_serial_port from another.
@@ -388,13 +387,13 @@ public:
    *
    * @param device The platform-specific device name.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    */
   void open(const std::string& device)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().open(impl_.get_implementation(), device, ec);
-    boost::asio::detail::throw_error(ec, "open");
+    asio::detail::throw_error(ec, "open");
   }
 
   /// Open the serial port using the specified device name.
@@ -406,11 +405,11 @@ public:
    *
    * @param ec Set the indicate what error occurred, if any.
    */
-  BOOST_ASIO_SYNC_OP_VOID open(const std::string& device,
-      boost::system::error_code& ec)
+  ASIO_SYNC_OP_VOID open(const std::string& device,
+      asio::error_code& ec)
   {
     impl_.get_service().open(impl_.get_implementation(), device, ec);
-    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
+    ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Assign an existing native serial port to the serial port.
@@ -419,14 +418,14 @@ public:
    *
    * @param native_serial_port A native serial port.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    */
   void assign(const native_handle_type& native_serial_port)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(),
         native_serial_port, ec);
-    boost::asio::detail::throw_error(ec, "assign");
+    asio::detail::throw_error(ec, "assign");
   }
 
   /// Assign an existing native serial port to the serial port.
@@ -437,12 +436,12 @@ public:
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  BOOST_ASIO_SYNC_OP_VOID assign(const native_handle_type& native_serial_port,
-      boost::system::error_code& ec)
+  ASIO_SYNC_OP_VOID assign(const native_handle_type& native_serial_port,
+      asio::error_code& ec)
   {
     impl_.get_service().assign(impl_.get_implementation(),
         native_serial_port, ec);
-    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
+    ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Determine whether the serial port is open.
@@ -455,29 +454,29 @@ public:
   /**
    * This function is used to close the serial port. Any asynchronous read or
    * write operations will be cancelled immediately, and will complete with the
-   * boost::asio::error::operation_aborted error.
+   * asio::error::operation_aborted error.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    */
   void close()
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().close(impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "close");
+    asio::detail::throw_error(ec, "close");
   }
 
   /// Close the serial port.
   /**
    * This function is used to close the serial port. Any asynchronous read or
    * write operations will be cancelled immediately, and will complete with the
-   * boost::asio::error::operation_aborted error.
+   * asio::error::operation_aborted error.
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  BOOST_ASIO_SYNC_OP_VOID close(boost::system::error_code& ec)
+  ASIO_SYNC_OP_VOID close(asio::error_code& ec)
   {
     impl_.get_service().close(impl_.get_implementation(), ec);
-    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
+    ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Get the native serial port representation.
@@ -495,29 +494,29 @@ public:
   /**
    * This function causes all outstanding asynchronous read or write operations
    * to finish immediately, and the handlers for cancelled operations will be
-   * passed the boost::asio::error::operation_aborted error.
+   * passed the asio::error::operation_aborted error.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    */
   void cancel()
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().cancel(impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "cancel");
+    asio::detail::throw_error(ec, "cancel");
   }
 
   /// Cancel all asynchronous operations associated with the serial port.
   /**
    * This function causes all outstanding asynchronous read or write operations
    * to finish immediately, and the handlers for cancelled operations will be
-   * passed the boost::asio::error::operation_aborted error.
+   * passed the asio::error::operation_aborted error.
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  BOOST_ASIO_SYNC_OP_VOID cancel(boost::system::error_code& ec)
+  ASIO_SYNC_OP_VOID cancel(asio::error_code& ec)
   {
     impl_.get_service().cancel(impl_.get_implementation(), ec);
-    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
+    ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Send a break sequence to the serial port.
@@ -525,13 +524,13 @@ public:
    * This function causes a break sequence of platform-specific duration to be
    * sent out the serial port.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    */
   void send_break()
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().send_break(impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "send_break");
+    asio::detail::throw_error(ec, "send_break");
   }
 
   /// Send a break sequence to the serial port.
@@ -541,10 +540,10 @@ public:
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  BOOST_ASIO_SYNC_OP_VOID send_break(boost::system::error_code& ec)
+  ASIO_SYNC_OP_VOID send_break(asio::error_code& ec)
   {
     impl_.get_service().send_break(impl_.get_implementation(), ec);
-    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
+    ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Set an option on the serial port.
@@ -553,21 +552,21 @@ public:
    *
    * @param option The option value to be set on the serial port.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    *
    * @sa SettableSerialPortOption @n
-   * boost::asio::serial_port_base::baud_rate @n
-   * boost::asio::serial_port_base::flow_control @n
-   * boost::asio::serial_port_base::parity @n
-   * boost::asio::serial_port_base::stop_bits @n
-   * boost::asio::serial_port_base::character_size
+   * asio::serial_port_base::baud_rate @n
+   * asio::serial_port_base::flow_control @n
+   * asio::serial_port_base::parity @n
+   * asio::serial_port_base::stop_bits @n
+   * asio::serial_port_base::character_size
    */
   template <typename SettableSerialPortOption>
   void set_option(const SettableSerialPortOption& option)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().set_option(impl_.get_implementation(), option, ec);
-    boost::asio::detail::throw_error(ec, "set_option");
+    asio::detail::throw_error(ec, "set_option");
   }
 
   /// Set an option on the serial port.
@@ -579,18 +578,18 @@ public:
    * @param ec Set to indicate what error occurred, if any.
    *
    * @sa SettableSerialPortOption @n
-   * boost::asio::serial_port_base::baud_rate @n
-   * boost::asio::serial_port_base::flow_control @n
-   * boost::asio::serial_port_base::parity @n
-   * boost::asio::serial_port_base::stop_bits @n
-   * boost::asio::serial_port_base::character_size
+   * asio::serial_port_base::baud_rate @n
+   * asio::serial_port_base::flow_control @n
+   * asio::serial_port_base::parity @n
+   * asio::serial_port_base::stop_bits @n
+   * asio::serial_port_base::character_size
    */
   template <typename SettableSerialPortOption>
-  BOOST_ASIO_SYNC_OP_VOID set_option(const SettableSerialPortOption& option,
-      boost::system::error_code& ec)
+  ASIO_SYNC_OP_VOID set_option(const SettableSerialPortOption& option,
+      asio::error_code& ec)
   {
     impl_.get_service().set_option(impl_.get_implementation(), option, ec);
-    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
+    ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Get an option from the serial port.
@@ -600,21 +599,21 @@ public:
    *
    * @param option The option value to be obtained from the serial port.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    *
    * @sa GettableSerialPortOption @n
-   * boost::asio::serial_port_base::baud_rate @n
-   * boost::asio::serial_port_base::flow_control @n
-   * boost::asio::serial_port_base::parity @n
-   * boost::asio::serial_port_base::stop_bits @n
-   * boost::asio::serial_port_base::character_size
+   * asio::serial_port_base::baud_rate @n
+   * asio::serial_port_base::flow_control @n
+   * asio::serial_port_base::parity @n
+   * asio::serial_port_base::stop_bits @n
+   * asio::serial_port_base::character_size
    */
   template <typename GettableSerialPortOption>
   void get_option(GettableSerialPortOption& option) const
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().get_option(impl_.get_implementation(), option, ec);
-    boost::asio::detail::throw_error(ec, "get_option");
+    asio::detail::throw_error(ec, "get_option");
   }
 
   /// Get an option from the serial port.
@@ -627,18 +626,18 @@ public:
    * @param ec Set to indicate what error occurred, if any.
    *
    * @sa GettableSerialPortOption @n
-   * boost::asio::serial_port_base::baud_rate @n
-   * boost::asio::serial_port_base::flow_control @n
-   * boost::asio::serial_port_base::parity @n
-   * boost::asio::serial_port_base::stop_bits @n
-   * boost::asio::serial_port_base::character_size
+   * asio::serial_port_base::baud_rate @n
+   * asio::serial_port_base::flow_control @n
+   * asio::serial_port_base::parity @n
+   * asio::serial_port_base::stop_bits @n
+   * asio::serial_port_base::character_size
    */
   template <typename GettableSerialPortOption>
-  BOOST_ASIO_SYNC_OP_VOID get_option(GettableSerialPortOption& option,
-      boost::system::error_code& ec) const
+  ASIO_SYNC_OP_VOID get_option(GettableSerialPortOption& option,
+      asio::error_code& ec) const
   {
     impl_.get_service().get_option(impl_.get_implementation(), option, ec);
-    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
+    ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Write some data to the serial port.
@@ -651,8 +650,8 @@ public:
    *
    * @returns The number of bytes written.
    *
-   * @throws boost::system::system_error Thrown on failure. An error code of
-   * boost::asio::error::eof indicates that the connection was closed by the
+   * @throws asio::system_error Thrown on failure. An error code of
+   * asio::error::eof indicates that the connection was closed by the
    * peer.
    *
    * @note The write_some operation may not transmit all of the data to the
@@ -662,7 +661,7 @@ public:
    * @par Example
    * To write a single data buffer use the @ref buffer function as follows:
    * @code
-   * basic_serial_port.write_some(boost::asio::buffer(data, size));
+   * basic_serial_port.write_some(asio::buffer(data, size));
    * @endcode
    * See the @ref buffer documentation for information on writing multiple
    * buffers in one go, and how to use it with arrays, boost::array or
@@ -671,10 +670,10 @@ public:
   template <typename ConstBufferSequence>
   std::size_t write_some(const ConstBufferSequence& buffers)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     std::size_t s = impl_.get_service().write_some(
         impl_.get_implementation(), buffers, ec);
-    boost::asio::detail::throw_error(ec, "write_some");
+    asio::detail::throw_error(ec, "write_some");
     return s;
   }
 
@@ -696,7 +695,7 @@ public:
    */
   template <typename ConstBufferSequence>
   std::size_t write_some(const ConstBufferSequence& buffers,
-      boost::system::error_code& ec)
+      asio::error_code& ec)
   {
     return impl_.get_service().write_some(
         impl_.get_implementation(), buffers, ec);
@@ -719,16 +718,16 @@ public:
    * @ref yield_context, or a function object with the correct completion
    * signature. The function signature of the completion handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error, // Result of operation.
+   *   const asio::error_code& error, // Result of operation.
    *   std::size_t bytes_transferred // Number of bytes written.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using boost::asio::async_immediate().
+   * manner equivalent to using asio::async_immediate().
    *
    * @par Completion Signature
-   * @code void(boost::system::error_code, std::size_t) @endcode
+   * @code void(asio::error_code, std::size_t) @endcode
    *
    * @note The write operation may not transmit all of the data to the peer.
    * Consider using the @ref async_write function if you need to ensure that all
@@ -738,7 +737,7 @@ public:
    * To write a single data buffer use the @ref buffer function as follows:
    * @code
    * basic_serial_port.async_write_some(
-   *     boost::asio::buffer(data, size), handler);
+   *     asio::buffer(data, size), handler);
    * @endcode
    * See the @ref buffer documentation for information on writing multiple
    * buffers in one go, and how to use it with arrays, boost::array or
@@ -746,7 +745,7 @@ public:
    *
    * @par Per-Operation Cancellation
    * On POSIX or Windows operating systems, this asynchronous operation supports
-   * cancellation for the following boost::asio::cancellation_type values:
+   * cancellation for the following asio::cancellation_type values:
    *
    * @li @c cancellation_type::terminal
    *
@@ -755,17 +754,17 @@ public:
    * @li @c cancellation_type::total
    */
   template <typename ConstBufferSequence,
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
         std::size_t)) WriteToken = default_completion_token_t<executor_type>>
   auto async_write_some(const ConstBufferSequence& buffers,
       WriteToken&& token = default_completion_token_t<executor_type>())
     -> decltype(
       async_initiate<WriteToken,
-        void (boost::system::error_code, std::size_t)>(
+        void (asio::error_code, std::size_t)>(
           declval<initiate_async_write_some>(), token, buffers))
   {
     return async_initiate<WriteToken,
-      void (boost::system::error_code, std::size_t)>(
+      void (asio::error_code, std::size_t)>(
         initiate_async_write_some(this), token, buffers);
   }
 
@@ -779,8 +778,8 @@ public:
    *
    * @returns The number of bytes read.
    *
-   * @throws boost::system::system_error Thrown on failure. An error code of
-   * boost::asio::error::eof indicates that the connection was closed by the
+   * @throws asio::system_error Thrown on failure. An error code of
+   * asio::error::eof indicates that the connection was closed by the
    * peer.
    *
    * @note The read_some operation may not read all of the requested number of
@@ -791,7 +790,7 @@ public:
    * @par Example
    * To read into a single data buffer use the @ref buffer function as follows:
    * @code
-   * basic_serial_port.read_some(boost::asio::buffer(data, size));
+   * basic_serial_port.read_some(asio::buffer(data, size));
    * @endcode
    * See the @ref buffer documentation for information on reading into multiple
    * buffers in one go, and how to use it with arrays, boost::array or
@@ -800,10 +799,10 @@ public:
   template <typename MutableBufferSequence>
   std::size_t read_some(const MutableBufferSequence& buffers)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     std::size_t s = impl_.get_service().read_some(
         impl_.get_implementation(), buffers, ec);
-    boost::asio::detail::throw_error(ec, "read_some");
+    asio::detail::throw_error(ec, "read_some");
     return s;
   }
 
@@ -826,7 +825,7 @@ public:
    */
   template <typename MutableBufferSequence>
   std::size_t read_some(const MutableBufferSequence& buffers,
-      boost::system::error_code& ec)
+      asio::error_code& ec)
   {
     return impl_.get_service().read_some(
         impl_.get_implementation(), buffers, ec);
@@ -849,16 +848,16 @@ public:
    * @ref yield_context, or a function object with the correct completion
    * signature. The function signature of the completion handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error, // Result of operation.
+   *   const asio::error_code& error, // Result of operation.
    *   std::size_t bytes_transferred // Number of bytes read.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using boost::asio::async_immediate().
+   * manner equivalent to using asio::async_immediate().
    *
    * @par Completion Signature
-   * @code void(boost::system::error_code, std::size_t) @endcode
+   * @code void(asio::error_code, std::size_t) @endcode
    *
    * @note The read operation may not read all of the requested number of bytes.
    * Consider using the @ref async_read function if you need to ensure that the
@@ -869,7 +868,7 @@ public:
    * To read into a single data buffer use the @ref buffer function as follows:
    * @code
    * basic_serial_port.async_read_some(
-   *     boost::asio::buffer(data, size), handler);
+   *     asio::buffer(data, size), handler);
    * @endcode
    * See the @ref buffer documentation for information on reading into multiple
    * buffers in one go, and how to use it with arrays, boost::array or
@@ -877,7 +876,7 @@ public:
    *
    * @par Per-Operation Cancellation
    * On POSIX or Windows operating systems, this asynchronous operation supports
-   * cancellation for the following boost::asio::cancellation_type values:
+   * cancellation for the following asio::cancellation_type values:
    *
    * @li @c cancellation_type::terminal
    *
@@ -886,17 +885,17 @@ public:
    * @li @c cancellation_type::total
    */
   template <typename MutableBufferSequence,
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
         std::size_t)) ReadToken = default_completion_token_t<executor_type>>
   auto async_read_some(const MutableBufferSequence& buffers,
       ReadToken&& token = default_completion_token_t<executor_type>())
     -> decltype(
       async_initiate<ReadToken,
-        void (boost::system::error_code, std::size_t)>(
+        void (asio::error_code, std::size_t)>(
           declval<initiate_async_read_some>(), token, buffers))
   {
     return async_initiate<ReadToken,
-      void (boost::system::error_code, std::size_t)>(
+      void (asio::error_code, std::size_t)>(
         initiate_async_read_some(this), token, buffers);
   }
 
@@ -926,7 +925,7 @@ private:
     {
       // If you get an error on the following line it means that your handler
       // does not meet the documented type requirements for a WriteHandler.
-      BOOST_ASIO_WRITE_HANDLER_CHECK(WriteHandler, handler) type_check;
+      ASIO_WRITE_HANDLER_CHECK(WriteHandler, handler) type_check;
 
       detail::non_const_lvalue<WriteHandler> handler2(handler);
       self_->impl_.get_service().async_write_some(
@@ -959,7 +958,7 @@ private:
     {
       // If you get an error on the following line it means that your handler
       // does not meet the documented type requirements for a ReadHandler.
-      BOOST_ASIO_READ_HANDLER_CHECK(ReadHandler, handler) type_check;
+      ASIO_READ_HANDLER_CHECK(ReadHandler, handler) type_check;
 
       detail::non_const_lvalue<ReadHandler> handler2(handler);
       self_->impl_.get_service().async_read_some(
@@ -971,7 +970,7 @@ private:
     basic_serial_port* self_;
   };
 
-#if defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
   detail::io_object_impl<detail::win_iocp_serial_port_service, Executor> impl_;
 #else
   detail::io_object_impl<detail::posix_serial_port_service, Executor> impl_;
@@ -979,11 +978,10 @@ private:
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // defined(BOOST_ASIO_HAS_SERIAL_PORT)
+#endif // defined(ASIO_HAS_SERIAL_PORT)
        //   || defined(GENERATING_DOCUMENTATION)
 
-#endif // BOOST_ASIO_BASIC_SERIAL_PORT_HPP
+#endif // ASIO_BASIC_SERIAL_PORT_HPP

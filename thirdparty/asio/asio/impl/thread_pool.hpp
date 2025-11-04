@@ -8,32 +8,31 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IMPL_THREAD_POOL_HPP
-#define BOOST_ASIO_IMPL_THREAD_POOL_HPP
+#ifndef ASIO_IMPL_THREAD_POOL_HPP
+#define ASIO_IMPL_THREAD_POOL_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/config.hpp>
-#include <boost/asio/detail/blocking_executor_op.hpp>
-#include <boost/asio/detail/executor_op.hpp>
-#include <boost/asio/detail/fenced_block.hpp>
-#include <boost/asio/detail/non_const_lvalue.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/execution_context.hpp>
+#include "asio/config.hpp"
+#include "asio/detail/blocking_executor_op.hpp"
+#include "asio/detail/executor_op.hpp"
+#include "asio/detail/fenced_block.hpp"
+#include "asio/detail/non_const_lvalue.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/execution_context.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
-#if !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#if !defined(ASIO_NO_TS_EXECUTORS)
 
 template <typename Allocator>
 thread_pool::thread_pool(allocator_arg_t, const Allocator& a)
   : execution_context(std::allocator_arg, a),
-    scheduler_(boost::asio::make_service<detail::scheduler>(*this, false)),
+    scheduler_(asio::make_service<detail::scheduler>(*this, false)),
     threads_(allocator<void>(*this)),
     num_threads_(default_thread_pool_size()),
     joinable_(true)
@@ -41,14 +40,14 @@ thread_pool::thread_pool(allocator_arg_t, const Allocator& a)
   start();
 }
 
-#endif // !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#endif // !defined(ASIO_NO_TS_EXECUTORS)
 
 template <typename Allocator>
 thread_pool::thread_pool(allocator_arg_t,
     const Allocator& a, std::size_t num_threads)
   : execution_context(std::allocator_arg, a,
       config_from_concurrency_hint(num_threads == 1 ? 1 : 0)),
-    scheduler_(boost::asio::make_service<detail::scheduler>(*this, false)),
+    scheduler_(asio::make_service<detail::scheduler>(*this, false)),
     threads_(allocator<void>(*this)),
     num_threads_(clamp_thread_pool_size(num_threads)),
     joinable_(true)
@@ -61,7 +60,7 @@ thread_pool::thread_pool(allocator_arg_t,
     const Allocator& a, std::size_t num_threads,
     const execution_context::service_maker& initial_services)
   : execution_context(std::allocator_arg, a, initial_services),
-    scheduler_(boost::asio::make_service<detail::scheduler>(*this, false)),
+    scheduler_(asio::make_service<detail::scheduler>(*this, false)),
     threads_(allocator<void>(*this)),
     num_threads_(clamp_thread_pool_size(num_threads)),
     joinable_(true)
@@ -145,21 +144,21 @@ void thread_pool::basic_executor_type<Allocator,
     // Make a local, non-const copy of the function.
     function_type tmp(static_cast<Function&&>(f));
 
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
     try
     {
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
       detail::fenced_block b(detail::fenced_block::full);
       static_cast<function_type&&>(tmp)();
       return;
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
     }
     catch (...)
     {
       pool_->scheduler_.capture_current_exception();
       return;
     }
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
   }
 
   // Allocate and construct an operation to wrap the function.
@@ -170,12 +169,12 @@ void thread_pool::basic_executor_type<Allocator,
 
   if ((bits_ & relationship_continuation) != 0)
   {
-    BOOST_ASIO_HANDLER_CREATION((*pool_, *p.p,
+    ASIO_HANDLER_CREATION((*pool_, *p.p,
           "thread_pool", pool_, 0, "execute(blk=never,rel=cont)"));
   }
   else
   {
-    BOOST_ASIO_HANDLER_CREATION((*pool_, *p.p,
+    ASIO_HANDLER_CREATION((*pool_, *p.p,
           "thread_pool", pool_, 0, "execute(blk=never,rel=fork)"));
   }
 
@@ -195,34 +194,34 @@ void thread_pool::basic_executor_type<Allocator,
   // Invoke immediately if we are already inside the thread pool.
   if (pool_->scheduler_.can_dispatch())
   {
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
     try
     {
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
       detail::fenced_block b(detail::fenced_block::full);
       static_cast<decay_t<Function>&&>(f2.value)();
       return;
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
     }
     catch (...)
     {
       std::terminate();
     }
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
   }
 
   // Construct an operation to wrap the function.
   typedef decay_t<Function> function_type;
   detail::blocking_executor_op<function_type> op(f2.value);
 
-  BOOST_ASIO_HANDLER_CREATION((*pool_, op,
+  ASIO_HANDLER_CREATION((*pool_, op,
         "thread_pool", pool_, 0, "execute(blk=always)"));
 
   pool_->scheduler_.post_immediate_completion(&op, false);
   op.wait();
 }
 
-#if !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#if !defined(ASIO_NO_TS_EXECUTORS)
 template <typename Allocator, unsigned int Bits>
 inline thread_pool& thread_pool::basic_executor_type<
     Allocator, Bits>::context() const noexcept
@@ -267,7 +266,7 @@ void thread_pool::basic_executor_type<Allocator, Bits>::dispatch(
   typename op::ptr p = { detail::addressof(a), op::ptr::allocate(a), 0 };
   p.p = new (p.v) op(static_cast<Function&&>(f), a);
 
-  BOOST_ASIO_HANDLER_CREATION((*pool_, *p.p,
+  ASIO_HANDLER_CREATION((*pool_, *p.p,
         "thread_pool", pool_, 0, "dispatch"));
 
   pool_->scheduler_.post_immediate_completion(p.p, false);
@@ -286,7 +285,7 @@ void thread_pool::basic_executor_type<Allocator, Bits>::post(
   typename op::ptr p = { detail::addressof(a), op::ptr::allocate(a), 0 };
   p.p = new (p.v) op(static_cast<Function&&>(f), a);
 
-  BOOST_ASIO_HANDLER_CREATION((*pool_, *p.p,
+  ASIO_HANDLER_CREATION((*pool_, *p.p,
         "thread_pool", pool_, 0, "post"));
 
   pool_->scheduler_.post_immediate_completion(p.p, false);
@@ -305,17 +304,16 @@ void thread_pool::basic_executor_type<Allocator, Bits>::defer(
   typename op::ptr p = { detail::addressof(a), op::ptr::allocate(a), 0 };
   p.p = new (p.v) op(static_cast<Function&&>(f), a);
 
-  BOOST_ASIO_HANDLER_CREATION((*pool_, *p.p,
+  ASIO_HANDLER_CREATION((*pool_, *p.p,
         "thread_pool", pool_, 0, "defer"));
 
   pool_->scheduler_.post_immediate_completion(p.p, true);
   p.v = p.p = 0;
 }
-#endif // !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#endif // !defined(ASIO_NO_TS_EXECUTORS)
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_IMPL_THREAD_POOL_HPP
+#endif // ASIO_IMPL_THREAD_POOL_HPP

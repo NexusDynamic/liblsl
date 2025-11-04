@@ -8,27 +8,26 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IMPL_EXECUTOR_HPP
-#define BOOST_ASIO_IMPL_EXECUTOR_HPP
+#ifndef ASIO_IMPL_EXECUTOR_HPP
+#define ASIO_IMPL_EXECUTOR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#if !defined(ASIO_NO_TS_EXECUTORS)
 
 #include <new>
-#include <boost/asio/detail/atomic_count.hpp>
-#include <boost/asio/detail/global.hpp>
-#include <boost/asio/detail/memory.hpp>
-#include <boost/asio/executor.hpp>
-#include <boost/asio/system_executor.hpp>
+#include "asio/detail/atomic_count.hpp"
+#include "asio/detail/global.hpp"
+#include "asio/detail/memory.hpp"
+#include "asio/executor.hpp"
+#include "asio/system_executor.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 #if !defined(GENERATING_DOCUMENTATION)
@@ -39,7 +38,7 @@ class executor::impl
   : public executor::impl_base
 {
 public:
-  typedef BOOST_ASIO_REBIND_ALLOC(Allocator, impl) allocator_type;
+  typedef ASIO_REBIND_ALLOC(Allocator, impl) allocator_type;
 
   static impl_base* create(const Executor& e, Allocator a = Allocator())
   {
@@ -310,10 +309,9 @@ const Executor* executor::target() const noexcept
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#endif // !defined(ASIO_NO_TS_EXECUTORS)
 
-#endif // BOOST_ASIO_IMPL_EXECUTOR_HPP
+#endif // ASIO_IMPL_EXECUTOR_HPP

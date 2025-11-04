@@ -8,41 +8,40 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_WINRT_TIMER_SCHEDULER_HPP
-#define BOOST_ASIO_DETAIL_WINRT_TIMER_SCHEDULER_HPP
+#ifndef ASIO_DETAIL_WINRT_TIMER_SCHEDULER_HPP
+#define ASIO_DETAIL_WINRT_TIMER_SCHEDULER_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_WINDOWS_RUNTIME)
+#if defined(ASIO_WINDOWS_RUNTIME)
 
 #include <cstddef>
-#include <boost/asio/detail/event.hpp>
-#include <boost/asio/detail/limits.hpp>
-#include <boost/asio/detail/mutex.hpp>
-#include <boost/asio/detail/op_queue.hpp>
-#include <boost/asio/detail/thread.hpp>
-#include <boost/asio/detail/timer_queue_base.hpp>
-#include <boost/asio/detail/timer_queue_set.hpp>
-#include <boost/asio/detail/wait_op.hpp>
-#include <boost/asio/execution_context.hpp>
+#include "asio/detail/event.hpp"
+#include "asio/detail/limits.hpp"
+#include "asio/detail/mutex.hpp"
+#include "asio/detail/op_queue.hpp"
+#include "asio/detail/thread.hpp"
+#include "asio/detail/timer_queue_base.hpp"
+#include "asio/detail/timer_queue_set.hpp"
+#include "asio/detail/wait_op.hpp"
+#include "asio/execution_context.hpp"
 
-#if defined(BOOST_ASIO_HAS_IOCP)
-# include <boost/asio/detail/win_iocp_io_context.hpp>
-#else // defined(BOOST_ASIO_HAS_IOCP)
-# include <boost/asio/detail/scheduler.hpp>
-#endif // defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
+# include "asio/detail/win_iocp_io_context.hpp"
+#else // defined(ASIO_HAS_IOCP)
+# include "asio/detail/scheduler.hpp"
+#endif // defined(ASIO_HAS_IOCP)
 
-#if defined(BOOST_ASIO_HAS_IOCP)
-# include <boost/asio/detail/thread.hpp>
-#endif // defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
+# include "asio/detail/thread.hpp"
+#endif // defined(ASIO_HAS_IOCP)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -51,19 +50,19 @@ class winrt_timer_scheduler
 {
 public:
   // Constructor.
-  BOOST_ASIO_DECL winrt_timer_scheduler(execution_context& context);
+  ASIO_DECL winrt_timer_scheduler(execution_context& context);
 
   // Destructor.
-  BOOST_ASIO_DECL ~winrt_timer_scheduler();
+  ASIO_DECL ~winrt_timer_scheduler();
 
   // Destroy all user-defined handler objects owned by the service.
-  BOOST_ASIO_DECL void shutdown();
+  ASIO_DECL void shutdown();
 
   // Recreate internal descriptors following a fork.
-  BOOST_ASIO_DECL void notify_fork(execution_context::fork_event fork_ev);
+  ASIO_DECL void notify_fork(execution_context::fork_event fork_ev);
 
   // Initialise the task. No effect as this class uses its own thread.
-  BOOST_ASIO_DECL void init_task();
+  ASIO_DECL void init_task();
 
   // Add a new timer queue to the reactor.
   template <typename TimeTraits, typename Allocator>
@@ -96,19 +95,19 @@ public:
 
 private:
   // Run the select loop in the thread.
-  BOOST_ASIO_DECL void run_thread();
+  ASIO_DECL void run_thread();
 
   // Entry point for the select loop thread.
-  BOOST_ASIO_DECL static void call_run_thread(winrt_timer_scheduler* reactor);
+  ASIO_DECL static void call_run_thread(winrt_timer_scheduler* reactor);
 
   // Helper function to add a new timer queue.
-  BOOST_ASIO_DECL void do_add_timer_queue(timer_queue_base& queue);
+  ASIO_DECL void do_add_timer_queue(timer_queue_base& queue);
 
   // Helper function to remove a timer queue.
-  BOOST_ASIO_DECL void do_remove_timer_queue(timer_queue_base& queue);
+  ASIO_DECL void do_remove_timer_queue(timer_queue_base& queue);
 
   // The scheduler implementation used to post completions.
-#if defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
   typedef class win_iocp_io_context scheduler_impl;
 #else
   typedef class scheduler scheduler_impl;
@@ -116,16 +115,16 @@ private:
   scheduler_impl& scheduler_;
 
   // Mutex used to protect internal variables.
-  boost::asio::detail::mutex mutex_;
+  asio::detail::mutex mutex_;
 
   // Event used to wake up background thread.
-  boost::asio::detail::event event_;
+  asio::detail::event event_;
 
   // The timer queues.
   timer_queue_set timer_queues_;
 
   // The background thread that is waiting for timers to expire.
-  boost::asio::detail::thread thread_;
+  asio::detail::thread thread_;
 
   // Does the background thread need to stop.
   bool stop_thread_;
@@ -136,15 +135,14 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#include <boost/asio/detail/impl/winrt_timer_scheduler.hpp>
-#if defined(BOOST_ASIO_HEADER_ONLY)
-# include <boost/asio/detail/impl/winrt_timer_scheduler.ipp>
-#endif // defined(BOOST_ASIO_HEADER_ONLY)
+#include "asio/detail/impl/winrt_timer_scheduler.hpp"
+#if defined(ASIO_HEADER_ONLY)
+# include "asio/detail/impl/winrt_timer_scheduler.ipp"
+#endif // defined(ASIO_HEADER_ONLY)
 
-#endif // defined(BOOST_ASIO_WINDOWS_RUNTIME)
+#endif // defined(ASIO_WINDOWS_RUNTIME)
 
-#endif // BOOST_ASIO_DETAIL_WINRT_TIMER_SCHEDULER_HPP
+#endif // ASIO_DETAIL_WINRT_TIMER_SCHEDULER_HPP

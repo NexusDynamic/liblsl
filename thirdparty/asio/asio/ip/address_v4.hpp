@@ -8,36 +8,35 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IP_ADDRESS_V4_HPP
-#define BOOST_ASIO_IP_ADDRESS_V4_HPP
+#ifndef ASIO_IP_ADDRESS_V4_HPP
+#define ASIO_IP_ADDRESS_V4_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <functional>
 #include <string>
-#include <boost/asio/detail/array.hpp>
-#include <boost/asio/detail/cstdint.hpp>
-#include <boost/asio/detail/socket_types.hpp>
-#include <boost/asio/detail/string_view.hpp>
-#include <boost/asio/detail/winsock_init.hpp>
-#include <boost/system/error_code.hpp>
+#include "asio/detail/array.hpp"
+#include "asio/detail/cstdint.hpp"
+#include "asio/detail/socket_types.hpp"
+#include "asio/detail/string_view.hpp"
+#include "asio/detail/winsock_init.hpp"
+#include "asio/error_code.hpp"
 
-#if !defined(BOOST_ASIO_NO_IOSTREAM)
+#if !defined(ASIO_NO_IOSTREAM)
 # include <iosfwd>
-#endif // !defined(BOOST_ASIO_NO_IOSTREAM)
+#endif // !defined(ASIO_NO_IOSTREAM)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace ip {
 
 /// Implements IP version 4 style addresses.
 /**
- * The boost::asio::ip::address_v4 class provides the ability to use and
+ * The asio::ip::address_v4 class provides the ability to use and
  * manipulate IP version 4 addresses.
  *
  * @par Thread Safety
@@ -58,7 +57,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef array<unsigned char, 4> bytes_type;
 #else
-  typedef boost::asio::detail::array<unsigned char, 4> bytes_type;
+  typedef asio::detail::array<unsigned char, 4> bytes_type;
 #endif
 
   /// Default constructor.
@@ -81,13 +80,13 @@ public:
    * <tt>0 - 0xFF</tt>. Note that no range checking is required for platforms
    * where <tt>std::numeric_limits<unsigned char>::max()</tt> is <tt>0xFF</tt>.
    */
-  BOOST_ASIO_DECL explicit address_v4(const bytes_type& bytes);
+  ASIO_DECL explicit address_v4(const bytes_type& bytes);
 
   /// Construct an address from an unsigned integer in host byte order.
   /**
    * Initialises the @c address_v4 object such that <tt>to_uint() == addr</tt>.
    */
-  BOOST_ASIO_DECL explicit address_v4(uint_type addr);
+  ASIO_DECL explicit address_v4(uint_type addr);
 
   /// Copy constructor.
   address_v4(const address_v4& other) noexcept
@@ -116,13 +115,13 @@ public:
   }
 
   /// Get the address in bytes, in network byte order.
-  BOOST_ASIO_DECL bytes_type to_bytes() const noexcept;
+  ASIO_DECL bytes_type to_bytes() const noexcept;
 
   /// Get the address as an unsigned integer in host byte order.
-  BOOST_ASIO_DECL uint_type to_uint() const noexcept;
+  ASIO_DECL uint_type to_uint() const noexcept;
 
   /// Get the address as a string in dotted decimal format.
-  BOOST_ASIO_DECL std::string to_string() const;
+  ASIO_DECL std::string to_string() const;
 
   /// Determine whether the address is a loopback address.
   /**
@@ -132,7 +131,7 @@ public:
    *
    * @returns <tt>(to_uint() & 0xFF000000) == 0x7F000000</tt>.
    */
-  BOOST_ASIO_DECL bool is_loopback() const noexcept;
+  ASIO_DECL bool is_loopback() const noexcept;
 
   /// Determine whether the address is unspecified.
   /**
@@ -141,7 +140,7 @@ public:
    *
    * @returns <tt>to_uint() == 0</tt>.
    */
-  BOOST_ASIO_DECL bool is_unspecified() const noexcept;
+  ASIO_DECL bool is_unspecified() const noexcept;
 
   /// Determine whether the address is a multicast address.
   /**
@@ -151,7 +150,7 @@ public:
    *
    * @returns <tt>(to_uint() & 0xF0000000) == 0xE0000000</tt>.
    */
-  BOOST_ASIO_DECL bool is_multicast() const noexcept;
+  ASIO_DECL bool is_multicast() const noexcept;
 
   /// Compare two addresses for equality.
   friend bool operator==(const address_v4& a1,
@@ -253,7 +252,7 @@ public:
 
 private:
   // The underlying IPv4 address.
-  boost::asio::detail::in4_addr_type addr_;
+  asio::detail::in4_addr_type addr_;
 };
 
 /// Create an IPv4 address from raw bytes in network order.
@@ -278,48 +277,48 @@ inline address_v4 make_address_v4(address_v4::uint_type addr)
 /**
  * @relates address_v4
  */
-BOOST_ASIO_DECL address_v4 make_address_v4(const char* str);
+ASIO_DECL address_v4 make_address_v4(const char* str);
 
 /// Create an IPv4 address from an IP address string in dotted decimal form.
 /**
  * @relates address_v4
  */
-BOOST_ASIO_DECL address_v4 make_address_v4(const char* str,
-    boost::system::error_code& ec) noexcept;
+ASIO_DECL address_v4 make_address_v4(const char* str,
+    asio::error_code& ec) noexcept;
 
 /// Create an IPv4 address from an IP address string in dotted decimal form.
 /**
  * @relates address_v4
  */
-BOOST_ASIO_DECL address_v4 make_address_v4(const std::string& str);
+ASIO_DECL address_v4 make_address_v4(const std::string& str);
 
 /// Create an IPv4 address from an IP address string in dotted decimal form.
 /**
  * @relates address_v4
  */
-BOOST_ASIO_DECL address_v4 make_address_v4(const std::string& str,
-    boost::system::error_code& ec) noexcept;
+ASIO_DECL address_v4 make_address_v4(const std::string& str,
+    asio::error_code& ec) noexcept;
 
-#if defined(BOOST_ASIO_HAS_STRING_VIEW) \
+#if defined(ASIO_HAS_STRING_VIEW) \
   || defined(GENERATING_DOCUMENTATION)
 
 /// Create an IPv4 address from an IP address string in dotted decimal form.
 /**
  * @relates address_v4
  */
-BOOST_ASIO_DECL address_v4 make_address_v4(string_view str);
+ASIO_DECL address_v4 make_address_v4(string_view str);
 
 /// Create an IPv4 address from an IP address string in dotted decimal form.
 /**
  * @relates address_v4
  */
-BOOST_ASIO_DECL address_v4 make_address_v4(string_view str,
-    boost::system::error_code& ec) noexcept;
+ASIO_DECL address_v4 make_address_v4(string_view str,
+    asio::error_code& ec) noexcept;
 
-#endif // defined(BOOST_ASIO_HAS_STRING_VIEW)
+#endif // defined(ASIO_HAS_STRING_VIEW)
        //  || defined(GENERATING_DOCUMENTATION)
 
-#if !defined(BOOST_ASIO_NO_IOSTREAM)
+#if !defined(ASIO_NO_IOSTREAM)
 
 /// Output an address as a string.
 /**
@@ -331,24 +330,23 @@ BOOST_ASIO_DECL address_v4 make_address_v4(string_view str,
  *
  * @return The output stream.
  *
- * @relates boost::asio::ip::address_v4
+ * @relates asio::ip::address_v4
  */
 template <typename Elem, typename Traits>
 std::basic_ostream<Elem, Traits>& operator<<(
     std::basic_ostream<Elem, Traits>& os, const address_v4& addr);
 
-#endif // !defined(BOOST_ASIO_NO_IOSTREAM)
+#endif // !defined(ASIO_NO_IOSTREAM)
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
 
 namespace std {
 
 template <>
-struct hash<boost::asio::ip::address_v4>
+struct hash<asio::ip::address_v4>
 {
-  std::size_t operator()(const boost::asio::ip::address_v4& addr)
+  std::size_t operator()(const asio::ip::address_v4& addr)
     const noexcept
   {
     return std::hash<unsigned int>()(addr.to_uint());
@@ -357,11 +355,11 @@ struct hash<boost::asio::ip::address_v4>
 
 } // namespace std
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#include <boost/asio/ip/impl/address_v4.hpp>
-#if defined(BOOST_ASIO_HEADER_ONLY)
-# include <boost/asio/ip/impl/address_v4.ipp>
-#endif // defined(BOOST_ASIO_HEADER_ONLY)
+#include "asio/ip/impl/address_v4.hpp"
+#if defined(ASIO_HEADER_ONLY)
+# include "asio/ip/impl/address_v4.ipp"
+#endif // defined(ASIO_HEADER_ONLY)
 
-#endif // BOOST_ASIO_IP_ADDRESS_V4_HPP
+#endif // ASIO_IP_ADDRESS_V4_HPP

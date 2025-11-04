@@ -8,21 +8,20 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IMMEDIATE_HPP
-#define BOOST_ASIO_IMMEDIATE_HPP
+#ifndef ASIO_IMMEDIATE_HPP
+#define ASIO_IMMEDIATE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/associated_immediate_executor.hpp>
-#include <boost/asio/async_result.hpp>
-#include <boost/asio/dispatch.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/associated_immediate_executor.hpp"
+#include "asio/async_result.hpp"
+#include "asio/dispatch.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -68,17 +67,17 @@ private:
  * @param token The completion token.
  *
  * The completion handler is immediately submitted for execution by calling
- * boost::asio::dispatch() on the handler's associated immediate executor.
+ * asio::dispatch() on the handler's associated immediate executor.
  *
  * If the completion handler does not have a customised associated immediate
- * executor, then the handler is submitted as if by calling boost::asio::post()
+ * executor, then the handler is submitted as if by calling asio::post()
  * on the supplied I/O executor.
  *
  * @par Completion Signature
  * @code void() @endcode
  */
 template <typename Executor,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void()) NullaryToken
+    ASIO_COMPLETION_TOKEN_FOR(void()) NullaryToken
       = default_completion_token_t<Executor>>
 inline auto async_immediate(const Executor& ex,
     NullaryToken&& token = default_completion_token_t<Executor>(),
@@ -107,17 +106,17 @@ inline auto async_immediate(const Executor& ex,
  * @param token The completion token.
  *
  * The completion handler is immediately submitted for execution by calling
- * boost::asio::dispatch() on the handler's associated immediate executor.
+ * asio::dispatch() on the handler's associated immediate executor.
  *
  * If the completion handler does not have a customised associated immediate
- * executor, then the handler is submitted as if by calling boost::asio::post()
+ * executor, then the handler is submitted as if by calling asio::post()
  * on the I/O executor obtained from the supplied execution context.
  *
  * @par Completion Signature
  * @code void() @endcode
  */
 template <typename ExecutionContext,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void()) NullaryToken
+    ASIO_COMPLETION_TOKEN_FOR(void()) NullaryToken
       = default_completion_token_t<typename ExecutionContext::executor_type>>
 inline auto async_immediate(ExecutionContext& ctx,
     NullaryToken&& token = default_completion_token_t<
@@ -137,8 +136,7 @@ inline auto async_immediate(ExecutionContext& ctx,
 }
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_IMMEDIATE_HPP
+#endif // ASIO_IMMEDIATE_HPP

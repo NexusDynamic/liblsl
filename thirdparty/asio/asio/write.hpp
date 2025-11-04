@@ -8,40 +8,39 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_WRITE_HPP
-#define BOOST_ASIO_WRITE_HPP
+#ifndef ASIO_WRITE_HPP
+#define ASIO_WRITE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <cstddef>
-#include <boost/asio/async_result.hpp>
-#include <boost/asio/buffer.hpp>
-#include <boost/asio/completion_condition.hpp>
-#include <boost/asio/error.hpp>
+#include "asio/async_result.hpp"
+#include "asio/buffer.hpp"
+#include "asio/completion_condition.hpp"
+#include "asio/error.hpp"
 
-#if !defined(BOOST_ASIO_NO_EXTENSIONS)
-# include <boost/asio/basic_streambuf_fwd.hpp>
-#endif // !defined(BOOST_ASIO_NO_EXTENSIONS)
+#if !defined(ASIO_NO_EXTENSIONS)
+# include "asio/basic_streambuf_fwd.hpp"
+#endif // !defined(ASIO_NO_EXTENSIONS)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
 template <typename> class initiate_async_write;
-#if !defined(BOOST_ASIO_NO_DYNAMIC_BUFFER_V1)
+#if !defined(ASIO_NO_DYNAMIC_BUFFER_V1)
 template <typename> class initiate_async_write_dynbuf_v1;
-#endif // !defined(BOOST_ASIO_NO_DYNAMIC_BUFFER_V1)
+#endif // !defined(ASIO_NO_DYNAMIC_BUFFER_V1)
 template <typename> class initiate_async_write_dynbuf_v2;
 
 } // namespace detail
 
 /**
- * @defgroup write boost::asio::write
+ * @defgroup write asio::write
  *
  * @brief The @c write function is a composed operation that writes a certain
  * amount of data to a stream before returning.
@@ -70,19 +69,19 @@ template <typename> class initiate_async_write_dynbuf_v2;
  *
  * @returns The number of bytes transferred.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws asio::system_error Thrown on failure.
  *
  * @par Example
  * To write a single data buffer use the @ref buffer function as follows:
- * @code boost::asio::write(s, boost::asio::buffer(data, size)); @endcode
+ * @code asio::write(s, asio::buffer(data, size)); @endcode
  * See the @ref buffer documentation for information on writing multiple
  * buffers in one go, and how to use it with arrays, boost::array or
  * std::vector.
  *
  * @note This overload is equivalent to calling:
- * @code boost::asio::write(
+ * @code asio::write(
  *     s, buffers,
- *     boost::asio::transfer_all()); @endcode
+ *     asio::transfer_all()); @endcode
  */
 template <typename SyncWriteStream, typename ConstBufferSequence>
 std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
@@ -116,19 +115,19 @@ std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
  *
  * @par Example
  * To write a single data buffer use the @ref buffer function as follows:
- * @code boost::asio::write(s, boost::asio::buffer(data, size), ec); @endcode
+ * @code asio::write(s, asio::buffer(data, size), ec); @endcode
  * See the @ref buffer documentation for information on writing multiple
  * buffers in one go, and how to use it with arrays, boost::array or
  * std::vector.
  *
  * @note This overload is equivalent to calling:
- * @code boost::asio::write(
+ * @code asio::write(
  *     s, buffers,
- *     boost::asio::transfer_all(), ec); @endcode
+ *     asio::transfer_all(), ec); @endcode
  */
 template <typename SyncWriteStream, typename ConstBufferSequence>
 std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
-    boost::system::error_code& ec,
+    asio::error_code& ec,
     constraint_t<
       is_const_buffer_sequence<ConstBufferSequence>::value
     > = 0);
@@ -158,7 +157,7 @@ std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest write_some operation.
- *   const boost::system::error_code& error,
+ *   const asio::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -169,12 +168,12 @@ std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
  *
  * @returns The number of bytes transferred.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws asio::system_error Thrown on failure.
  *
  * @par Example
  * To write a single data buffer use the @ref buffer function as follows:
- * @code boost::asio::write(s, boost::asio::buffer(data, size),
- *     boost::asio::transfer_at_least(32)); @endcode
+ * @code asio::write(s, asio::buffer(data, size),
+ *     asio::transfer_at_least(32)); @endcode
  * See the @ref buffer documentation for information on writing multiple
  * buffers in one go, and how to use it with arrays, boost::array or
  * std::vector.
@@ -215,7 +214,7 @@ std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest write_some operation.
- *   const boost::system::error_code& error,
+ *   const asio::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -232,7 +231,7 @@ std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
 template <typename SyncWriteStream, typename ConstBufferSequence,
     typename CompletionCondition>
 std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
-    CompletionCondition completion_condition, boost::system::error_code& ec,
+    CompletionCondition completion_condition, asio::error_code& ec,
     constraint_t<
       is_const_buffer_sequence<ConstBufferSequence>::value
     > = 0,
@@ -240,7 +239,7 @@ std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
       is_completion_condition<CompletionCondition>::value
     > = 0);
 
-#if !defined(BOOST_ASIO_NO_DYNAMIC_BUFFER_V1)
+#if !defined(ASIO_NO_DYNAMIC_BUFFER_V1)
 
 /// Write all of the supplied data to a stream before returning.
 /**
@@ -262,12 +261,12 @@ std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
  *
  * @returns The number of bytes transferred.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws asio::system_error Thrown on failure.
  *
  * @note This overload is equivalent to calling:
- * @code boost::asio::write(
+ * @code asio::write(
  *     s, buffers,
- *     boost::asio::transfer_all()); @endcode
+ *     asio::transfer_all()); @endcode
  */
 template <typename SyncWriteStream, typename DynamicBuffer_v1>
 std::size_t write(SyncWriteStream& s,
@@ -302,14 +301,14 @@ std::size_t write(SyncWriteStream& s,
  * @returns The number of bytes transferred.
  *
  * @note This overload is equivalent to calling:
- * @code boost::asio::write(
+ * @code asio::write(
  *     s, buffers,
- *     boost::asio::transfer_all(), ec); @endcode
+ *     asio::transfer_all(), ec); @endcode
  */
 template <typename SyncWriteStream, typename DynamicBuffer_v1>
 std::size_t write(SyncWriteStream& s,
     DynamicBuffer_v1&& buffers,
-    boost::system::error_code& ec,
+    asio::error_code& ec,
     constraint_t<
       is_dynamic_buffer_v1<decay_t<DynamicBuffer_v1>>::value
     > = 0,
@@ -340,7 +339,7 @@ std::size_t write(SyncWriteStream& s,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest write_some operation.
- *   const boost::system::error_code& error,
+ *   const asio::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -351,7 +350,7 @@ std::size_t write(SyncWriteStream& s,
  *
  * @returns The number of bytes transferred.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws asio::system_error Thrown on failure.
  */
 template <typename SyncWriteStream, typename DynamicBuffer_v1,
     typename CompletionCondition>
@@ -391,7 +390,7 @@ std::size_t write(SyncWriteStream& s,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest write_some operation.
- *   const boost::system::error_code& error,
+ *   const asio::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -409,7 +408,7 @@ template <typename SyncWriteStream, typename DynamicBuffer_v1,
     typename CompletionCondition>
 std::size_t write(SyncWriteStream& s,
     DynamicBuffer_v1&& buffers,
-    CompletionCondition completion_condition, boost::system::error_code& ec,
+    CompletionCondition completion_condition, asio::error_code& ec,
     constraint_t<
       is_dynamic_buffer_v1<decay_t<DynamicBuffer_v1>>::value
     > = 0,
@@ -420,8 +419,8 @@ std::size_t write(SyncWriteStream& s,
       is_completion_condition<CompletionCondition>::value
     > = 0);
 
-#if !defined(BOOST_ASIO_NO_EXTENSIONS)
-#if !defined(BOOST_ASIO_NO_IOSTREAM)
+#if !defined(ASIO_NO_EXTENSIONS)
+#if !defined(ASIO_NO_IOSTREAM)
 
 /// Write all of the supplied data to a stream before returning.
 /**
@@ -442,12 +441,12 @@ std::size_t write(SyncWriteStream& s,
  *
  * @returns The number of bytes transferred.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws asio::system_error Thrown on failure.
  *
  * @note This overload is equivalent to calling:
- * @code boost::asio::write(
+ * @code asio::write(
  *     s, b,
- *     boost::asio::transfer_all()); @endcode
+ *     asio::transfer_all()); @endcode
  */
 template <typename SyncWriteStream, typename Allocator>
 std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b);
@@ -474,13 +473,13 @@ std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b);
  * @returns The number of bytes transferred.
  *
  * @note This overload is equivalent to calling:
- * @code boost::asio::write(
+ * @code asio::write(
  *     s, b,
- *     boost::asio::transfer_all(), ec); @endcode
+ *     asio::transfer_all(), ec); @endcode
  */
 template <typename SyncWriteStream, typename Allocator>
 std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b,
-    boost::system::error_code& ec);
+    asio::error_code& ec);
 
 /// Write a certain amount of data to a stream before returning.
 /**
@@ -504,7 +503,7 @@ std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest write_some operation.
- *   const boost::system::error_code& error,
+ *   const asio::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -515,7 +514,7 @@ std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b,
  *
  * @returns The number of bytes transferred.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws asio::system_error Thrown on failure.
  */
 template <typename SyncWriteStream, typename Allocator,
     typename CompletionCondition>
@@ -547,7 +546,7 @@ std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest write_some operation.
- *   const boost::system::error_code& error,
+ *   const asio::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -564,14 +563,14 @@ std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b,
 template <typename SyncWriteStream, typename Allocator,
     typename CompletionCondition>
 std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b,
-    CompletionCondition completion_condition, boost::system::error_code& ec,
+    CompletionCondition completion_condition, asio::error_code& ec,
     constraint_t<
       is_completion_condition<CompletionCondition>::value
     > = 0);
 
-#endif // !defined(BOOST_ASIO_NO_IOSTREAM)
-#endif // !defined(BOOST_ASIO_NO_EXTENSIONS)
-#endif // !defined(BOOST_ASIO_NO_DYNAMIC_BUFFER_V1)
+#endif // !defined(ASIO_NO_IOSTREAM)
+#endif // !defined(ASIO_NO_EXTENSIONS)
+#endif // !defined(ASIO_NO_DYNAMIC_BUFFER_V1)
 
 /// Write all of the supplied data to a stream before returning.
 /**
@@ -593,12 +592,12 @@ std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b,
  *
  * @returns The number of bytes transferred.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws asio::system_error Thrown on failure.
  *
  * @note This overload is equivalent to calling:
- * @code boost::asio::write(
+ * @code asio::write(
  *     s, buffers,
- *     boost::asio::transfer_all()); @endcode
+ *     asio::transfer_all()); @endcode
  */
 template <typename SyncWriteStream, typename DynamicBuffer_v2>
 std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
@@ -629,13 +628,13 @@ std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
  * @returns The number of bytes transferred.
  *
  * @note This overload is equivalent to calling:
- * @code boost::asio::write(
+ * @code asio::write(
  *     s, buffers,
- *     boost::asio::transfer_all(), ec); @endcode
+ *     asio::transfer_all(), ec); @endcode
  */
 template <typename SyncWriteStream, typename DynamicBuffer_v2>
 std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
-    boost::system::error_code& ec,
+    asio::error_code& ec,
     constraint_t<
       is_dynamic_buffer_v2<DynamicBuffer_v2>::value
     > = 0);
@@ -663,7 +662,7 @@ std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest write_some operation.
- *   const boost::system::error_code& error,
+ *   const asio::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -674,7 +673,7 @@ std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
  *
  * @returns The number of bytes transferred.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws asio::system_error Thrown on failure.
  */
 template <typename SyncWriteStream, typename DynamicBuffer_v2,
     typename CompletionCondition>
@@ -710,7 +709,7 @@ std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest write_some operation.
- *   const boost::system::error_code& error,
+ *   const asio::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -727,7 +726,7 @@ std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
 template <typename SyncWriteStream, typename DynamicBuffer_v2,
     typename CompletionCondition>
 std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
-    CompletionCondition completion_condition, boost::system::error_code& ec,
+    CompletionCondition completion_condition, asio::error_code& ec,
     constraint_t<
       is_dynamic_buffer_v2<DynamicBuffer_v2>::value
     > = 0,
@@ -737,7 +736,7 @@ std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
 
 /*@}*/
 /**
- * @defgroup async_write boost::asio::async_write
+ * @defgroup async_write asio::async_write
  *
  * @brief The @c async_write function is a composed asynchronous operation that
  * writes a certain amount of data to a stream before completion.
@@ -778,7 +777,7 @@ std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
  * signature. The function signature of the completion handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const asio::error_code& error,
  *
  *   // Number of bytes written from the buffers. If an error
  *   // occurred, this will be less than the sum of the buffer sizes.
@@ -787,15 +786,15 @@ std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the completion handler will not be invoked from within this function.
  * On immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::async_immediate().
+ * manner equivalent to using asio::async_immediate().
  *
  * @par Completion Signature
- * @code void(boost::system::error_code, std::size_t) @endcode
+ * @code void(asio::error_code, std::size_t) @endcode
  *
  * @par Example
  * To write a single data buffer use the @ref buffer function as follows:
  * @code
- * boost::asio::async_write(s, boost::asio::buffer(data, size), handler);
+ * asio::async_write(s, asio::buffer(data, size), handler);
  * @endcode
  * See the @ref buffer documentation for information on writing multiple
  * buffers in one go, and how to use it with arrays, boost::array or
@@ -803,7 +802,7 @@ std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
  *
  * @par Per-Operation Cancellation
  * This asynchronous operation supports cancellation for the following
- * boost::asio::cancellation_type values:
+ * asio::cancellation_type values:
  *
  * @li @c cancellation_type::terminal
  *
@@ -813,7 +812,7 @@ std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
  * @c async_write_some operation.
  */
 template <typename AsyncWriteStream, typename ConstBufferSequence,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
       std::size_t)) WriteToken
         = default_completion_token_t<typename AsyncWriteStream::executor_type>>
 inline auto async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
@@ -827,12 +826,12 @@ inline auto async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
     > = 0)
   -> decltype(
     async_initiate<WriteToken,
-      void (boost::system::error_code, std::size_t)>(
+      void (asio::error_code, std::size_t)>(
         declval<detail::initiate_async_write<AsyncWriteStream>>(),
         token, buffers, transfer_all()))
 {
   return async_initiate<WriteToken,
-    void (boost::system::error_code, std::size_t)>(
+    void (asio::error_code, std::size_t)>(
       detail::initiate_async_write<AsyncWriteStream>(s),
       token, buffers, transfer_all());
 }
@@ -869,7 +868,7 @@ inline auto async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest async_write_some operation.
- *   const boost::system::error_code& error,
+ *   const asio::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -885,7 +884,7 @@ inline auto async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
  * signature. The function signature of the completion handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const asio::error_code& error,
  *
  *   // Number of bytes written from the buffers. If an error
  *   // occurred, this will be less than the sum of the buffer sizes.
@@ -894,16 +893,16 @@ inline auto async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the completion handler will not be invoked from within this function.
  * On immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::async_immediate().
+ * manner equivalent to using asio::async_immediate().
  *
  * @par Completion Signature
- * @code void(boost::system::error_code, std::size_t) @endcode
+ * @code void(asio::error_code, std::size_t) @endcode
  *
  * @par Example
  * To write a single data buffer use the @ref buffer function as follows:
- * @code boost::asio::async_write(s,
- *     boost::asio::buffer(data, size),
- *     boost::asio::transfer_at_least(32),
+ * @code asio::async_write(s,
+ *     asio::buffer(data, size),
+ *     asio::transfer_at_least(32),
  *     handler); @endcode
  * See the @ref buffer documentation for information on writing multiple
  * buffers in one go, and how to use it with arrays, boost::array or
@@ -911,7 +910,7 @@ inline auto async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
  *
  * @par Per-Operation Cancellation
  * This asynchronous operation supports cancellation for the following
- * boost::asio::cancellation_type values:
+ * asio::cancellation_type values:
  *
  * @li @c cancellation_type::terminal
  *
@@ -922,7 +921,7 @@ inline auto async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
  */
 template <typename AsyncWriteStream,
     typename ConstBufferSequence, typename CompletionCondition,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
       std::size_t)) WriteToken
         = default_completion_token_t<typename AsyncWriteStream::executor_type>>
 inline auto async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
@@ -937,19 +936,19 @@ inline auto async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
     > = 0)
   -> decltype(
     async_initiate<WriteToken,
-      void (boost::system::error_code, std::size_t)>(
+      void (asio::error_code, std::size_t)>(
         declval<detail::initiate_async_write<AsyncWriteStream>>(),
         token, buffers,
         static_cast<CompletionCondition&&>(completion_condition)))
 {
   return async_initiate<WriteToken,
-    void (boost::system::error_code, std::size_t)>(
+    void (asio::error_code, std::size_t)>(
       detail::initiate_async_write<AsyncWriteStream>(s),
       token, buffers,
       static_cast<CompletionCondition&&>(completion_condition));
 }
 
-#if !defined(BOOST_ASIO_NO_DYNAMIC_BUFFER_V1)
+#if !defined(ASIO_NO_DYNAMIC_BUFFER_V1)
 
 /// Start an asynchronous operation to write all of the supplied data to a
 /// stream.
@@ -985,7 +984,7 @@ inline auto async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
  * signature. The function signature of the completion handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const asio::error_code& error,
  *
  *   // Number of bytes written from the buffers. If an error
  *   // occurred, this will be less than the sum of the buffer sizes.
@@ -994,14 +993,14 @@ inline auto async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the completion handler will not be invoked from within this function.
  * On immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::async_immediate().
+ * manner equivalent to using asio::async_immediate().
  *
  * @par Completion Signature
- * @code void(boost::system::error_code, std::size_t) @endcode
+ * @code void(asio::error_code, std::size_t) @endcode
  *
  * @par Per-Operation Cancellation
  * This asynchronous operation supports cancellation for the following
- * boost::asio::cancellation_type values:
+ * asio::cancellation_type values:
  *
  * @li @c cancellation_type::terminal
  *
@@ -1011,7 +1010,7 @@ inline auto async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
  * @c async_write_some operation.
  */
 template <typename AsyncWriteStream, typename DynamicBuffer_v1,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
       std::size_t)) WriteToken
         = default_completion_token_t<typename AsyncWriteStream::executor_type>>
 inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v1&& buffers,
@@ -1028,13 +1027,13 @@ inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v1&& buffers,
     > = 0)
   -> decltype(
     async_initiate<WriteToken,
-      void (boost::system::error_code, std::size_t)>(
+      void (asio::error_code, std::size_t)>(
         declval<detail::initiate_async_write_dynbuf_v1<AsyncWriteStream>>(),
         token, static_cast<DynamicBuffer_v1&&>(buffers),
         transfer_all()))
 {
   return async_initiate<WriteToken,
-    void (boost::system::error_code, std::size_t)>(
+    void (asio::error_code, std::size_t)>(
       detail::initiate_async_write_dynbuf_v1<AsyncWriteStream>(s),
       token, static_cast<DynamicBuffer_v1&&>(buffers),
       transfer_all());
@@ -1072,7 +1071,7 @@ inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v1&& buffers,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest async_write_some operation.
- *   const boost::system::error_code& error,
+ *   const asio::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -1088,7 +1087,7 @@ inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v1&& buffers,
  * signature. The function signature of the completion handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const asio::error_code& error,
  *
  *   // Number of bytes written from the buffers. If an error
  *   // occurred, this will be less than the sum of the buffer sizes.
@@ -1097,14 +1096,14 @@ inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v1&& buffers,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the completion handler will not be invoked from within this function.
  * On immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::async_immediate().
+ * manner equivalent to using asio::async_immediate().
  *
  * @par Completion Signature
- * @code void(boost::system::error_code, std::size_t) @endcode
+ * @code void(asio::error_code, std::size_t) @endcode
  *
  * @par Per-Operation Cancellation
  * This asynchronous operation supports cancellation for the following
- * boost::asio::cancellation_type values:
+ * asio::cancellation_type values:
  *
  * @li @c cancellation_type::terminal
  *
@@ -1115,7 +1114,7 @@ inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v1&& buffers,
  */
 template <typename AsyncWriteStream,
     typename DynamicBuffer_v1, typename CompletionCondition,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
       std::size_t)) WriteToken
         = default_completion_token_t<typename AsyncWriteStream::executor_type>>
 inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v1&& buffers,
@@ -1133,20 +1132,20 @@ inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v1&& buffers,
     > = 0)
   -> decltype(
     async_initiate<WriteToken,
-      void (boost::system::error_code, std::size_t)>(
+      void (asio::error_code, std::size_t)>(
         declval<detail::initiate_async_write_dynbuf_v1<AsyncWriteStream>>(),
         token, static_cast<DynamicBuffer_v1&&>(buffers),
         static_cast<CompletionCondition&&>(completion_condition)))
 {
   return async_initiate<WriteToken,
-    void (boost::system::error_code, std::size_t)>(
+    void (asio::error_code, std::size_t)>(
       detail::initiate_async_write_dynbuf_v1<AsyncWriteStream>(s),
       token, static_cast<DynamicBuffer_v1&&>(buffers),
       static_cast<CompletionCondition&&>(completion_condition));
 }
 
-#if !defined(BOOST_ASIO_NO_EXTENSIONS)
-#if !defined(BOOST_ASIO_NO_IOSTREAM)
+#if !defined(ASIO_NO_EXTENSIONS)
+#if !defined(ASIO_NO_IOSTREAM)
 
 /// Start an asynchronous operation to write all of the supplied data to a
 /// stream.
@@ -1180,7 +1179,7 @@ inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v1&& buffers,
  * signature. The function signature of the completion handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const asio::error_code& error,
  *
  *   // Number of bytes written from the buffers. If an error
  *   // occurred, this will be less than the sum of the buffer sizes.
@@ -1189,14 +1188,14 @@ inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v1&& buffers,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the completion handler will not be invoked from within this function.
  * On immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::async_immediate().
+ * manner equivalent to using asio::async_immediate().
  *
  * @par Completion Signature
- * @code void(boost::system::error_code, std::size_t) @endcode
+ * @code void(asio::error_code, std::size_t) @endcode
  *
  * @par Per-Operation Cancellation
  * This asynchronous operation supports cancellation for the following
- * boost::asio::cancellation_type values:
+ * asio::cancellation_type values:
  *
  * @li @c cancellation_type::terminal
  *
@@ -1206,7 +1205,7 @@ inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v1&& buffers,
  * @c async_write_some operation.
  */
 template <typename AsyncWriteStream, typename Allocator,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
       std::size_t)) WriteToken
         = default_completion_token_t<typename AsyncWriteStream::executor_type>>
 inline auto async_write(AsyncWriteStream& s, basic_streambuf<Allocator>& b,
@@ -1217,12 +1216,12 @@ inline auto async_write(AsyncWriteStream& s, basic_streambuf<Allocator>& b,
     > = 0)
   -> decltype(
     async_initiate<WriteToken,
-      void (boost::system::error_code, std::size_t)>(
+      void (asio::error_code, std::size_t)>(
         declval<detail::initiate_async_write_dynbuf_v1<AsyncWriteStream>>(),
         token, basic_streambuf_ref<Allocator>(b), transfer_all()))
 {
   return async_initiate<WriteToken,
-    void (boost::system::error_code, std::size_t)>(
+    void (asio::error_code, std::size_t)>(
       detail::initiate_async_write_dynbuf_v1<AsyncWriteStream>(s),
       token, basic_streambuf_ref<Allocator>(b), transfer_all());
 }
@@ -1257,7 +1256,7 @@ inline auto async_write(AsyncWriteStream& s, basic_streambuf<Allocator>& b,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest async_write_some operation.
- *   const boost::system::error_code& error,
+ *   const asio::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -1273,7 +1272,7 @@ inline auto async_write(AsyncWriteStream& s, basic_streambuf<Allocator>& b,
  * signature. The function signature of the completion handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const asio::error_code& error,
  *
  *   // Number of bytes written from the buffers. If an error
  *   // occurred, this will be less than the sum of the buffer sizes.
@@ -1282,14 +1281,14 @@ inline auto async_write(AsyncWriteStream& s, basic_streambuf<Allocator>& b,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the completion handler will not be invoked from within this function.
  * On immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::async_immediate().
+ * manner equivalent to using asio::async_immediate().
  *
  * @par Completion Signature
- * @code void(boost::system::error_code, std::size_t) @endcode
+ * @code void(asio::error_code, std::size_t) @endcode
  *
  * @par Per-Operation Cancellation
  * This asynchronous operation supports cancellation for the following
- * boost::asio::cancellation_type values:
+ * asio::cancellation_type values:
  *
  * @li @c cancellation_type::terminal
  *
@@ -1300,7 +1299,7 @@ inline auto async_write(AsyncWriteStream& s, basic_streambuf<Allocator>& b,
  */
 template <typename AsyncWriteStream,
     typename Allocator, typename CompletionCondition,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
       std::size_t)) WriteToken
         = default_completion_token_t<typename AsyncWriteStream::executor_type>>
 inline auto async_write(AsyncWriteStream& s, basic_streambuf<Allocator>& b,
@@ -1312,21 +1311,21 @@ inline auto async_write(AsyncWriteStream& s, basic_streambuf<Allocator>& b,
     > = 0)
   -> decltype(
     async_initiate<WriteToken,
-      void (boost::system::error_code, std::size_t)>(
+      void (asio::error_code, std::size_t)>(
         declval<detail::initiate_async_write_dynbuf_v1<AsyncWriteStream>>(),
         token, basic_streambuf_ref<Allocator>(b),
         static_cast<CompletionCondition&&>(completion_condition)))
 {
   return async_initiate<WriteToken,
-    void (boost::system::error_code, std::size_t)>(
+    void (asio::error_code, std::size_t)>(
       detail::initiate_async_write_dynbuf_v1<AsyncWriteStream>(s),
       token, basic_streambuf_ref<Allocator>(b),
       static_cast<CompletionCondition&&>(completion_condition));
 }
 
-#endif // !defined(BOOST_ASIO_NO_IOSTREAM)
-#endif // !defined(BOOST_ASIO_NO_EXTENSIONS)
-#endif // !defined(BOOST_ASIO_NO_DYNAMIC_BUFFER_V1)
+#endif // !defined(ASIO_NO_IOSTREAM)
+#endif // !defined(ASIO_NO_EXTENSIONS)
+#endif // !defined(ASIO_NO_DYNAMIC_BUFFER_V1)
 
 /// Start an asynchronous operation to write all of the supplied data to a
 /// stream.
@@ -1362,7 +1361,7 @@ inline auto async_write(AsyncWriteStream& s, basic_streambuf<Allocator>& b,
  * signature. The function signature of the completion handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const asio::error_code& error,
  *
  *   // Number of bytes written from the buffers. If an error
  *   // occurred, this will be less than the sum of the buffer sizes.
@@ -1371,14 +1370,14 @@ inline auto async_write(AsyncWriteStream& s, basic_streambuf<Allocator>& b,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the completion handler will not be invoked from within this function.
  * On immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::async_immediate().
+ * manner equivalent to using asio::async_immediate().
  *
  * @par Completion Signature
- * @code void(boost::system::error_code, std::size_t) @endcode
+ * @code void(asio::error_code, std::size_t) @endcode
  *
  * @par Per-Operation Cancellation
  * This asynchronous operation supports cancellation for the following
- * boost::asio::cancellation_type values:
+ * asio::cancellation_type values:
  *
  * @li @c cancellation_type::terminal
  *
@@ -1388,7 +1387,7 @@ inline auto async_write(AsyncWriteStream& s, basic_streambuf<Allocator>& b,
  * @c async_write_some operation.
  */
 template <typename AsyncWriteStream, typename DynamicBuffer_v2,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
       std::size_t)) WriteToken
         = default_completion_token_t<typename AsyncWriteStream::executor_type>>
 inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v2 buffers,
@@ -1402,13 +1401,13 @@ inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v2 buffers,
     > = 0)
   -> decltype(
     async_initiate<WriteToken,
-      void (boost::system::error_code, std::size_t)>(
+      void (asio::error_code, std::size_t)>(
         declval<detail::initiate_async_write_dynbuf_v2<AsyncWriteStream>>(),
         token, static_cast<DynamicBuffer_v2&&>(buffers),
         transfer_all()))
 {
   return async_initiate<WriteToken,
-    void (boost::system::error_code, std::size_t)>(
+    void (asio::error_code, std::size_t)>(
       detail::initiate_async_write_dynbuf_v2<AsyncWriteStream>(s),
       token, static_cast<DynamicBuffer_v2&&>(buffers),
       transfer_all());
@@ -1446,7 +1445,7 @@ inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v2 buffers,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest async_write_some operation.
- *   const boost::system::error_code& error,
+ *   const asio::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -1462,7 +1461,7 @@ inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v2 buffers,
  * signature. The function signature of the completion handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const asio::error_code& error,
  *
  *   // Number of bytes written from the buffers. If an error
  *   // occurred, this will be less than the sum of the buffer sizes.
@@ -1471,14 +1470,14 @@ inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v2 buffers,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the completion handler will not be invoked from within this function.
  * On immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::async_immediate().
+ * manner equivalent to using asio::async_immediate().
  *
  * @par Completion Signature
- * @code void(boost::system::error_code, std::size_t) @endcode
+ * @code void(asio::error_code, std::size_t) @endcode
  *
  * @par Per-Operation Cancellation
  * This asynchronous operation supports cancellation for the following
- * boost::asio::cancellation_type values:
+ * asio::cancellation_type values:
  *
  * @li @c cancellation_type::terminal
  *
@@ -1489,7 +1488,7 @@ inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v2 buffers,
  */
 template <typename AsyncWriteStream,
     typename DynamicBuffer_v2, typename CompletionCondition,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
       std::size_t)) WriteToken
         = default_completion_token_t<typename AsyncWriteStream::executor_type>>
 inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v2 buffers,
@@ -1504,13 +1503,13 @@ inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v2 buffers,
     > = 0)
   -> decltype(
     async_initiate<WriteToken,
-      void (boost::system::error_code, std::size_t)>(
+      void (asio::error_code, std::size_t)>(
         declval<detail::initiate_async_write_dynbuf_v2<AsyncWriteStream>>(),
         token, static_cast<DynamicBuffer_v2&&>(buffers),
         static_cast<CompletionCondition&&>(completion_condition)))
 {
   return async_initiate<WriteToken,
-    void (boost::system::error_code, std::size_t)>(
+    void (asio::error_code, std::size_t)>(
       detail::initiate_async_write_dynbuf_v2<AsyncWriteStream>(s),
       token, static_cast<DynamicBuffer_v2&&>(buffers),
       static_cast<CompletionCondition&&>(completion_condition));
@@ -1519,10 +1518,9 @@ inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v2 buffers,
 /*@}*/
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#include <boost/asio/impl/write.hpp>
+#include "asio/impl/write.hpp"
 
-#endif // BOOST_ASIO_WRITE_HPP
+#endif // ASIO_WRITE_HPP

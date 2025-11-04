@@ -8,27 +8,26 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_STRAND_EXECUTOR_SERVICE_HPP
-#define BOOST_ASIO_DETAIL_STRAND_EXECUTOR_SERVICE_HPP
+#ifndef ASIO_DETAIL_STRAND_EXECUTOR_SERVICE_HPP
+#define ASIO_DETAIL_STRAND_EXECUTOR_SERVICE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/atomic_count.hpp>
-#include <boost/asio/detail/executor_op.hpp>
-#include <boost/asio/detail/memory.hpp>
-#include <boost/asio/detail/mutex.hpp>
-#include <boost/asio/detail/op_queue.hpp>
-#include <boost/asio/detail/scheduler_operation.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/execution.hpp>
-#include <boost/asio/execution_context.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/atomic_count.hpp"
+#include "asio/detail/executor_op.hpp"
+#include "asio/detail/memory.hpp"
+#include "asio/detail/mutex.hpp"
+#include "asio/detail/op_queue.hpp"
+#include "asio/detail/scheduler_operation.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/execution.hpp"
+#include "asio/execution_context.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -41,7 +40,7 @@ public:
   class strand_impl
   {
   public:
-    BOOST_ASIO_DECL ~strand_impl();
+    ASIO_DECL ~strand_impl();
 
   private:
     friend class strand_executor_service;
@@ -79,13 +78,13 @@ public:
   typedef shared_ptr<strand_impl> implementation_type;
 
   // Construct a new strand service for the specified context.
-  BOOST_ASIO_DECL explicit strand_executor_service(execution_context& context);
+  ASIO_DECL explicit strand_executor_service(execution_context& context);
 
   // Destroy all user-defined handler objects owned by the service.
-  BOOST_ASIO_DECL void shutdown();
+  ASIO_DECL void shutdown();
 
   // Create a new strand_executor implementation.
-  BOOST_ASIO_DECL implementation_type create_implementation();
+  ASIO_DECL implementation_type create_implementation();
 
   // Request invocation of the given function.
   template <typename Executor, typename Function>
@@ -119,7 +118,7 @@ public:
       Function&& function, const Allocator& a);
 
   // Determine whether the strand is running in the current thread.
-  BOOST_ASIO_DECL static bool running_in_this_thread(
+  ASIO_DECL static bool running_in_this_thread(
       const implementation_type& impl);
 
 private:
@@ -128,15 +127,15 @@ private:
   template <typename Executor, typename = void> class invoker;
 
   // Adds a function to the strand. Returns true if it acquires the lock.
-  BOOST_ASIO_DECL static bool enqueue(const implementation_type& impl,
+  ASIO_DECL static bool enqueue(const implementation_type& impl,
       scheduler_operation* op);
 
   // Transfers waiting handlers to the ready queue. Returns true if one or more
   // handlers were transferred.
-  BOOST_ASIO_DECL static bool push_waiting_to_ready(implementation_type& impl);
+  ASIO_DECL static bool push_waiting_to_ready(implementation_type& impl);
 
   // Invokes all ready-to-run handlers.
-  BOOST_ASIO_DECL static void run_ready_handlers(implementation_type& impl);
+  ASIO_DECL static void run_ready_handlers(implementation_type& impl);
 
   // Helper function to request invocation of the given function.
   template <typename Executor, typename Function, typename Allocator>
@@ -162,13 +161,12 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#include <boost/asio/detail/impl/strand_executor_service.hpp>
-#if defined(BOOST_ASIO_HEADER_ONLY)
-# include <boost/asio/detail/impl/strand_executor_service.ipp>
-#endif // defined(BOOST_ASIO_HEADER_ONLY)
+#include "asio/detail/impl/strand_executor_service.hpp"
+#if defined(ASIO_HEADER_ONLY)
+# include "asio/detail/impl/strand_executor_service.ipp"
+#endif // defined(ASIO_HEADER_ONLY)
 
-#endif // BOOST_ASIO_DETAIL_STRAND_EXECUTOR_SERVICE_HPP
+#endif // ASIO_DETAIL_STRAND_EXECUTOR_SERVICE_HPP

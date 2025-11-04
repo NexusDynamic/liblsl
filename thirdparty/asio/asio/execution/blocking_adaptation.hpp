@@ -8,33 +8,32 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXECUTION_BLOCKING_ADAPTATION_HPP
-#define BOOST_ASIO_EXECUTION_BLOCKING_ADAPTATION_HPP
+#ifndef ASIO_EXECUTION_BLOCKING_ADAPTATION_HPP
+#define ASIO_EXECUTION_BLOCKING_ADAPTATION_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/event.hpp>
-#include <boost/asio/detail/mutex.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/execution/executor.hpp>
-#include <boost/asio/is_applicable_property.hpp>
-#include <boost/asio/prefer.hpp>
-#include <boost/asio/query.hpp>
-#include <boost/asio/require.hpp>
-#include <boost/asio/traits/prefer_member.hpp>
-#include <boost/asio/traits/query_free.hpp>
-#include <boost/asio/traits/query_member.hpp>
-#include <boost/asio/traits/query_static_constexpr_member.hpp>
-#include <boost/asio/traits/require_member.hpp>
-#include <boost/asio/traits/static_query.hpp>
-#include <boost/asio/traits/static_require.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/event.hpp"
+#include "asio/detail/mutex.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/execution/executor.hpp"
+#include "asio/is_applicable_property.hpp"
+#include "asio/prefer.hpp"
+#include "asio/query.hpp"
+#include "asio/require.hpp"
+#include "asio/traits/prefer_member.hpp"
+#include "asio/traits/query_free.hpp"
+#include "asio/traits/query_member.hpp"
+#include "asio/traits/query_static_constexpr_member.hpp"
+#include "asio/traits/require_member.hpp"
+#include "asio/traits/static_query.hpp"
+#include "asio/traits/static_require.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 #if defined(GENERATING_DOCUMENTATION)
@@ -155,10 +154,10 @@ template <int I> struct allowed_t;
 template <int I = 0>
 struct blocking_adaptation_t
 {
-#if defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr bool is_applicable_property_v = is_executor<T>::value;
-#endif // defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
   static constexpr bool is_requirable = false;
   static constexpr bool is_preferable = false;
@@ -185,7 +184,7 @@ struct blocking_adaptation_t
   template <typename T>
   struct proxy
   {
-#if defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#if defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
     struct type
     {
       template <typename P>
@@ -199,15 +198,15 @@ struct blocking_adaptation_t
           declval<conditional_t<true, T, P>>().query(static_cast<P&&>(p))
         );
     };
-#else // defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#else // defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
     typedef T type;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#endif // defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
   };
 
   template <typename T>
   struct static_proxy
   {
-#if defined(BOOST_ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
+#if defined(ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
     struct type
     {
       template <typename P>
@@ -224,9 +223,9 @@ struct blocking_adaptation_t
         return T::query(static_cast<P&&>(p));
       }
     };
-#else // defined(BOOST_ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
+#else // defined(ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
     typedef T type;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
+#endif // defined(ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
   };
 
   template <typename T>
@@ -238,8 +237,8 @@ struct blocking_adaptation_t
     traits::query_static_constexpr_member<
       typename static_proxy<T>::type, blocking_adaptation_t> {};
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr typename query_static_constexpr_member<T>::result_type
   static_query()
@@ -289,8 +288,8 @@ struct blocking_adaptation_t
       typename T = decltype(blocking_adaptation_t::static_query<E>())>
   static constexpr const T static_query_v
     = blocking_adaptation_t::static_query<E>();
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
   friend constexpr bool operator==(
       const blocking_adaptation_t& a, const blocking_adaptation_t& b)
@@ -319,15 +318,15 @@ struct blocking_adaptation_t
         can_query<const Executor&, disallowed_t>::value
       >* = 0)
 #if !defined(__clang__) // Clang crashes if noexcept is used here.
-#if defined(BOOST_ASIO_MSVC) // Visual C++ wants the type to be qualified.
+#if defined(ASIO_MSVC) // Visual C++ wants the type to be qualified.
     noexcept(is_nothrow_query<const Executor&,
         blocking_adaptation_t<>::disallowed_t>::value)
-#else // defined(BOOST_ASIO_MSVC)
+#else // defined(ASIO_MSVC)
     noexcept(is_nothrow_query<const Executor&, disallowed_t>::value)
-#endif // defined(BOOST_ASIO_MSVC)
+#endif // defined(ASIO_MSVC)
 #endif // !defined(__clang__)
   {
-    return boost::asio::query(ex, disallowed_t());
+    return asio::query(ex, disallowed_t());
   }
 
   template <typename Executor>
@@ -340,30 +339,30 @@ struct blocking_adaptation_t
         can_query<const Executor&, allowed_t>::value
       >* = 0)
 #if !defined(__clang__) // Clang crashes if noexcept is used here.
-#if defined(BOOST_ASIO_MSVC) // Visual C++ wants the type to be qualified.
+#if defined(ASIO_MSVC) // Visual C++ wants the type to be qualified.
     noexcept(is_nothrow_query<const Executor&,
         blocking_adaptation_t<>::allowed_t>::value)
-#else // defined(BOOST_ASIO_MSVC)
+#else // defined(ASIO_MSVC)
     noexcept(is_nothrow_query<const Executor&, allowed_t>::value)
-#endif // defined(BOOST_ASIO_MSVC)
+#endif // defined(ASIO_MSVC)
 #endif // !defined(__clang__)
   {
-    return boost::asio::query(ex, allowed_t());
+    return asio::query(ex, allowed_t());
   }
 
-  BOOST_ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(disallowed_t, disallowed);
-  BOOST_ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(allowed_t, allowed);
+  ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(disallowed_t, disallowed);
+  ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(allowed_t, allowed);
 
 private:
   int value_;
 };
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 template <int I> template <typename E, typename T>
 const T blocking_adaptation_t<I>::static_query_v;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 template <int I>
 const typename blocking_adaptation_t<I>::disallowed_t
@@ -378,10 +377,10 @@ namespace blocking_adaptation {
 template <int I = 0>
 struct disallowed_t
 {
-#if defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr bool is_applicable_property_v = is_executor<T>::value;
-#endif // defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
   static constexpr bool is_requirable = true;
   static constexpr bool is_preferable = true;
@@ -403,8 +402,8 @@ struct disallowed_t
       typename blocking_adaptation_t<I>::template static_proxy<T>::type,
         disallowed_t> {};
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr
   typename query_static_constexpr_member<T>::result_type
@@ -435,8 +434,8 @@ struct disallowed_t
   template <typename E, typename T = decltype(disallowed_t::static_query<E>())>
   static constexpr const T static_query_v
     = disallowed_t::static_query<E>();
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
   static constexpr blocking_adaptation_t<I> value()
   {
@@ -464,12 +463,12 @@ struct disallowed_t
   }
 };
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 template <int I> template <typename E, typename T>
 const T disallowed_t<I>::static_query_v;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 template <typename>
 struct is_blocking_adaptation_t : false_type
@@ -548,7 +547,7 @@ public:
   > query(const Property& p) const
     noexcept(is_nothrow_query<const Executor&, Property>::value)
   {
-    return boost::asio::query(executor_, p);
+    return asio::query(executor_, p);
   }
 
   template <int I>
@@ -568,7 +567,7 @@ public:
     noexcept(is_nothrow_require<const Executor&, Property>::value)
   {
     return adapter<decay_t<require_result_t<const Executor&, Property>>>(
-        0, boost::asio::require(executor_, p));
+        0, asio::require(executor_, p));
   }
 
   template <typename Property>
@@ -582,7 +581,7 @@ public:
     noexcept(is_nothrow_prefer<const Executor&, Property>::value)
   {
     return adapter<decay_t<prefer_result_t<const Executor&, Property>>>(
-        0, boost::asio::prefer(executor_, p));
+        0, asio::prefer(executor_, p));
   }
 
   template <typename Function>
@@ -610,10 +609,10 @@ private:
 template <int I = 0>
 struct allowed_t
 {
-#if defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr bool is_applicable_property_v = is_executor<T>::value;
-#endif // defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
   static constexpr bool is_requirable = true;
   static constexpr bool is_preferable = false;
@@ -635,8 +634,8 @@ struct allowed_t
       typename blocking_adaptation_t<I>::template static_proxy<T>::type,
         allowed_t> {};
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr typename query_static_constexpr_member<T>::result_type
   static_query()
@@ -647,8 +646,8 @@ struct allowed_t
 
   template <typename E, typename T = decltype(allowed_t::static_query<E>())>
   static constexpr const T static_query_v = allowed_t::static_query<E>();
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
   static constexpr blocking_adaptation_t<I> value()
   {
@@ -686,12 +685,12 @@ struct allowed_t
   }
 };
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 template <int I> template <typename E, typename T>
 const T allowed_t<I>::static_query_v;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 template <typename Function>
 class blocking_execute_state
@@ -709,7 +708,7 @@ public:
   {
     handler h = { this };
     ex.execute(h);
-    boost::asio::detail::mutex::scoped_lock lock(mutex_);
+    asio::detail::mutex::scoped_lock lock(mutex_);
     while (!is_complete_)
       event_.wait(lock);
   }
@@ -718,7 +717,7 @@ public:
   {
     ~cleanup()
     {
-      boost::asio::detail::mutex::scoped_lock lock(state_->mutex_);
+      asio::detail::mutex::scoped_lock lock(state_->mutex_);
       state_->is_complete_ = true;
       state_->event_.unlock_and_signal_one_for_destruction(lock);
     }
@@ -738,8 +737,8 @@ public:
   };
 
   Function func_;
-  boost::asio::detail::mutex mutex_;
-  boost::asio::detail::event event_;
+  asio::detail::mutex mutex_;
+  asio::detail::event event_;
   bool is_complete_;
 };
 
@@ -758,11 +757,11 @@ void blocking_execute(
 
 typedef detail::blocking_adaptation_t<> blocking_adaptation_t;
 
-BOOST_ASIO_INLINE_VARIABLE constexpr blocking_adaptation_t blocking_adaptation;
+ASIO_INLINE_VARIABLE constexpr blocking_adaptation_t blocking_adaptation;
 
 } // namespace execution
 
-#if !defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#if !defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
 template <typename T>
 struct is_applicable_property<T, execution::blocking_adaptation_t>
@@ -782,11 +781,11 @@ struct is_applicable_property<T, execution::blocking_adaptation_t::allowed_t>
 {
 };
 
-#endif // !defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // !defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
 namespace traits {
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_FREE_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_QUERY_FREE_TRAIT)
 
 template <typename T>
 struct query_free_default<T, execution::blocking_adaptation_t,
@@ -815,10 +814,10 @@ struct query_free_default<T, execution::blocking_adaptation_t,
   typedef execution::blocking_adaptation_t result_type;
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_FREE_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_QUERY_FREE_TRAIT)
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  || !defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if !defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  || !defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 template <typename T>
 struct static_query<T, execution::blocking_adaptation_t,
@@ -953,10 +952,10 @@ struct static_query<T, execution::blocking_adaptation_t::allowed_t,
   }
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   || !defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // !defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   || !defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_REQUIRE_FREE_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_REQUIRE_FREE_TRAIT)
 
 template <typename T>
 struct require_free_default<T, execution::blocking_adaptation_t::allowed_t,
@@ -970,9 +969,9 @@ struct require_free_default<T, execution::blocking_adaptation_t::allowed_t,
   typedef execution::detail::blocking_adaptation::adapter<T> result_type;
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_REQUIRE_FREE_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_REQUIRE_FREE_TRAIT)
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
 
 template <typename Executor>
 struct equality_comparable<
@@ -982,9 +981,9 @@ struct equality_comparable<
   static constexpr bool is_noexcept = true;
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT)
 
 template <typename Executor, typename Function>
 struct execute_member<
@@ -995,9 +994,9 @@ struct execute_member<
   typedef void result_type;
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT)
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
 
 template <typename Executor, int I>
 struct query_static_constexpr_member<
@@ -1044,9 +1043,9 @@ struct query_static_constexpr_member<
   }
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
 
 template <typename Executor, typename Property>
 struct query_member<
@@ -1061,9 +1060,9 @@ struct query_member<
   typedef query_result_t<Executor, Property> result_type;
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_REQUIRE_MEMBER_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_REQUIRE_MEMBER_TRAIT)
 
 template <typename Executor, int I>
 struct require_member<
@@ -1089,9 +1088,9 @@ struct require_member<
     decay_t<require_result_t<Executor, Property>>> result_type;
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_REQUIRE_MEMBER_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_REQUIRE_MEMBER_TRAIT)
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_PREFER_MEMBER_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_PREFER_MEMBER_TRAIT)
 
 template <typename Executor, typename Property>
 struct prefer_member<
@@ -1107,15 +1106,14 @@ struct prefer_member<
     decay_t<prefer_result_t<Executor, Property>>> result_type;
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_PREFER_MEMBER_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_PREFER_MEMBER_TRAIT)
 
 } // namespace traits
 
 #endif // defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_EXECUTION_BLOCKING_ADAPTATION_HPP
+#endif // ASIO_EXECUTION_BLOCKING_ADAPTATION_HPP

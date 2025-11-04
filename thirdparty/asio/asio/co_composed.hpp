@@ -8,65 +8,64 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_CO_COMPOSED_HPP
-#define BOOST_ASIO_CO_COMPOSED_HPP
+#ifndef ASIO_CO_COMPOSED_HPP
+#define ASIO_CO_COMPOSED_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_CO_AWAIT) || defined(GENERATING_DOCUMENTATION)
+#if defined(ASIO_HAS_CO_AWAIT) || defined(GENERATING_DOCUMENTATION)
 
 #include <new>
 #include <tuple>
 #include <variant>
-#include <boost/asio/associated_cancellation_slot.hpp>
-#include <boost/asio/associator.hpp>
-#include <boost/asio/async_result.hpp>
-#include <boost/asio/cancellation_state.hpp>
-#include <boost/asio/detail/composed_work.hpp>
-#include <boost/asio/detail/recycling_allocator.hpp>
-#include <boost/asio/detail/throw_error.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/error.hpp>
+#include "asio/associated_cancellation_slot.hpp"
+#include "asio/associator.hpp"
+#include "asio/async_result.hpp"
+#include "asio/cancellation_state.hpp"
+#include "asio/detail/composed_work.hpp"
+#include "asio/detail/recycling_allocator.hpp"
+#include "asio/detail/throw_error.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/error.hpp"
 
-#if defined(BOOST_ASIO_HAS_STD_COROUTINE)
+#if defined(ASIO_HAS_STD_COROUTINE)
 # include <coroutine>
-#else // defined(BOOST_ASIO_HAS_STD_COROUTINE)
+#else // defined(ASIO_HAS_STD_COROUTINE)
 # include <experimental/coroutine>
-#endif // defined(BOOST_ASIO_HAS_STD_COROUTINE)
+#endif // defined(ASIO_HAS_STD_COROUTINE)
 
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
-# if defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#  include <boost/asio/detail/source_location.hpp>
-# endif // defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
+# if defined(ASIO_HAS_SOURCE_LOCATION)
+#  include "asio/detail/source_location.hpp"
+# endif // defined(ASIO_HAS_SOURCE_LOCATION)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
-#if defined(BOOST_ASIO_HAS_STD_COROUTINE)
+#if defined(ASIO_HAS_STD_COROUTINE)
 using std::coroutine_handle;
 using std::suspend_always;
 using std::suspend_never;
-#else // defined(BOOST_ASIO_HAS_STD_COROUTINE)
+#else // defined(ASIO_HAS_STD_COROUTINE)
 using std::experimental::coroutine_handle;
 using std::experimental::suspend_always;
 using std::experimental::suspend_never;
-#endif // defined(BOOST_ASIO_HAS_STD_COROUTINE)
+#endif // defined(ASIO_HAS_STD_COROUTINE)
 
-using boost::asio::detail::composed_io_executors;
-using boost::asio::detail::composed_work;
-using boost::asio::detail::composed_work_guard;
-using boost::asio::detail::get_composed_io_executor;
-using boost::asio::detail::make_composed_io_executors;
-using boost::asio::detail::recycling_allocator;
-using boost::asio::detail::throw_error;
+using asio::detail::composed_io_executors;
+using asio::detail::composed_work;
+using asio::detail::composed_work_guard;
+using asio::detail::get_composed_io_executor;
+using asio::detail::make_composed_io_executors;
+using asio::detail::recycling_allocator;
+using asio::detail::throw_error;
 
 template <typename Executors, typename Handler, typename Return>
 class co_composed_state;
@@ -77,7 +76,7 @@ class co_composed_handler_base;
 template <typename Executors, typename Handler, typename Return>
 class co_composed_promise;
 
-template <BOOST_ASIO_COMPLETION_SIGNATURE... Signatures>
+template <ASIO_COMPLETION_SIGNATURE... Signatures>
 class co_composed_returns
 {
 };
@@ -191,10 +190,10 @@ struct co_composed_state_default_cancellation_on_suspend_impl<
 template <typename Executors, typename Handler, typename Return,
     typename R, typename... Args, typename... Signatures>
 struct co_composed_state_default_cancellation_on_suspend_impl<Executors,
-    Handler, Return, R(boost::system::error_code, Args...), Signatures...>
+    Handler, Return, R(asio::error_code, Args...), Signatures...>
 {
   using promise_type = co_composed_promise<Executors, Handler, Return>;
-  using return_type = std::tuple<boost::system::error_code, Args...>;
+  using return_type = std::tuple<asio::error_code, Args...>;
 
   static constexpr void (*fn())(void*)
   {
@@ -213,7 +212,7 @@ struct co_composed_state_default_cancellation_on_suspend_impl<Executors,
           Return>(std::move(composed_handler));
 
         std::move(handler)(
-            boost::system::error_code(boost::asio::error::operation_aborted),
+            asio::error_code(asio::error::operation_aborted),
             Args{}...);
       };
     }
@@ -251,8 +250,8 @@ struct co_composed_state_default_cancellation_on_suspend_impl<Executors,
 
         std::move(handler)(
             std::make_exception_ptr(
-              boost::system::system_error(
-                boost::asio::error::operation_aborted, "co_await")),
+              asio::system_error(
+                asio::error::operation_aborted, "co_await")),
             Args{}...);
       };
     }
@@ -363,7 +362,7 @@ private:
   void check_for_cancellation_on_transform()
   {
     if (throw_if_cancelled_ && !!cancelled())
-      throw_error(boost::asio::error::operation_aborted, "co_await");
+      throw_error(asio::error::operation_aborted, "co_await");
   }
 
   bool check_for_cancellation_on_suspend(
@@ -614,7 +613,7 @@ public:
 template <typename Executors, typename Handler,
     typename Return, typename R, typename... Args>
 class co_composed_handler<Executors, Handler,
-    Return, R(boost::system::error_code, Args...)>
+    Return, R(asio::error_code, Args...)>
   : public co_composed_handler_base<Executors, Handler, Return>
 {
 public:
@@ -622,10 +621,10 @@ public:
     Handler, Return>::co_composed_handler_base;
 
   using args_type = std::tuple<decay_t<Args>...>;
-  using result_type = std::tuple<boost::system::error_code, args_type>;
+  using result_type = std::tuple<asio::error_code, args_type>;
 
   template <typename... T>
-  void operator()(const boost::system::error_code& ec, T&&... args)
+  void operator()(const asio::error_code& ec, T&&... args)
   {
     result_type result(ec, args_type(static_cast<T&&>(args)...));
     this->resume(&result);
@@ -846,33 +845,33 @@ public:
     throw;
   }
 
-  template <BOOST_ASIO_ASYNC_OPERATION Op>
+  template <ASIO_ASYNC_OPERATION Op>
   auto await_transform(Op&& op,
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
-# if defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-      boost::asio::detail::source_location location
-        = boost::asio::detail::source_location::current(),
-# endif // defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
+# if defined(ASIO_HAS_SOURCE_LOCATION)
+      asio::detail::source_location location
+        = asio::detail::source_location::current(),
+# endif // defined(ASIO_HAS_SOURCE_LOCATION)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
       constraint_t<is_async_operation<Op>::value> = 0)
   {
     class [[nodiscard]] awaitable
     {
     public:
       awaitable(Op&& op, co_composed_promise& promise
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
-# if defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-          , const boost::asio::detail::source_location& location
-# endif // defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
+# if defined(ASIO_HAS_SOURCE_LOCATION)
+          , const asio::detail::source_location& location
+# endif // defined(ASIO_HAS_SOURCE_LOCATION)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
         )
         : op_(static_cast<Op&&>(op)),
           promise_(promise)
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
-# if defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
+# if defined(ASIO_HAS_SOURCE_LOCATION)
         , location_(location)
-# endif // defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+# endif // defined(ASIO_HAS_SOURCE_LOCATION)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
       {
       }
 
@@ -889,14 +888,14 @@ public:
           promise_.state_.on_suspend_->fn_ =
             [](void* p)
             {
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
-# if defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-              BOOST_ASIO_HANDLER_LOCATION((
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
+# if defined(ASIO_HAS_SOURCE_LOCATION)
+              ASIO_HANDLER_LOCATION((
                   static_cast<awaitable*>(p)->location_.file_name(),
                   static_cast<awaitable*>(p)->location_.line(),
                   static_cast<awaitable*>(p)->location_.function_name()));
-# endif // defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+# endif // defined(ASIO_HAS_SOURCE_LOCATION)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
               static_cast<Op&&>(static_cast<awaitable*>(p)->op_)(
                   co_composed_handler<Executors, Handler,
                     Return, completion_signature_of_t<Op>>(
@@ -914,20 +913,20 @@ public:
     private:
       Op&& op_;
       co_composed_promise& promise_;
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
-# if defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-      boost::asio::detail::source_location location_;
-# endif // defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
+# if defined(ASIO_HAS_SOURCE_LOCATION)
+      asio::detail::source_location location_;
+# endif // defined(ASIO_HAS_SOURCE_LOCATION)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
     };
 
     state_.check_for_cancellation_on_transform();
     return awaitable{static_cast<Op&&>(op), *this
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
-# if defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
+# if defined(ASIO_HAS_SOURCE_LOCATION)
         , location
-# endif // defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+# endif // defined(ASIO_HAS_SOURCE_LOCATION)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
       };
   }
 
@@ -1149,50 +1148,48 @@ struct associator<Associator,
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
 
 #if !defined(GENERATING_DOCUMENTATION)
-# if defined(BOOST_ASIO_HAS_STD_COROUTINE)
+# if defined(ASIO_HAS_STD_COROUTINE)
 namespace std {
-# else // defined(BOOST_ASIO_HAS_STD_COROUTINE)
+# else // defined(ASIO_HAS_STD_COROUTINE)
 namespace std { namespace experimental {
-# endif // defined(BOOST_ASIO_HAS_STD_COROUTINE)
+# endif // defined(ASIO_HAS_STD_COROUTINE)
 
 template <typename C, typename Executors,
     typename Handler, typename Return, typename... Args>
 struct coroutine_traits<void, C&,
-    boost::asio::detail::co_composed_state<Executors, Handler, Return>, Args...>
+    asio::detail::co_composed_state<Executors, Handler, Return>, Args...>
 {
   using promise_type =
-    boost::asio::detail::co_composed_promise<Executors, Handler, Return>;
+    asio::detail::co_composed_promise<Executors, Handler, Return>;
 };
 
 template <typename C, typename Executors,
     typename Handler, typename Return, typename... Args>
 struct coroutine_traits<void, C&&,
-    boost::asio::detail::co_composed_state<Executors, Handler, Return>, Args...>
+    asio::detail::co_composed_state<Executors, Handler, Return>, Args...>
 {
   using promise_type =
-    boost::asio::detail::co_composed_promise<Executors, Handler, Return>;
+    asio::detail::co_composed_promise<Executors, Handler, Return>;
 };
 
 template <typename Executors, typename Handler,
     typename Return, typename... Args>
 struct coroutine_traits<void,
-    boost::asio::detail::co_composed_state<Executors, Handler, Return>, Args...>
+    asio::detail::co_composed_state<Executors, Handler, Return>, Args...>
 {
   using promise_type =
-    boost::asio::detail::co_composed_promise<Executors, Handler, Return>;
+    asio::detail::co_composed_promise<Executors, Handler, Return>;
 };
 
-# if defined(BOOST_ASIO_HAS_STD_COROUTINE)
+# if defined(ASIO_HAS_STD_COROUTINE)
 } // namespace std
-# else // defined(BOOST_ASIO_HAS_STD_COROUTINE)
+# else // defined(ASIO_HAS_STD_COROUTINE)
 }} // namespace std::experimental
-# endif // defined(BOOST_ASIO_HAS_STD_COROUTINE)
+# endif // defined(ASIO_HAS_STD_COROUTINE)
 #endif // !defined(GENERATING_DOCUMENTATION)
 
-namespace boost {
 namespace asio {
 
 /// Creates an initiation function object that may be used to launch a
@@ -1228,31 +1225,31 @@ namespace asio {
  * auto async_echo(tcp::socket& socket,
  *     CompletionToken&& token)
  * {
- *   return boost::asio::async_initiate<
- *     CompletionToken, void(boost::system::error_code)>(
- *       boost::asio::co_composed(
+ *   return asio::async_initiate<
+ *     CompletionToken, void(std::error_code)>(
+ *       asio::co_composed(
  *         [](auto state, tcp::socket& socket) -> void
  *         {
  *           state.reset_cancellation_state(
- *             boost::asio::enable_terminal_cancellation());
+ *             asio::enable_terminal_cancellation());
  *
  *           while (!state.cancelled())
  *           {
  *             char data[1024];
  *             auto [e1, n1] =
  *               co_await socket.async_read_some(
- *                 boost::asio::buffer(data));
+ *                 asio::buffer(data));
  *
  *             if (e1)
  *               co_yield state.complete(e1);
  *
  *             if (!!state.cancelled())
  *               co_yield state.complete(
- *                 make_error_code(boost::asio::error::operation_aborted));
+ *                 make_error_code(asio::error::operation_aborted));
  *
  *             auto [e2, n2] =
- *               co_await boost::asio::async_write(socket,
- *                 boost::asio::buffer(data, n1));
+ *               co_await asio::async_write(socket,
+ *                 asio::buffer(data, n1));
  *
  *             if (e2)
  *               co_yield state.complete(e2);
@@ -1270,29 +1267,29 @@ namespace asio {
  * auto async_echo(tcp::socket& socket,
  *     CompletionToken&& token)
  * {
- *   return boost::asio::async_initiate<
- *     CompletionToken, void(boost::system::error_code)>(
- *       boost::asio::co_composed<
- *         void(boost::system::error_code)>(
+ *   return asio::async_initiate<
+ *     CompletionToken, void(std::error_code)>(
+ *       asio::co_composed<
+ *         void(std::error_code)>(
  *           [](auto state, tcp::socket& socket) -> void
  *           {
  *             try
  *             {
  *               state.throw_if_cancelled(true);
  *               state.reset_cancellation_state(
- *                 boost::asio::enable_terminal_cancellation());
+ *                 asio::enable_terminal_cancellation());
  *
  *               for (;;)
  *               {
  *                 char data[1024];
  *                 std::size_t n = co_await socket.async_read_some(
- *                     boost::asio::buffer(data));
+ *                     asio::buffer(data));
  *
- *                 co_await boost::asio::async_write(socket,
- *                     boost::asio::buffer(data, n));
+ *                 co_await asio::async_write(socket,
+ *                     asio::buffer(data, n));
  *               }
  *             }
- *             catch (const boost::system::system_error& e)
+ *             catch (const std::system_error& e)
  *             {
  *               co_return {e.code()};
  *             }
@@ -1300,7 +1297,7 @@ namespace asio {
  *       token, std::ref(socket));
  * } @endcode
  */
-template <BOOST_ASIO_COMPLETION_SIGNATURE... Signatures,
+template <ASIO_COMPLETION_SIGNATURE... Signatures,
     typename Implementation, typename... IoObjectsOrExecutors>
 inline auto co_composed(Implementation&& implementation,
     IoObjectsOrExecutors&&... io_objects_or_executors)
@@ -1314,10 +1311,9 @@ inline auto co_composed(Implementation&& implementation,
 }
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // defined(BOOST_ASIO_HAS_CO_AWAIT) || defined(GENERATING_DOCUMENTATION)
+#endif // defined(ASIO_HAS_CO_AWAIT) || defined(GENERATING_DOCUMENTATION)
 
-#endif // BOOST_ASIO_CO_COMPOSED_HPP
+#endif // ASIO_CO_COMPOSED_HPP

@@ -8,24 +8,23 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_CANCELLATION_SIGNAL_HPP
-#define BOOST_ASIO_CANCELLATION_SIGNAL_HPP
+#ifndef ASIO_CANCELLATION_SIGNAL_HPP
+#define ASIO_CANCELLATION_SIGNAL_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <cassert>
 #include <new>
 #include <utility>
-#include <boost/asio/cancellation_type.hpp>
-#include <boost/asio/detail/cstddef.hpp>
-#include <boost/asio/detail/type_traits.hpp>
+#include "asio/cancellation_type.hpp"
+#include "asio/detail/cstddef.hpp"
+#include "asio/detail/type_traits.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -90,7 +89,7 @@ public:
   {
   }
 
-  BOOST_ASIO_DECL ~cancellation_signal();
+  ASIO_DECL ~cancellation_signal();
 
   /// Emits the signal and causes invocation of the slot's handler, if any.
   void emit(cancellation_type_t type)
@@ -130,7 +129,7 @@ public:
    *
    * The handler is a function object to be called when the signal is emitted.
    * The signature of the handler must be
-   * @code void handler(boost::asio::cancellation_type_t); @endcode
+   * @code void handler(asio::cancellation_type_t); @endcode
    *
    * @param args Arguments to be passed to the @c CancellationHandler object's
    * constructor.
@@ -163,7 +162,7 @@ public:
    *
    * The handler is a function object to be called when the signal is emitted.
    * The signature of the handler must be
-   * @code void handler(boost::asio::cancellation_type_t); @endcode
+   * @code void handler(asio::cancellation_type_t); @endcode
    *
    * @param handler The handler to be installed.
    *
@@ -180,7 +179,7 @@ public:
   /**
    * Destroys any existing handler in the slot.
    */
-  BOOST_ASIO_DECL void clear();
+  ASIO_DECL void clear();
 
   /// Returns whether the slot is connected to a signal.
   constexpr bool is_connected() const noexcept
@@ -217,14 +216,14 @@ private:
   {
   }
 
-  BOOST_ASIO_DECL std::pair<void*, std::size_t> prepare_memory(
+  ASIO_DECL std::pair<void*, std::size_t> prepare_memory(
       std::size_t size, std::size_t align);
 
   struct auto_delete_helper
   {
     std::pair<void*, std::size_t> mem;
 
-    BOOST_ASIO_DECL ~auto_delete_helper();
+    ASIO_DECL ~auto_delete_helper();
   };
 
   detail::cancellation_handler_base** handler_;
@@ -236,12 +235,11 @@ inline cancellation_slot cancellation_signal::slot() noexcept
 }
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#if defined(BOOST_ASIO_HEADER_ONLY)
-# include <boost/asio/impl/cancellation_signal.ipp>
-#endif // defined(BOOST_ASIO_HEADER_ONLY)
+#if defined(ASIO_HEADER_ONLY)
+# include "asio/impl/cancellation_signal.ipp"
+#endif // defined(ASIO_HEADER_ONLY)
 
-#endif // BOOST_ASIO_CANCELLATION_SIGNAL_HPP
+#endif // ASIO_CANCELLATION_SIGNAL_HPP

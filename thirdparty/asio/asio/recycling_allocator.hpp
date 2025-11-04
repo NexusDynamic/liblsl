@@ -8,19 +8,18 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_RECYCLING_ALLOCATOR_HPP
-#define BOOST_ASIO_RECYCLING_ALLOCATOR_HPP
+#ifndef ASIO_RECYCLING_ALLOCATOR_HPP
+#define ASIO_RECYCLING_ALLOCATOR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/recycling_allocator.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/recycling_allocator.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 /// An allocator that caches memory blocks in thread-local storage for reuse.
@@ -133,8 +132,7 @@ public:
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_RECYCLING_ALLOCATOR_HPP
+#endif // ASIO_RECYCLING_ALLOCATOR_HPP

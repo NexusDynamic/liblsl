@@ -8,26 +8,26 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXECUTION_HPP
-#define BOOST_ASIO_EXECUTION_HPP
+#ifndef ASIO_EXECUTION_HPP
+#define ASIO_EXECUTION_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/execution/allocator.hpp>
-#include <boost/asio/execution/any_executor.hpp>
-#include <boost/asio/execution/bad_executor.hpp>
-#include <boost/asio/execution/blocking.hpp>
-#include <boost/asio/execution/blocking_adaptation.hpp>
-#include <boost/asio/execution/context.hpp>
-#include <boost/asio/execution/context_as.hpp>
-#include <boost/asio/execution/executor.hpp>
-#include <boost/asio/execution/invocable_archetype.hpp>
-#include <boost/asio/execution/mapping.hpp>
-#include <boost/asio/execution/occupancy.hpp>
-#include <boost/asio/execution/outstanding_work.hpp>
-#include <boost/asio/execution/prefer_only.hpp>
-#include <boost/asio/execution/relationship.hpp>
+#include "asio/execution/allocator.hpp"
+#include "asio/execution/any_executor.hpp"
+#include "asio/execution/bad_executor.hpp"
+#include "asio/execution/blocking.hpp"
+#include "asio/execution/blocking_adaptation.hpp"
+#include "asio/execution/context.hpp"
+#include "asio/execution/context_as.hpp"
+#include "asio/execution/executor.hpp"
+#include "asio/execution/invocable_archetype.hpp"
+#include "asio/execution/mapping.hpp"
+#include "asio/execution/occupancy.hpp"
+#include "asio/execution/outstanding_work.hpp"
+#include "asio/execution/prefer_only.hpp"
+#include "asio/execution/relationship.hpp"
 
-#endif // BOOST_ASIO_EXECUTION_HPP
+#endif // ASIO_EXECUTION_HPP

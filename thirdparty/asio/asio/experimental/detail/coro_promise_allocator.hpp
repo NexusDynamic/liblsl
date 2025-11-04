@@ -9,14 +9,13 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXPERIMENTAL_DETAIL_CORO_PROMISE_ALLOCATOR_HPP
-#define BOOST_ASIO_EXPERIMENTAL_DETAIL_CORO_PROMISE_ALLOCATOR_HPP
+#ifndef ASIO_EXPERIMENTAL_DETAIL_CORO_PROMISE_ALLOCATOR_HPP
+#define ASIO_EXPERIMENTAL_DETAIL_CORO_PROMISE_ALLOCATOR_HPP
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <limits>
-#include <boost/asio/experimental/coro_traits.hpp>
+#include "asio/experimental/coro_traits.hpp"
 
-namespace boost {
 namespace asio {
 namespace experimental {
 namespace detail {
@@ -138,6 +137,5 @@ struct coro_promise_allocator<std::allocator<void>>
 } // namespace detail
 } // namespace experimental
 } // namespace asio
-} // namespace boost
 
-#endif // BOOST_ASIO_EXPERIMENTAL_DETAIL_CORO_PROMISE_ALLOCATOR_HPP
+#endif // ASIO_EXPERIMENTAL_DETAIL_CORO_PROMISE_ALLOCATOR_HPP

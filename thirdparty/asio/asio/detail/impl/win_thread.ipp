@@ -8,27 +8,26 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_IMPL_WIN_THREAD_IPP
-#define BOOST_ASIO_DETAIL_IMPL_WIN_THREAD_IPP
+#ifndef ASIO_DETAIL_IMPL_WIN_THREAD_IPP
+#define ASIO_DETAIL_IMPL_WIN_THREAD_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_WINDOWS) \
-  && !defined(BOOST_ASIO_WINDOWS_APP) \
+#if defined(ASIO_WINDOWS) \
+  && !defined(ASIO_WINDOWS_APP) \
   && !defined(UNDER_CE)
 
 #include <process.h>
-#include <boost/asio/detail/throw_error.hpp>
-#include <boost/asio/detail/win_thread.hpp>
-#include <boost/asio/error.hpp>
+#include "asio/detail/throw_error.hpp"
+#include "asio/detail/win_thread.hpp"
+#include "asio/error.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -75,9 +74,9 @@ win_thread::func_base* win_thread::start_thread(
   {
     DWORD last_error = ::GetLastError();
     arg->destroy();
-    boost::system::error_code ec(last_error,
-        boost::asio::error::get_system_category());
-    boost::asio::detail::throw_error(ec, "thread.entry_event");
+    asio::error_code ec(last_error,
+        asio::error::get_system_category());
+    asio::detail::throw_error(ec, "thread.entry_event");
   }
 
   arg->exit_event_ = ::CreateEventW(0, true, false, 0);
@@ -86,9 +85,9 @@ win_thread::func_base* win_thread::start_thread(
     DWORD last_error = ::GetLastError();
     ::CloseHandle(arg->entry_event_);
     arg->destroy();
-    boost::system::error_code ec(last_error,
-        boost::asio::error::get_system_category());
-    boost::asio::detail::throw_error(ec, "thread.exit_event");
+    asio::error_code ec(last_error,
+        asio::error::get_system_category());
+    asio::detail::throw_error(ec, "thread.exit_event");
   }
 
   unsigned int thread_id = 0;
@@ -100,9 +99,9 @@ win_thread::func_base* win_thread::start_thread(
     ::CloseHandle(arg->entry_event_);
     ::CloseHandle(arg->exit_event_);
     arg->destroy();
-    boost::system::error_code ec(last_error,
-        boost::asio::error::get_system_category());
-    boost::asio::detail::throw_error(ec, "thread");
+    asio::error_code ec(last_error,
+        asio::error::get_system_category());
+    asio::detail::throw_error(ec, "thread");
   }
 
   if (arg->entry_event_)
@@ -142,12 +141,11 @@ void __stdcall apc_function(ULONG_PTR) {}
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // defined(BOOST_ASIO_WINDOWS)
-       // && !defined(BOOST_ASIO_WINDOWS_APP)
+#endif // defined(ASIO_WINDOWS)
+       // && !defined(ASIO_WINDOWS_APP)
        // && !defined(UNDER_CE)
 
-#endif // BOOST_ASIO_DETAIL_IMPL_WIN_THREAD_IPP
+#endif // ASIO_DETAIL_IMPL_WIN_THREAD_IPP

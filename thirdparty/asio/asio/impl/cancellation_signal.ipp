@@ -8,21 +8,20 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IMPL_CANCELLATION_SIGNAL_IPP
-#define BOOST_ASIO_IMPL_CANCELLATION_SIGNAL_IPP
+#ifndef ASIO_IMPL_CANCELLATION_SIGNAL_IPP
+#define ASIO_IMPL_CANCELLATION_SIGNAL_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/cancellation_signal.hpp>
-#include <boost/asio/detail/thread_context.hpp>
-#include <boost/asio/detail/thread_info_base.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/cancellation_signal.hpp"
+#include "asio/detail/thread_context.hpp"
+#include "asio/detail/thread_info_base.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 cancellation_signal::~cancellation_signal()
@@ -91,8 +90,7 @@ cancellation_slot::auto_delete_helper::~auto_delete_helper()
 }
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_IMPL_CANCELLATION_SIGNAL_IPP
+#endif // ASIO_IMPL_CANCELLATION_SIGNAL_IPP

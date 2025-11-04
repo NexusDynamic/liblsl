@@ -8,44 +8,42 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_IMPL_THROW_ERROR_IPP
-#define BOOST_ASIO_DETAIL_IMPL_THROW_ERROR_IPP
+#ifndef ASIO_DETAIL_IMPL_THROW_ERROR_IPP
+#define ASIO_DETAIL_IMPL_THROW_ERROR_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/throw_error.hpp>
-#include <boost/system/system_error.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/throw_error.hpp"
+#include "asio/system_error.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
 void do_throw_error(
-    const boost::system::error_code& err
-    BOOST_ASIO_SOURCE_LOCATION_PARAM)
+    const asio::error_code& err
+    ASIO_SOURCE_LOCATION_PARAM)
 {
-  boost::system::system_error e(err);
-  boost::asio::detail::throw_exception(e BOOST_ASIO_SOURCE_LOCATION_ARG);
+  asio::system_error e(err);
+  asio::detail::throw_exception(e ASIO_SOURCE_LOCATION_ARG);
 }
 
 void do_throw_error(
-    const boost::system::error_code& err,
+    const asio::error_code& err,
     const char* location
-    BOOST_ASIO_SOURCE_LOCATION_PARAM)
+    ASIO_SOURCE_LOCATION_PARAM)
 {
-  boost::system::system_error e(err, location);
-  boost::asio::detail::throw_exception(e BOOST_ASIO_SOURCE_LOCATION_ARG);
+  asio::system_error e(err, location);
+  asio::detail::throw_exception(e ASIO_SOURCE_LOCATION_ARG);
 }
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_IMPL_THROW_ERROR_IPP
+#endif // ASIO_DETAIL_IMPL_THROW_ERROR_IPP

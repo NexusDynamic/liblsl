@@ -8,22 +8,21 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXPERIMENTAL_CHANNEL_TRAITS_HPP
-#define BOOST_ASIO_EXPERIMENTAL_CHANNEL_TRAITS_HPP
+#ifndef ASIO_EXPERIMENTAL_CHANNEL_TRAITS_HPP
+#define ASIO_EXPERIMENTAL_CHANNEL_TRAITS_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <deque>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/error.hpp>
-#include <boost/asio/experimental/channel_error.hpp>
+#include "asio/detail/type_traits.hpp"
+#include "asio/error.hpp"
+#include "asio/experimental/channel_error.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace experimental {
 
@@ -83,7 +82,7 @@ struct channel_traits
 };
 
 template <typename R>
-struct channel_traits<R(boost::system::error_code)>
+struct channel_traits<R(asio::error_code)>
 {
   template <typename... NewSignatures>
   struct rebind
@@ -97,27 +96,27 @@ struct channel_traits<R(boost::system::error_code)>
     typedef std::deque<Element> type;
   };
 
-  typedef R receive_cancelled_signature(boost::system::error_code);
+  typedef R receive_cancelled_signature(asio::error_code);
 
   template <typename F>
   static void invoke_receive_cancelled(F f)
   {
-    const boost::system::error_code e = error::channel_cancelled;
+    const asio::error_code e = error::channel_cancelled;
     static_cast<F&&>(f)(e);
   }
 
-  typedef R receive_closed_signature(boost::system::error_code);
+  typedef R receive_closed_signature(asio::error_code);
 
   template <typename F>
   static void invoke_receive_closed(F f)
   {
-    const boost::system::error_code e = error::channel_closed;
+    const asio::error_code e = error::channel_closed;
     static_cast<F&&>(f)(e);
   }
 };
 
 template <typename R, typename... Args, typename... Signatures>
-struct channel_traits<R(boost::system::error_code, Args...), Signatures...>
+struct channel_traits<R(asio::error_code, Args...), Signatures...>
 {
   template <typename... NewSignatures>
   struct rebind
@@ -131,21 +130,21 @@ struct channel_traits<R(boost::system::error_code, Args...), Signatures...>
     typedef std::deque<Element> type;
   };
 
-  typedef R receive_cancelled_signature(boost::system::error_code, Args...);
+  typedef R receive_cancelled_signature(asio::error_code, Args...);
 
   template <typename F>
   static void invoke_receive_cancelled(F f)
   {
-    const boost::system::error_code e = error::channel_cancelled;
+    const asio::error_code e = error::channel_cancelled;
     static_cast<F&&>(f)(e, decay_t<Args>()...);
   }
 
-  typedef R receive_closed_signature(boost::system::error_code, Args...);
+  typedef R receive_closed_signature(asio::error_code, Args...);
 
   template <typename F>
   static void invoke_receive_closed(F f)
   {
-    const boost::system::error_code e = error::channel_closed;
+    const asio::error_code e = error::channel_closed;
     static_cast<F&&>(f)(e, decay_t<Args>()...);
   }
 };
@@ -170,9 +169,9 @@ struct channel_traits<R(std::exception_ptr)>
   template <typename F>
   static void invoke_receive_cancelled(F f)
   {
-    const boost::system::error_code e = error::channel_cancelled;
+    const asio::error_code e = error::channel_cancelled;
     static_cast<F&&>(f)(
-        std::make_exception_ptr(boost::system::system_error(e)));
+        std::make_exception_ptr(asio::system_error(e)));
   }
 
   typedef R receive_closed_signature(std::exception_ptr);
@@ -180,9 +179,9 @@ struct channel_traits<R(std::exception_ptr)>
   template <typename F>
   static void invoke_receive_closed(F f)
   {
-    const boost::system::error_code e = error::channel_closed;
+    const asio::error_code e = error::channel_closed;
     static_cast<F&&>(f)(
-        std::make_exception_ptr(boost::system::system_error(e)));
+        std::make_exception_ptr(asio::system_error(e)));
   }
 };
 
@@ -206,9 +205,9 @@ struct channel_traits<R(std::exception_ptr, Args...), Signatures...>
   template <typename F>
   static void invoke_receive_cancelled(F f)
   {
-    const boost::system::error_code e = error::channel_cancelled;
+    const asio::error_code e = error::channel_cancelled;
     static_cast<F&&>(f)(
-        std::make_exception_ptr(boost::system::system_error(e)),
+        std::make_exception_ptr(asio::system_error(e)),
         decay_t<Args>()...);
   }
 
@@ -217,9 +216,9 @@ struct channel_traits<R(std::exception_ptr, Args...), Signatures...>
   template <typename F>
   static void invoke_receive_closed(F f)
   {
-    const boost::system::error_code e = error::channel_closed;
+    const asio::error_code e = error::channel_closed;
     static_cast<F&&>(f)(
-        std::make_exception_ptr(boost::system::system_error(e)),
+        std::make_exception_ptr(asio::system_error(e)),
         decay_t<Args>()...);
   }
 };
@@ -239,21 +238,21 @@ struct channel_traits<R()>
     typedef std::deque<Element> type;
   };
 
-  typedef R receive_cancelled_signature(boost::system::error_code);
+  typedef R receive_cancelled_signature(asio::error_code);
 
   template <typename F>
   static void invoke_receive_cancelled(F f)
   {
-    const boost::system::error_code e = error::channel_cancelled;
+    const asio::error_code e = error::channel_cancelled;
     static_cast<F&&>(f)(e);
   }
 
-  typedef R receive_closed_signature(boost::system::error_code);
+  typedef R receive_closed_signature(asio::error_code);
 
   template <typename F>
   static void invoke_receive_closed(F f)
   {
-    const boost::system::error_code e = error::channel_closed;
+    const asio::error_code e = error::channel_closed;
     static_cast<F&&>(f)(e);
   }
 };
@@ -273,21 +272,21 @@ struct channel_traits<R(T)>
     typedef std::deque<Element> type;
   };
 
-  typedef R receive_cancelled_signature(boost::system::error_code);
+  typedef R receive_cancelled_signature(asio::error_code);
 
   template <typename F>
   static void invoke_receive_cancelled(F f)
   {
-    const boost::system::error_code e = error::channel_cancelled;
+    const asio::error_code e = error::channel_cancelled;
     static_cast<F&&>(f)(e);
   }
 
-  typedef R receive_closed_signature(boost::system::error_code);
+  typedef R receive_closed_signature(asio::error_code);
 
   template <typename F>
   static void invoke_receive_closed(F f)
   {
-    const boost::system::error_code e = error::channel_closed;
+    const asio::error_code e = error::channel_closed;
     static_cast<F&&>(f)(e);
   }
 };
@@ -296,8 +295,7 @@ struct channel_traits<R(T)>
 
 } // namespace experimental
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_EXPERIMENTAL_CHANNEL_TRAITS_HPP
+#endif // ASIO_EXPERIMENTAL_CHANNEL_TRAITS_HPP

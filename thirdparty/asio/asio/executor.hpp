@@ -8,28 +8,27 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXECUTOR_HPP
-#define BOOST_ASIO_EXECUTOR_HPP
+#ifndef ASIO_EXECUTOR_HPP
+#define ASIO_EXECUTOR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#if !defined(ASIO_NO_TS_EXECUTORS)
 
 #include <new>
 #include <typeinfo>
-#include <boost/asio/detail/cstddef.hpp>
-#include <boost/asio/detail/executor_function.hpp>
-#include <boost/asio/detail/memory.hpp>
-#include <boost/asio/detail/throw_exception.hpp>
-#include <boost/asio/execution_context.hpp>
+#include "asio/detail/cstddef.hpp"
+#include "asio/detail/executor_function.hpp"
+#include "asio/detail/memory.hpp"
+#include "asio/detail/throw_exception.hpp"
+#include "asio/execution_context.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 /// Exception thrown when trying to access an empty polymorphic executor.
@@ -38,10 +37,10 @@ class bad_executor
 {
 public:
   /// Constructor.
-  BOOST_ASIO_DECL bad_executor() noexcept;
+  ASIO_DECL bad_executor() noexcept;
 
   /// Obtain message associated with exception.
-  BOOST_ASIO_DECL virtual const char* what() const
+  ASIO_DECL virtual const char* what() const
     noexcept;
 };
 
@@ -226,17 +225,17 @@ public:
    * @returns If @c *this has a target type of type @c T, <tt>typeid(T)</tt>;
    * otherwise, <tt>typeid(void)</tt>.
    */
-#if !defined(BOOST_ASIO_NO_TYPEID) || defined(GENERATING_DOCUMENTATION)
+#if !defined(ASIO_NO_TYPEID) || defined(GENERATING_DOCUMENTATION)
   const std::type_info& target_type() const noexcept
   {
     return impl_ ? impl_->target_type() : typeid(void);
   }
-#else // !defined(BOOST_ASIO_NO_TYPEID) || defined(GENERATING_DOCUMENTATION)
+#else // !defined(ASIO_NO_TYPEID) || defined(GENERATING_DOCUMENTATION)
   const void* target_type() const noexcept
   {
     return impl_ ? impl_->target_type() : 0;
   }
-#endif // !defined(BOOST_ASIO_NO_TYPEID) || defined(GENERATING_DOCUMENTATION)
+#endif // !defined(ASIO_NO_TYPEID) || defined(GENERATING_DOCUMENTATION)
 
   /// Obtain a pointer to the target executor object.
   /**
@@ -277,21 +276,21 @@ private:
   typedef detail::executor_function function;
   template <typename, typename> class impl;
 
-#if !defined(BOOST_ASIO_NO_TYPEID)
+#if !defined(ASIO_NO_TYPEID)
   typedef const std::type_info& type_id_result_type;
-#else // !defined(BOOST_ASIO_NO_TYPEID)
+#else // !defined(ASIO_NO_TYPEID)
   typedef const void* type_id_result_type;
-#endif // !defined(BOOST_ASIO_NO_TYPEID)
+#endif // !defined(ASIO_NO_TYPEID)
 
   template <typename T>
   static type_id_result_type type_id()
   {
-#if !defined(BOOST_ASIO_NO_TYPEID)
+#if !defined(ASIO_NO_TYPEID)
     return typeid(T);
-#else // !defined(BOOST_ASIO_NO_TYPEID)
+#else // !defined(ASIO_NO_TYPEID)
     static int unique_id;
     return &unique_id;
-#endif // !defined(BOOST_ASIO_NO_TYPEID)
+#endif // !defined(ASIO_NO_TYPEID)
   }
 
   // Base class for all polymorphic executor implementations.
@@ -326,7 +325,7 @@ private:
     if (!impl_)
     {
       bad_executor ex;
-      boost::asio::detail::throw_exception(ex);
+      asio::detail::throw_exception(ex);
     }
     return impl_;
   }
@@ -349,17 +348,16 @@ private:
 };
 
 } // namespace asio
-} // namespace boost
 
-BOOST_ASIO_USES_ALLOCATOR(boost::asio::executor)
+ASIO_USES_ALLOCATOR(asio::executor)
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#include <boost/asio/impl/executor.hpp>
-#if defined(BOOST_ASIO_HEADER_ONLY)
-# include <boost/asio/impl/executor.ipp>
-#endif // defined(BOOST_ASIO_HEADER_ONLY)
+#include "asio/impl/executor.hpp"
+#if defined(ASIO_HEADER_ONLY)
+# include "asio/impl/executor.ipp"
+#endif // defined(ASIO_HEADER_ONLY)
 
-#endif // !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#endif // !defined(ASIO_NO_TS_EXECUTORS)
 
-#endif // BOOST_ASIO_EXECUTOR_HPP
+#endif // ASIO_EXECUTOR_HPP

@@ -8,17 +8,16 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_TYPE_TRAITS_HPP
-#define BOOST_ASIO_DETAIL_TYPE_TRAITS_HPP
+#ifndef ASIO_DETAIL_TYPE_TRAITS_HPP
+#define ASIO_DETAIL_TYPE_TRAITS_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <type_traits>
 
-namespace boost {
 namespace asio {
 
 using std::add_const;
@@ -132,7 +131,7 @@ using std::remove_reference;
 template <typename T>
 using remove_reference_t = typename std::remove_reference<T>::type;
 
-#if defined(BOOST_ASIO_HAS_STD_INVOKE_RESULT)
+#if defined(ASIO_HAS_STD_INVOKE_RESULT)
 
 template <typename> struct result_of;
 
@@ -142,14 +141,14 @@ struct result_of<F(Args...)> : std::invoke_result<F, Args...> {};
 template <typename T>
 using result_of_t = typename result_of<T>::type;
 
-#else // defined(BOOST_ASIO_HAS_STD_INVOKE_RESULT)
+#else // defined(ASIO_HAS_STD_INVOKE_RESULT)
 
 using std::result_of;
 
 template <typename T>
 using result_of_t = typename std::result_of<T>::type;
 
-#endif // defined(BOOST_ASIO_HAS_STD_INVOKE_RESULT)
+#endif // defined(ASIO_HAS_STD_INVOKE_RESULT)
 
 using std::true_type;
 
@@ -187,6 +186,5 @@ template <typename T>
 using type_identity_t = typename type_identity<T>::type;
 
 } // namespace asio
-} // namespace boost
 
-#endif // BOOST_ASIO_DETAIL_TYPE_TRAITS_HPP
+#endif // ASIO_DETAIL_TYPE_TRAITS_HPP

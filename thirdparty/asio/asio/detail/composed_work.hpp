@@ -8,24 +8,23 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_COMPOSED_WORK_HPP
-#define BOOST_ASIO_DETAIL_COMPOSED_WORK_HPP
+#ifndef ASIO_DETAIL_COMPOSED_WORK_HPP
+#define ASIO_DETAIL_COMPOSED_WORK_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/execution/executor.hpp>
-#include <boost/asio/execution/outstanding_work.hpp>
-#include <boost/asio/executor_work_guard.hpp>
-#include <boost/asio/is_executor.hpp>
-#include <boost/asio/system_executor.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/execution/executor.hpp"
+#include "asio/execution/outstanding_work.hpp"
+#include "asio/executor_work_guard.hpp"
+#include "asio/is_executor.hpp"
+#include "asio/system_executor.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -38,7 +37,7 @@ public:
     > executor_type;
 
   composed_work_guard(const Executor& ex)
-    : executor_(boost::asio::prefer(ex, execution::outstanding_work.tracked))
+    : executor_(asio::prefer(ex, execution::outstanding_work.tracked))
   {
   }
 
@@ -75,7 +74,7 @@ public:
   }
 };
 
-#if !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#if !defined(ASIO_NO_TS_EXECUTORS)
 
 template <typename Executor>
 struct composed_work_guard<Executor,
@@ -90,7 +89,7 @@ struct composed_work_guard<Executor,
   }
 };
 
-#endif // !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#endif // !defined(ASIO_NO_TS_EXECUTORS)
 
 template <typename>
 struct composed_io_executors;
@@ -247,8 +246,7 @@ inline const Executor& get_composed_io_executor(const Executor& ex,
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_COMPOSED_WORK_HPP
+#endif // ASIO_DETAIL_COMPOSED_WORK_HPP

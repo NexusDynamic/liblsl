@@ -8,28 +8,27 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXECUTION_EXECUTOR_HPP
-#define BOOST_ASIO_EXECUTION_EXECUTOR_HPP
+#ifndef ASIO_EXECUTION_EXECUTOR_HPP
+#define ASIO_EXECUTION_EXECUTOR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/execution/invocable_archetype.hpp>
-#include <boost/asio/traits/equality_comparable.hpp>
-#include <boost/asio/traits/execute_member.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/execution/invocable_archetype.hpp"
+#include "asio/traits/equality_comparable.hpp"
+#include "asio/traits/execute_member.hpp"
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT) \
-  && defined(BOOST_ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
-# define BOOST_ASIO_HAS_DEDUCED_EXECUTION_IS_EXECUTOR_TRAIT 1
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
+#if defined(ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT) \
+  && defined(ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
+# define ASIO_HAS_DEDUCED_EXECUTION_IS_EXECUTOR_TRAIT 1
+#endif // defined(ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT)
+       //   && defined(ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace execution {
 namespace detail {
@@ -89,30 +88,29 @@ struct is_executor :
 {
 };
 
-#if defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
 template <typename T>
 constexpr const bool is_executor_v = is_executor<T>::value;
 
-#endif // defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
-#if defined(BOOST_ASIO_HAS_CONCEPTS)
+#if defined(ASIO_HAS_CONCEPTS)
 
 template <typename T>
-BOOST_ASIO_CONCEPT executor = is_executor<T>::value;
+ASIO_CONCEPT executor = is_executor<T>::value;
 
-#define BOOST_ASIO_EXECUTION_EXECUTOR ::boost::asio::execution::executor
+#define ASIO_EXECUTION_EXECUTOR ::asio::execution::executor
 
-#else // defined(BOOST_ASIO_HAS_CONCEPTS)
+#else // defined(ASIO_HAS_CONCEPTS)
 
-#define BOOST_ASIO_EXECUTION_EXECUTOR typename
+#define ASIO_EXECUTION_EXECUTOR typename
 
-#endif // defined(BOOST_ASIO_HAS_CONCEPTS)
+#endif // defined(ASIO_HAS_CONCEPTS)
 
 } // namespace execution
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_EXECUTION_EXECUTOR_HPP
+#endif // ASIO_EXECUTION_EXECUTOR_HPP

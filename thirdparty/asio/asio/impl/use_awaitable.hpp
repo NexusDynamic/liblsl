@@ -8,21 +8,20 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IMPL_USE_AWAITABLE_HPP
-#define BOOST_ASIO_IMPL_USE_AWAITABLE_HPP
+#ifndef ASIO_IMPL_USE_AWAITABLE_HPP
+#define ASIO_IMPL_USE_AWAITABLE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/async_result.hpp>
-#include <boost/asio/cancellation_signal.hpp>
-#include <boost/asio/disposition.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/async_result.hpp"
+#include "asio/cancellation_signal.hpp"
+#include "asio/disposition.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -204,7 +203,7 @@ public:
       use_awaitable_t<Executor> u, InitArgs&... args)
   {
     (void)u;
-    BOOST_ASIO_HANDLER_LOCATION((u.file_name_, u.line_, u.function_name_));
+    ASIO_HANDLER_LOCATION((u.file_name_, u.line_, u.function_name_));
     handler_type handler(frame->detach_thread());
     std::move(initiation)(std::move(handler), std::move(args)...);
     return nullptr;
@@ -229,8 +228,7 @@ public:
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_IMPL_USE_AWAITABLE_HPP
+#endif // ASIO_IMPL_USE_AWAITABLE_HPP

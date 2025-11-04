@@ -8,24 +8,23 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_IO_OBJECT_IMPL_HPP
-#define BOOST_ASIO_DETAIL_IO_OBJECT_IMPL_HPP
+#ifndef ASIO_DETAIL_IO_OBJECT_IMPL_HPP
+#define ASIO_DETAIL_IO_OBJECT_IMPL_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
 #include <new>
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/execution/executor.hpp>
-#include <boost/asio/execution/context.hpp>
-#include <boost/asio/io_context.hpp>
-#include <boost/asio/query.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/execution/executor.hpp"
+#include "asio/execution/context.hpp"
+#include "asio/io_context.hpp"
+#include "asio/query.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -45,7 +44,7 @@ public:
 
   // Construct an I/O object using an executor.
   explicit io_object_impl(int, const executor_type& ex)
-    : service_(&boost::asio::use_service<IoObjectService>(
+    : service_(&asio::use_service<IoObjectService>(
           io_object_impl::get_context(ex))),
       executor_(ex)
   {
@@ -55,7 +54,7 @@ public:
   // Construct an I/O object using an execution context.
   template <typename ExecutionContext>
   explicit io_object_impl(int, int, ExecutionContext& context)
-    : service_(&boost::asio::use_service<IoObjectService>(context)),
+    : service_(&asio::use_service<IoObjectService>(context)),
       executor_(context.get_executor())
   {
     service_->construct(implementation_);
@@ -81,7 +80,7 @@ public:
   // Perform converting move-construction of an I/O object on another service.
   template <typename IoObjectService1, typename Executor1>
   io_object_impl(io_object_impl<IoObjectService1, Executor1>&& other)
-    : service_(&boost::asio::use_service<IoObjectService>(
+    : service_(&asio::use_service<IoObjectService>(
             io_object_impl::get_context(other.get_executor()))),
       executor_(other.get_executor())
   {
@@ -145,7 +144,7 @@ private:
   static execution_context& get_context(const T& t,
       enable_if_t<execution::is_executor<T>::value>* = 0)
   {
-    return boost::asio::query(t, execution::context);
+    return asio::query(t, execution::context);
   }
 
   // Helper function to get an executor's context.
@@ -172,8 +171,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_IO_OBJECT_IMPL_HPP
+#endif // ASIO_DETAIL_IO_OBJECT_IMPL_HPP

@@ -8,50 +8,49 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IMPL_SPAWN_HPP
-#define BOOST_ASIO_IMPL_SPAWN_HPP
+#ifndef ASIO_IMPL_SPAWN_HPP
+#define ASIO_IMPL_SPAWN_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <tuple>
-#include <boost/asio/associated_allocator.hpp>
-#include <boost/asio/associated_cancellation_slot.hpp>
-#include <boost/asio/associated_executor.hpp>
-#include <boost/asio/async_result.hpp>
-#include <boost/asio/bind_executor.hpp>
-#include <boost/asio/detail/atomic_count.hpp>
-#include <boost/asio/detail/bind_handler.hpp>
-#include <boost/asio/detail/handler_cont_helpers.hpp>
-#include <boost/asio/detail/memory.hpp>
-#include <boost/asio/detail/noncopyable.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/detail/utility.hpp>
-#include <boost/asio/disposition.hpp>
-#include <boost/asio/error.hpp>
-#include <boost/system/system_error.hpp>
+#include "asio/associated_allocator.hpp"
+#include "asio/associated_cancellation_slot.hpp"
+#include "asio/associated_executor.hpp"
+#include "asio/async_result.hpp"
+#include "asio/bind_executor.hpp"
+#include "asio/detail/atomic_count.hpp"
+#include "asio/detail/bind_handler.hpp"
+#include "asio/detail/handler_cont_helpers.hpp"
+#include "asio/detail/memory.hpp"
+#include "asio/detail/noncopyable.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/detail/utility.hpp"
+#include "asio/disposition.hpp"
+#include "asio/error.hpp"
+#include "asio/system_error.hpp"
 
-#if defined(BOOST_ASIO_HAS_BOOST_CONTEXT_FIBER)
+#if defined(ASIO_HAS_BOOST_CONTEXT_FIBER)
 # include <boost/context/fiber.hpp>
-#endif // defined(BOOST_ASIO_HAS_BOOST_CONTEXT_FIBER)
+#endif // defined(ASIO_HAS_BOOST_CONTEXT_FIBER)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
 inline void spawned_thread_rethrow(void* ex)
 {
   if (*static_cast<exception_ptr*>(ex))
     rethrow_exception(*static_cast<exception_ptr*>(ex));
 }
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
 
-#if defined(BOOST_ASIO_HAS_BOOST_CONTEXT_FIBER)
+#if defined(ASIO_HAS_BOOST_CONTEXT_FIBER)
 
 // Spawned thread implementation using Boost.Context's fiber.
 class spawned_fiber_thread : public spawned_thread_base
@@ -110,7 +109,7 @@ public:
   {
     if (throw_if_cancelled_)
       if (!!cancellation_state_.cancelled())
-        throw_error(boost::asio::error::operation_aborted, "yield");
+        throw_error(asio::error::operation_aborted, "yield");
     has_context_switched_ = true;
     on_suspend_fn_ = fn;
     on_suspend_arg_ = arg;
@@ -145,15 +144,15 @@ private:
       *spawned_thread_out_ = &spawned_thread;
       spawned_thread_out_ = 0;
       spawned_thread.suspend();
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
       try
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
       {
         function(&spawned_thread);
         spawned_thread.terminal_ = true;
         spawned_thread.suspend();
       }
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
       catch (const boost::context::detail::forced_unwind&)
       {
         throw;
@@ -164,7 +163,7 @@ private:
         spawned_thread.terminal_ = true;
         spawned_thread.suspend_with(spawned_thread_rethrow, &ex);
       }
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
       return static_cast<fiber_type&&>(spawned_thread.caller_);
     }
 
@@ -179,9 +178,9 @@ private:
   void* on_suspend_arg_;
 };
 
-#endif // defined(BOOST_ASIO_HAS_BOOST_CONTEXT_FIBER)
+#endif // defined(ASIO_HAS_BOOST_CONTEXT_FIBER)
 
-#if defined(BOOST_ASIO_HAS_BOOST_CONTEXT_FIBER)
+#if defined(ASIO_HAS_BOOST_CONTEXT_FIBER)
 typedef spawned_fiber_thread default_spawned_thread_type;
 #else
 # error No spawn() implementation available
@@ -333,12 +332,12 @@ public:
 };
 
 template <typename Executor, typename R>
-class spawn_handler<Executor, R(boost::system::error_code)>
+class spawn_handler<Executor, R(asio::error_code)>
   : public spawn_handler_base<Executor>
 {
 public:
   typedef void return_type;
-  typedef boost::system::error_code* result_type;
+  typedef asio::error_code* result_type;
 
   spawn_handler(const basic_yield_context<Executor>& yield, result_type& result)
     : spawn_handler_base<Executor>(yield),
@@ -346,7 +345,7 @@ public:
   {
   }
 
-  void operator()(boost::system::error_code ec)
+  void operator()(asio::error_code ec)
   {
     if (this->yield_.ec_)
     {
@@ -392,7 +391,7 @@ public:
   static return_type on_resume(result_type& result)
   {
     if (*result != no_error)
-      boost::asio::throw_exception(static_cast<Disposition&&>(*result));
+      asio::throw_exception(static_cast<Disposition&&>(*result));
   }
 
 private:
@@ -430,7 +429,7 @@ private:
 };
 
 template <typename Executor, typename R, typename T>
-class spawn_handler<Executor, R(boost::system::error_code, T)>
+class spawn_handler<Executor, R(asio::error_code, T)>
   : public spawn_handler_base<Executor>
 {
 public:
@@ -438,7 +437,7 @@ public:
 
   struct result_type
   {
-    boost::system::error_code* ec_;
+    asio::error_code* ec_;
     return_type* value_;
   };
 
@@ -448,7 +447,7 @@ public:
   {
   }
 
-  void operator()(boost::system::error_code ec, T value)
+  void operator()(asio::error_code ec, T value)
   {
     if (this->yield_.ec_)
     {
@@ -503,7 +502,7 @@ public:
   {
     if (*result.disposition_ != no_error)
     {
-      boost::asio::throw_exception(
+      asio::throw_exception(
           static_cast<Disposition&&>(*result.disposition_));
     }
     return static_cast<return_type&&>(*result.value_);
@@ -547,7 +546,7 @@ private:
 };
 
 template <typename Executor, typename R, typename... Ts>
-class spawn_handler<Executor, R(boost::system::error_code, Ts...)>
+class spawn_handler<Executor, R(asio::error_code, Ts...)>
   : public spawn_handler_base<Executor>
 {
 public:
@@ -555,7 +554,7 @@ public:
 
   struct result_type
   {
-    boost::system::error_code* ec_;
+    asio::error_code* ec_;
     return_type* value_;
   };
 
@@ -566,7 +565,7 @@ public:
   }
 
   template <typename... Args>
-  void operator()(boost::system::error_code ec,
+  void operator()(asio::error_code ec,
       Args&&... args)
   {
     return_type value(static_cast<Args&&>(args)...);
@@ -625,7 +624,7 @@ public:
   {
     if (*result.disposition_ != no_error)
     {
-      boost::asio::throw_exception(
+      asio::throw_exception(
           static_cast<Disposition&&>(*result.disposition_));
     }
     return static_cast<return_type&&>(*result.value_);
@@ -652,7 +651,7 @@ public:
   typedef typename detail::spawn_handler<Executor, Signature> handler_type;
   typedef typename handler_type::return_type return_type;
 
-#if defined(BOOST_ASIO_HAS_VARIADIC_LAMBDA_CAPTURES)
+#if defined(ASIO_HAS_VARIADIC_LAMBDA_CAPTURES)
 
   template <typename Initiation, typename... InitArgs>
   static return_type initiate(Initiation&& init,
@@ -673,7 +672,7 @@ public:
     return handler_type::on_resume(result);
   }
 
-#else // defined(BOOST_ASIO_HAS_VARIADIC_LAMBDA_CAPTURES)
+#else // defined(ASIO_HAS_VARIADIC_LAMBDA_CAPTURES)
 
   template <typename Initiation, typename... InitArgs>
   struct suspend_with_helper
@@ -714,7 +713,7 @@ public:
     return handler_type::on_resume(result);
   }
 
-#endif // defined(BOOST_ASIO_HAS_VARIADIC_LAMBDA_CAPTURES)
+#endif // defined(ASIO_HAS_VARIADIC_LAMBDA_CAPTURES)
 };
 
 #endif // !defined(GENERATING_DOCUMENTATION)
@@ -745,9 +744,9 @@ public:
 private:
   void call(const basic_yield_context<Executor>& yield, void_type<void>)
   {
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
     try
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
     {
       function_(yield);
       if (!yield.spawned_thread_->has_context_switched())
@@ -756,13 +755,13 @@ private:
         handler(handler_, exception_ptr());
       work_.complete(handler, handler.handler_);
     }
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
-# if defined(BOOST_ASIO_HAS_BOOST_CONTEXT_FIBER)
+#if !defined(ASIO_NO_EXCEPTIONS)
+# if defined(ASIO_HAS_BOOST_CONTEXT_FIBER)
     catch (const boost::context::detail::forced_unwind&)
     {
       throw;
     }
-# endif // defined(BOOST_ASIO_HAS_BOOST_CONTEXT_FIBER)
+# endif // defined(ASIO_HAS_BOOST_CONTEXT_FIBER)
     catch (...)
     {
       exception_ptr ex = current_exception();
@@ -771,15 +770,15 @@ private:
       detail::binder1<Handler, exception_ptr> handler(handler_, ex);
       work_.complete(handler, handler.handler_);
     }
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
   }
 
   template <typename T>
   void call(const basic_yield_context<Executor>& yield, void_type<T>)
   {
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
     try
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
     {
       T result(function_(yield));
       if (!yield.spawned_thread_->has_context_switched())
@@ -789,13 +788,13 @@ private:
           exception_ptr(), static_cast<T&&>(result));
       work_.complete(handler, handler.handler_);
     }
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
-# if defined(BOOST_ASIO_HAS_BOOST_CONTEXT_FIBER)
+#if !defined(ASIO_NO_EXCEPTIONS)
+# if defined(ASIO_HAS_BOOST_CONTEXT_FIBER)
     catch (const boost::context::detail::forced_unwind&)
     {
       throw;
     }
-# endif // defined(BOOST_ASIO_HAS_BOOST_CONTEXT_FIBER)
+# endif // defined(ASIO_HAS_BOOST_CONTEXT_FIBER)
     catch (...)
     {
       exception_ptr ex = current_exception();
@@ -805,7 +804,7 @@ private:
         handler(0, static_cast<Handler&&>(handler_), ex, T());
       work_.complete(handler, handler.handler_);
     }
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
   }
 
   Executor executor_;
@@ -905,7 +904,7 @@ public:
       handler_type, Executor> cancel_handler_type;
 
     associated_cancellation_slot_t<handler_type> slot
-      = boost::asio::get_associated_cancellation_slot(handler);
+      = asio::get_associated_cancellation_slot(handler);
 
     cancel_handler_type* cancel_handler = slot.is_connected()
       ? &slot.template emplace<cancel_handler_type>(handler, executor_)
@@ -927,7 +926,7 @@ public:
             proxy_slot, cancel_state)));
   }
 
-#if defined(BOOST_ASIO_HAS_BOOST_CONTEXT_FIBER)
+#if defined(ASIO_HAS_BOOST_CONTEXT_FIBER)
 
   template <typename Handler, typename StackAllocator, typename F>
   void operator()(Handler&& handler, allocator_arg_t,
@@ -940,7 +939,7 @@ public:
       handler_type, Executor> cancel_handler_type;
 
     associated_cancellation_slot_t<handler_type> slot
-      = boost::asio::get_associated_cancellation_slot(handler);
+      = asio::get_associated_cancellation_slot(handler);
 
     cancel_handler_type* cancel_handler = slot.is_connected()
       ? &slot.template emplace<cancel_handler_type>(handler, executor_)
@@ -963,7 +962,7 @@ public:
             proxy_slot, cancel_state)));
   }
 
-#endif // defined(BOOST_ASIO_HAS_BOOST_CONTEXT_FIBER)
+#endif // defined(ASIO_HAS_BOOST_CONTEXT_FIBER)
 
 private:
   executor_type executor_;
@@ -972,7 +971,7 @@ private:
 } // namespace detail
 
 template <typename Executor, typename F,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
+    ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
       result_of_t<F(basic_yield_context<Executor>)>>::type) CompletionToken>
 inline auto spawn(const Executor& ex, F&& function, CompletionToken&& token,
     constraint_t<
@@ -993,7 +992,7 @@ inline auto spawn(const Executor& ex, F&& function, CompletionToken&& token,
 }
 
 template <typename ExecutionContext, typename F,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
+    ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
       result_of_t<F(basic_yield_context<
         typename ExecutionContext::executor_type>)>>::type) CompletionToken>
 inline auto spawn(ExecutionContext& ctx, F&& function, CompletionToken&& token,
@@ -1014,7 +1013,7 @@ inline auto spawn(ExecutionContext& ctx, F&& function, CompletionToken&& token,
 }
 
 template <typename Executor, typename F,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
+    ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
       result_of_t<F(basic_yield_context<Executor>)>>::type)
         CompletionToken>
 inline auto spawn(const basic_yield_context<Executor>& ctx,
@@ -1033,10 +1032,10 @@ inline auto spawn(const basic_yield_context<Executor>& ctx,
       static_cast<CompletionToken&&>(token));
 }
 
-#if defined(BOOST_ASIO_HAS_BOOST_CONTEXT_FIBER)
+#if defined(ASIO_HAS_BOOST_CONTEXT_FIBER)
 
 template <typename Executor, typename StackAllocator, typename F,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
+    ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
       result_of_t<F(basic_yield_context<Executor>)>>::type)
         CompletionToken>
 inline auto spawn(const Executor& ex, allocator_arg_t,
@@ -1062,7 +1061,7 @@ inline auto spawn(const Executor& ex, allocator_arg_t,
 }
 
 template <typename ExecutionContext, typename StackAllocator, typename F,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
+    ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
       result_of_t<F(basic_yield_context<
         typename ExecutionContext::executor_type>)>>::type) CompletionToken>
 inline auto spawn(ExecutionContext& ctx, allocator_arg_t,
@@ -1087,7 +1086,7 @@ inline auto spawn(ExecutionContext& ctx, allocator_arg_t,
 }
 
 template <typename Executor, typename StackAllocator, typename F,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
+    ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
       result_of_t<F(basic_yield_context<Executor>)>>::type) CompletionToken>
 inline auto spawn(const basic_yield_context<Executor>& ctx, allocator_arg_t,
     StackAllocator&& stack_allocator, F&& function, CompletionToken&& token,
@@ -1107,11 +1106,10 @@ inline auto spawn(const basic_yield_context<Executor>& ctx, allocator_arg_t,
       static_cast<F&&>(function), static_cast<CompletionToken&&>(token));
 }
 
-#endif // defined(BOOST_ASIO_HAS_BOOST_CONTEXT_FIBER)
+#endif // defined(ASIO_HAS_BOOST_CONTEXT_FIBER)
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_IMPL_SPAWN_HPP
+#endif // ASIO_IMPL_SPAWN_HPP

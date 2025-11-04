@@ -8,23 +8,22 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_CANCELLATION_STATE_HPP
-#define BOOST_ASIO_CANCELLATION_STATE_HPP
+#ifndef ASIO_CANCELLATION_STATE_HPP
+#define ASIO_CANCELLATION_STATE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <cassert>
 #include <new>
 #include <utility>
-#include <boost/asio/cancellation_signal.hpp>
-#include <boost/asio/detail/cstddef.hpp>
+#include "asio/cancellation_signal.hpp"
+#include "asio/detail/cstddef.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 /// A simple cancellation signal propagation filter.
@@ -109,15 +108,15 @@ public:
    * @param filter A function object that is used to transform incoming
    * cancellation signals as they are received from the parent slot. This
    * function object must have the signature:
-   * @code boost::asio::cancellation_type_t filter(
-   *     boost::asio::cancellation_type_t); @endcode
+   * @code asio::cancellation_type_t filter(
+   *     asio::cancellation_type_t); @endcode
    *
    * The library provides the following pre-defined cancellation filters:
    *
-   * @li boost::asio::disable_cancellation
-   * @li boost::asio::enable_terminal_cancellation
-   * @li boost::asio::enable_partial_cancellation
-   * @li boost::asio::enable_total_cancellation
+   * @li asio::disable_cancellation
+   * @li asio::enable_terminal_cancellation
+   * @li asio::enable_partial_cancellation
+   * @li asio::enable_total_cancellation
    */
   template <typename CancellationSlot, typename Filter>
   constexpr cancellation_state(CancellationSlot slot, Filter filter)
@@ -135,21 +134,21 @@ public:
    * @param in_filter A function object that is used to transform incoming
    * cancellation signals as they are received from the parent slot. This
    * function object must have the signature:
-   * @code boost::asio::cancellation_type_t in_filter(
-   *     boost::asio::cancellation_type_t); @endcode
+   * @code asio::cancellation_type_t in_filter(
+   *     asio::cancellation_type_t); @endcode
    *
    * @param out_filter A function object that is used to transform outcoming
    * cancellation signals as they are relayed to the child slot. This function
    * object must have the signature:
-   * @code boost::asio::cancellation_type_t out_filter(
-   *     boost::asio::cancellation_type_t); @endcode
+   * @code asio::cancellation_type_t out_filter(
+   *     asio::cancellation_type_t); @endcode
    *
    * The library provides the following pre-defined cancellation filters:
    *
-   * @li boost::asio::disable_cancellation
-   * @li boost::asio::enable_terminal_cancellation
-   * @li boost::asio::enable_partial_cancellation
-   * @li boost::asio::enable_total_cancellation
+   * @li asio::disable_cancellation
+   * @li asio::enable_terminal_cancellation
+   * @li asio::enable_partial_cancellation
+   * @li asio::enable_total_cancellation
    */
   template <typename CancellationSlot, typename InFilter, typename OutFilter>
   constexpr cancellation_state(CancellationSlot slot,
@@ -230,8 +229,7 @@ private:
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_CANCELLATION_STATE_HPP
+#endif // ASIO_CANCELLATION_STATE_HPP

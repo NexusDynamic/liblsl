@@ -8,34 +8,33 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_EVENT_HPP
-#define BOOST_ASIO_DETAIL_EVENT_HPP
+#ifndef ASIO_DETAIL_EVENT_HPP
+#define ASIO_DETAIL_EVENT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if !defined(BOOST_ASIO_HAS_THREADS)
-# include <boost/asio/detail/null_event.hpp>
-#elif defined(BOOST_ASIO_WINDOWS)
-# include <boost/asio/detail/win_event.hpp>
-#elif defined(BOOST_ASIO_HAS_PTHREADS)
-# include <boost/asio/detail/posix_event.hpp>
+#if !defined(ASIO_HAS_THREADS)
+# include "asio/detail/null_event.hpp"
+#elif defined(ASIO_WINDOWS)
+# include "asio/detail/win_event.hpp"
+#elif defined(ASIO_HAS_PTHREADS)
+# include "asio/detail/posix_event.hpp"
 #else
-# include <boost/asio/detail/std_event.hpp>
+# include "asio/detail/std_event.hpp"
 #endif
 
-namespace boost {
 namespace asio {
 namespace detail {
 
-#if !defined(BOOST_ASIO_HAS_THREADS)
+#if !defined(ASIO_HAS_THREADS)
 typedef null_event event;
-#elif defined(BOOST_ASIO_WINDOWS)
+#elif defined(ASIO_WINDOWS)
 typedef win_event event;
-#elif defined(BOOST_ASIO_HAS_PTHREADS)
+#elif defined(ASIO_HAS_PTHREADS)
 typedef posix_event event;
 #else
 typedef std_event event;
@@ -43,6 +42,5 @@ typedef std_event event;
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#endif // BOOST_ASIO_DETAIL_EVENT_HPP
+#endif // ASIO_DETAIL_EVENT_HPP

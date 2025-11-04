@@ -8,24 +8,23 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_ASSOCIATED_EXECUTOR_HPP
-#define BOOST_ASIO_ASSOCIATED_EXECUTOR_HPP
+#ifndef ASIO_ASSOCIATED_EXECUTOR_HPP
+#define ASIO_ASSOCIATED_EXECUTOR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/associator.hpp>
-#include <boost/asio/detail/functional.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/execution/executor.hpp>
-#include <boost/asio/is_executor.hpp>
-#include <boost/asio/system_executor.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/associator.hpp"
+#include "asio/detail/functional.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/execution/executor.hpp"
+#include "asio/is_executor.hpp"
+#include "asio/system_executor.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 template <typename T, typename Executor>
@@ -140,7 +139,7 @@ struct associated_executor
  * @returns <tt>associated_executor<T>::get(t)</tt>
  */
 template <typename T>
-BOOST_ASIO_NODISCARD inline typename associated_executor<T>::type
+ASIO_NODISCARD inline typename associated_executor<T>::type
 get_associated_executor(const T& t) noexcept
 {
   return associated_executor<T>::get(t);
@@ -151,7 +150,7 @@ get_associated_executor(const T& t) noexcept
  * @returns <tt>associated_executor<T, Executor>::get(t, ex)</tt>
  */
 template <typename T, typename Executor>
-BOOST_ASIO_NODISCARD inline auto get_associated_executor(
+ASIO_NODISCARD inline auto get_associated_executor(
     const T& t, const Executor& ex,
     constraint_t<
       is_executor<Executor>::value || execution::is_executor<Executor>::value
@@ -167,7 +166,7 @@ BOOST_ASIO_NODISCARD inline auto get_associated_executor(
  * ExecutionContext::executor_type>::get(t, ctx.get_executor())</tt>
  */
 template <typename T, typename ExecutionContext>
-BOOST_ASIO_NODISCARD inline typename associated_executor<T,
+ASIO_NODISCARD inline typename associated_executor<T,
     typename ExecutionContext::executor_type>::type
 get_associated_executor(const T& t, ExecutionContext& ctx,
     constraint_t<is_convertible<ExecutionContext&,
@@ -230,8 +229,7 @@ struct associated_executor<reference_wrapper<T>, Executor>
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_ASSOCIATED_EXECUTOR_HPP
+#endif // ASIO_ASSOCIATED_EXECUTOR_HPP

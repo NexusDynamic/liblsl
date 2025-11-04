@@ -8,27 +8,26 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IMPL_EXPERIMENTAL_PARALLEL_GROUP_HPP
-#define BOOST_ASIO_IMPL_EXPERIMENTAL_PARALLEL_GROUP_HPP
+#ifndef ASIO_IMPL_EXPERIMENTAL_PARALLEL_GROUP_HPP
+#define ASIO_IMPL_EXPERIMENTAL_PARALLEL_GROUP_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <atomic>
 #include <deque>
 #include <memory>
 #include <new>
 #include <tuple>
-#include <boost/asio/associated_cancellation_slot.hpp>
-#include <boost/asio/detail/recycling_allocator.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/dispatch.hpp>
+#include "asio/associated_cancellation_slot.hpp"
+#include "asio/detail/recycling_allocator.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/dispatch.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace experimental {
 namespace detail {
@@ -95,8 +94,8 @@ struct parallel_group_completion_handler
   parallel_group_completion_handler(Handler&& h)
     : handler_(std::move(h)),
       executor_(
-          boost::asio::prefer(
-            boost::asio::get_associated_executor(handler_),
+          asio::prefer(
+            asio::get_associated_executor(handler_),
             execution::outstanding_work.tracked))
   {
   }
@@ -108,11 +107,11 @@ struct parallel_group_completion_handler
 
   void operator()()
   {
-    this->invoke(boost::asio::detail::make_index_sequence<sizeof...(Ops)>());
+    this->invoke(asio::detail::make_index_sequence<sizeof...(Ops)>());
   }
 
   template <std::size_t... I>
-  void invoke(boost::asio::detail::index_sequence<I...>)
+  void invoke(asio::detail::index_sequence<I...>)
   {
     this->invoke(std::tuple_cat(std::move(std::get<I>(args_).get())...));
   }
@@ -121,12 +120,12 @@ struct parallel_group_completion_handler
   void invoke(std::tuple<Args...>&& args)
   {
     this->invoke(std::move(args),
-        boost::asio::detail::index_sequence_for<Args...>());
+        asio::detail::index_sequence_for<Args...>());
   }
 
   template <typename... Args, std::size_t... I>
   void invoke(std::tuple<Args...>&& args,
-      boost::asio::detail::index_sequence<I...>)
+      asio::detail::index_sequence<I...>)
   {
     std::move(handler_)(completion_order_, std::move(std::get<I>(args))...);
   }
@@ -173,7 +172,7 @@ struct parallel_group_state
   std::atomic<unsigned int> outstanding_{sizeof...(Ops)};
 
   // The cancellation signals for each operation in the group.
-  boost::asio::cancellation_signal cancellation_signals_[sizeof...(Ops)];
+  asio::cancellation_signal cancellation_signals_[sizeof...(Ops)];
 
   // The cancellation condition is used to determine whether the results from an
   // individual operation warrant a cancellation request for the whole group.
@@ -187,7 +186,7 @@ struct parallel_group_state
 template <std::size_t I, typename Condition, typename Handler, typename... Ops>
 struct parallel_group_op_handler
 {
-  typedef boost::asio::cancellation_slot cancellation_slot_type;
+  typedef asio::cancellation_slot cancellation_slot_type;
 
   parallel_group_op_handler(
     std::shared_ptr<parallel_group_state<Condition, Handler, Ops...>> state)
@@ -228,7 +227,7 @@ struct parallel_group_op_handler
 
     // If this is the last outstanding operation, invoke the user's handler.
     if (--state_->outstanding_ == 0)
-      boost::asio::dispatch(std::move(state_->handler_));
+      asio::dispatch(std::move(state_->handler_));
   }
 
   std::shared_ptr<parallel_group_state<Condition, Handler, Ops...>> state_;
@@ -242,7 +241,7 @@ struct parallel_group_op_handler_with_executor :
   parallel_group_op_handler<I, Condition, Handler, Ops...>
 {
   typedef parallel_group_op_handler<I, Condition, Handler, Ops...> base_type;
-  typedef boost::asio::cancellation_slot cancellation_slot_type;
+  typedef asio::cancellation_slot cancellation_slot_type;
   typedef Executor executor_type;
 
   parallel_group_op_handler_with_executor(
@@ -281,14 +280,14 @@ struct parallel_group_op_handler_with_executor :
     {
       if (auto state = state_.lock())
       {
-        boost::asio::cancellation_signal* sig = &signal_;
-        boost::asio::dispatch(executor_,
+        asio::cancellation_signal* sig = &signal_;
+        asio::dispatch(executor_,
             [state, sig, type]{ sig->emit(type); });
       }
     }
 
     std::weak_ptr<parallel_group_state<Condition, Handler, Ops...>> state_;
-    boost::asio::cancellation_signal signal_;
+    asio::cancellation_signal signal_;
     executor_type executor_;
   };
 
@@ -305,7 +304,7 @@ struct parallel_group_op_launcher
       Condition, Handler, Ops...>>& state)
   {
     typedef associated_executor_t<Op> ex_type;
-    ex_type ex = boost::asio::get_associated_executor(op);
+    ex_type ex = asio::get_associated_executor(op);
     std::move(op)(
         parallel_group_op_handler_with_executor<ex_type, I,
           Condition, Handler, Ops...>(state, std::move(ex)));
@@ -360,18 +359,18 @@ struct parallel_group_cancellation_handler
 template <typename Condition, typename Handler,
     typename... Ops, std::size_t... I>
 void parallel_group_launch(Condition cancellation_condition, Handler handler,
-    std::tuple<Ops...>& ops, boost::asio::detail::index_sequence<I...>)
+    std::tuple<Ops...>& ops, asio::detail::index_sequence<I...>)
 {
   // Get the user's completion handler's cancellation slot, so that we can allow
   // cancellation of the entire group.
   associated_cancellation_slot_t<Handler> slot
-    = boost::asio::get_associated_cancellation_slot(handler);
+    = asio::get_associated_cancellation_slot(handler);
 
   // Create the shared state for the operation.
   typedef parallel_group_state<Condition, Handler, Ops...> state_type;
   std::shared_ptr<state_type> state = std::allocate_shared<state_type>(
-      boost::asio::detail::recycling_allocator<state_type,
-        boost::asio::detail::thread_info_base::parallel_group_tag>(),
+      asio::detail::recycling_allocator<state_type,
+        asio::detail::thread_info_base::parallel_group_tag>(),
       std::move(cancellation_condition), std::move(handler));
 
   // Initiate each individual operation in the group.
@@ -417,13 +416,13 @@ struct ranged_parallel_group_completion_handler
       std::size_t size, const Allocator& allocator)
     : handler_(std::move(h)),
       executor_(
-          boost::asio::prefer(
-            boost::asio::get_associated_executor(handler_),
+          asio::prefer(
+            asio::get_associated_executor(handler_),
             execution::outstanding_work.tracked)),
       allocator_(allocator),
       completion_order_(size, 0,
-          BOOST_ASIO_REBIND_ALLOC(Allocator, std::size_t)(allocator)),
-      args_(BOOST_ASIO_REBIND_ALLOC(Allocator, op_result_type)(allocator))
+          ASIO_REBIND_ALLOC(Allocator, std::size_t)(allocator)),
+      args_(ASIO_REBIND_ALLOC(Allocator, op_result_type)(allocator))
   {
     for (std::size_t i = 0; i < size; ++i)
       args_.emplace_back();
@@ -437,12 +436,12 @@ struct ranged_parallel_group_completion_handler
   void operator()()
   {
     this->invoke(
-        boost::asio::detail::make_index_sequence<
+        asio::detail::make_index_sequence<
           std::tuple_size<op_tuple_type>::value>());
   }
 
   template <std::size_t... I>
-  void invoke(boost::asio::detail::index_sequence<I...>)
+  void invoke(asio::detail::index_sequence<I...>)
   {
     typedef typename parallel_op_signature_as_tuple<
         typename ranged_parallel_group_signature<
@@ -454,7 +453,7 @@ struct ranged_parallel_group_completion_handler
     // Construct all result vectors using the supplied allocator.
     vectors_type vectors{
         typename std::tuple_element<I, vectors_type>::type(
-          BOOST_ASIO_REBIND_ALLOC(Allocator, int)(allocator_))...};
+          ASIO_REBIND_ALLOC(Allocator, int)(allocator_))...};
 
     // Reserve sufficient space in each of the result vectors.
     int reserve_fold[] = { 0,
@@ -482,9 +481,9 @@ struct ranged_parallel_group_completion_handler
   executor_type executor_;
   Allocator allocator_;
   std::vector<std::size_t,
-    BOOST_ASIO_REBIND_ALLOC(Allocator, std::size_t)> completion_order_;
+    ASIO_REBIND_ALLOC(Allocator, std::size_t)> completion_order_;
   std::deque<op_result_type,
-    BOOST_ASIO_REBIND_ALLOC(Allocator, op_result_type)> args_;
+    ASIO_REBIND_ALLOC(Allocator, op_result_type)> args_;
 };
 
 // Shared state for the parallel group.
@@ -496,8 +495,8 @@ struct ranged_parallel_group_state
     : cancellations_requested_(size),
       outstanding_(size),
       cancellation_signals_(
-          BOOST_ASIO_REBIND_ALLOC(Allocator,
-            boost::asio::cancellation_signal)(allocator)),
+          ASIO_REBIND_ALLOC(Allocator,
+            asio::cancellation_signal)(allocator)),
       cancellation_condition_(std::move(c)),
       handler_(std::move(h), size, allocator)
   {
@@ -525,8 +524,8 @@ struct ranged_parallel_group_state
   std::atomic<unsigned int> outstanding_;
 
   // The cancellation signals for each operation in the group.
-  std::deque<boost::asio::cancellation_signal,
-    BOOST_ASIO_REBIND_ALLOC(Allocator, boost::asio::cancellation_signal)>
+  std::deque<asio::cancellation_signal,
+    ASIO_REBIND_ALLOC(Allocator, asio::cancellation_signal)>
       cancellation_signals_;
 
   // The cancellation condition is used to determine whether the results from an
@@ -541,7 +540,7 @@ struct ranged_parallel_group_state
 template <typename Condition, typename Handler, typename Op, typename Allocator>
 struct ranged_parallel_group_op_handler
 {
-  typedef boost::asio::cancellation_slot cancellation_slot_type;
+  typedef asio::cancellation_slot cancellation_slot_type;
 
   ranged_parallel_group_op_handler(
       std::shared_ptr<ranged_parallel_group_state<
@@ -585,7 +584,7 @@ struct ranged_parallel_group_op_handler
 
     // If this is the last outstanding operation, invoke the user's handler.
     if (--state_->outstanding_ == 0)
-      boost::asio::dispatch(std::move(state_->handler_));
+      asio::dispatch(std::move(state_->handler_));
   }
 
   std::shared_ptr<ranged_parallel_group_state<
@@ -602,7 +601,7 @@ struct ranged_parallel_group_op_handler_with_executor :
 {
   typedef ranged_parallel_group_op_handler<
     Condition, Handler, Op, Allocator> base_type;
-  typedef boost::asio::cancellation_slot cancellation_slot_type;
+  typedef asio::cancellation_slot cancellation_slot_type;
   typedef Executor executor_type;
 
   ranged_parallel_group_op_handler_with_executor(
@@ -643,15 +642,15 @@ struct ranged_parallel_group_op_handler_with_executor :
     {
       if (auto state = state_.lock())
       {
-        boost::asio::cancellation_signal* sig = &signal_;
-        boost::asio::dispatch(executor_,
+        asio::cancellation_signal* sig = &signal_;
+        asio::dispatch(executor_,
             [state, sig, type]{ sig->emit(type); });
       }
     }
 
     std::weak_ptr<ranged_parallel_group_state<
       Condition, Handler, Op, Allocator>> state_;
-    boost::asio::cancellation_signal signal_;
+    asio::cancellation_signal signal_;
     executor_type executor_;
   };
 
@@ -692,7 +691,7 @@ void ranged_parallel_group_launch(Condition cancellation_condition,
   // Get the user's completion handler's cancellation slot, so that we can allow
   // cancellation of the entire group.
   associated_cancellation_slot_t<Handler> slot
-    = boost::asio::get_associated_cancellation_slot(handler);
+    = asio::get_associated_cancellation_slot(handler);
 
   // The type of the asynchronous operation.
   typedef decay_t<decltype(*declval<typename Range::iterator>())> op_type;
@@ -701,8 +700,8 @@ void ranged_parallel_group_launch(Condition cancellation_condition,
   typedef ranged_parallel_group_state<Condition,
     Handler, op_type, Allocator> state_type;
   std::shared_ptr<state_type> state = std::allocate_shared<state_type>(
-      boost::asio::detail::recycling_allocator<state_type,
-        boost::asio::detail::thread_info_base::parallel_group_tag>(),
+      asio::detail::recycling_allocator<state_type,
+        asio::detail::thread_info_base::parallel_group_tag>(),
       std::move(cancellation_condition),
       std::move(handler), range.size(), allocator);
 
@@ -711,7 +710,7 @@ void ranged_parallel_group_launch(Condition cancellation_condition,
   for (auto&& op : std::forward<Range>(range))
   {
     typedef associated_executor_t<op_type> ex_type;
-    ex_type ex = boost::asio::get_associated_executor(op);
+    ex_type ex = asio::get_associated_executor(op);
     std::move(op)(
         ranged_parallel_group_op_handler_with_executor<
           ex_type, Condition, Handler, op_type, Allocator>(
@@ -784,8 +783,7 @@ struct associator<Associator,
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_IMPL_EXPERIMENTAL_PARALLEL_GROUP_HPP
+#endif // ASIO_IMPL_EXPERIMENTAL_PARALLEL_GROUP_HPP

@@ -8,37 +8,36 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_GLOBAL_HPP
-#define BOOST_ASIO_DETAIL_GLOBAL_HPP
+#ifndef ASIO_DETAIL_GLOBAL_HPP
+#define ASIO_DETAIL_GLOBAL_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if !defined(BOOST_ASIO_HAS_THREADS)
-# include <boost/asio/detail/null_global.hpp>
-#elif defined(BOOST_ASIO_WINDOWS)
-# include <boost/asio/detail/win_global.hpp>
-#elif defined(BOOST_ASIO_HAS_PTHREADS)
-# include <boost/asio/detail/posix_global.hpp>
+#if !defined(ASIO_HAS_THREADS)
+# include "asio/detail/null_global.hpp"
+#elif defined(ASIO_WINDOWS)
+# include "asio/detail/win_global.hpp"
+#elif defined(ASIO_HAS_PTHREADS)
+# include "asio/detail/posix_global.hpp"
 #else
-# include <boost/asio/detail/std_global.hpp>
+# include "asio/detail/std_global.hpp"
 #endif
 
-namespace boost {
 namespace asio {
 namespace detail {
 
 template <typename T>
 inline T& global()
 {
-#if !defined(BOOST_ASIO_HAS_THREADS)
+#if !defined(ASIO_HAS_THREADS)
   return null_global<T>();
-#elif defined(BOOST_ASIO_WINDOWS)
+#elif defined(ASIO_WINDOWS)
   return win_global<T>();
-#elif defined(BOOST_ASIO_HAS_PTHREADS)
+#elif defined(ASIO_HAS_PTHREADS)
   return posix_global<T>();
 #else
   return std_global<T>();
@@ -47,6 +46,5 @@ inline T& global()
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#endif // BOOST_ASIO_DETAIL_GLOBAL_HPP
+#endif // ASIO_DETAIL_GLOBAL_HPP

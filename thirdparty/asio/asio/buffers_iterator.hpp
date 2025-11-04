@@ -8,23 +8,22 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_BUFFERS_ITERATOR_HPP
-#define BOOST_ASIO_BUFFERS_ITERATOR_HPP
+#ifndef ASIO_BUFFERS_ITERATOR_HPP
+#define ASIO_BUFFERS_ITERATOR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <cstddef>
 #include <iterator>
-#include <boost/asio/buffer.hpp>
-#include <boost/asio/detail/assert.hpp>
-#include <boost/asio/detail/type_traits.hpp>
+#include "asio/buffer.hpp"
+#include "asio/detail/assert.hpp"
+#include "asio/detail/type_traits.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 namespace detail
@@ -151,9 +150,9 @@ public:
 #endif // defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 3)
   {
     buffers_iterator new_iter;
-    new_iter.begin_ = boost::asio::buffer_sequence_begin(buffers);
-    new_iter.current_ = boost::asio::buffer_sequence_begin(buffers);
-    new_iter.end_ = boost::asio::buffer_sequence_end(buffers);
+    new_iter.begin_ = asio::buffer_sequence_begin(buffers);
+    new_iter.current_ = asio::buffer_sequence_begin(buffers);
+    new_iter.end_ = asio::buffer_sequence_end(buffers);
     while (new_iter.current_ != new_iter.end_)
     {
       new_iter.current_buffer_ = *new_iter.current_;
@@ -171,9 +170,9 @@ public:
 #endif // defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 3)
   {
     buffers_iterator new_iter;
-    new_iter.begin_ = boost::asio::buffer_sequence_begin(buffers);
-    new_iter.current_ = boost::asio::buffer_sequence_begin(buffers);
-    new_iter.end_ = boost::asio::buffer_sequence_end(buffers);
+    new_iter.begin_ = asio::buffer_sequence_begin(buffers);
+    new_iter.current_ = asio::buffer_sequence_begin(buffers);
+    new_iter.end_ = asio::buffer_sequence_end(buffers);
     while (new_iter.current_ != new_iter.end_)
     {
       buffer_type buffer = *new_iter.current_;
@@ -334,7 +333,7 @@ private:
   // Increment the iterator.
   void increment()
   {
-    BOOST_ASIO_ASSERT(current_ != end_ && "iterator out of bounds");
+    ASIO_ASSERT(current_ != end_ && "iterator out of bounds");
     ++position_;
 
     // Check if the increment can be satisfied by the current buffer.
@@ -357,7 +356,7 @@ private:
   // Decrement the iterator.
   void decrement()
   {
-    BOOST_ASIO_ASSERT(position_ > 0 && "iterator out of bounds");
+    ASIO_ASSERT(position_ > 0 && "iterator out of bounds");
     --position_;
 
     // Check if the decrement can be satisfied by the current buffer.
@@ -389,7 +388,7 @@ private:
   {
     if (n > 0)
     {
-      BOOST_ASIO_ASSERT(current_ != end_ && "iterator out of bounds");
+      ASIO_ASSERT(current_ != end_ && "iterator out of bounds");
       for (;;)
       {
         std::ptrdiff_t current_buffer_balance
@@ -411,7 +410,7 @@ private:
         // next iteration of this loop.
         if (++current_ == end_)
         {
-          BOOST_ASIO_ASSERT(n == 0 && "iterator out of bounds");
+          ASIO_ASSERT(n == 0 && "iterator out of bounds");
           current_buffer_ = buffer_type();
           current_buffer_position_ = 0;
           return;
@@ -423,7 +422,7 @@ private:
     else if (n < 0)
     {
       std::size_t abs_n = -n;
-      BOOST_ASIO_ASSERT(position_ >= abs_n && "iterator out of bounds");
+      ASIO_ASSERT(position_ >= abs_n && "iterator out of bounds");
       for (;;)
       {
         // Check if the advance can be satisfied by the current buffer.
@@ -441,7 +440,7 @@ private:
         // Check if we've reached the beginning of the buffers.
         if (current_ == begin_)
         {
-          BOOST_ASIO_ASSERT(abs_n == 0 && "iterator out of bounds");
+          ASIO_ASSERT(abs_n == 0 && "iterator out of bounds");
           current_buffer_position_ = 0;
           return;
         }
@@ -496,8 +495,7 @@ inline buffers_iterator<BufferSequence> buffers_end(
 }
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_BUFFERS_ITERATOR_HPP
+#endif // ASIO_BUFFERS_ITERATOR_HPP

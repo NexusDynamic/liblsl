@@ -8,20 +8,19 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_SSL_DETAIL_VERIFY_CALLBACK_HPP
-#define BOOST_ASIO_SSL_DETAIL_VERIFY_CALLBACK_HPP
+#ifndef ASIO_SSL_DETAIL_VERIFY_CALLBACK_HPP
+#define ASIO_SSL_DETAIL_VERIFY_CALLBACK_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#include <boost/asio/ssl/verify_context.hpp>
+#include "asio/ssl/verify_context.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace ssl {
 namespace detail {
@@ -57,8 +56,7 @@ private:
 } // namespace detail
 } // namespace ssl
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_SSL_DETAIL_VERIFY_CALLBACK_HPP
+#endif // ASIO_SSL_DETAIL_VERIFY_CALLBACK_HPP

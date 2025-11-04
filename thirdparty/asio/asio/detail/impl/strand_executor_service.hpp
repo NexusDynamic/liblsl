@@ -8,23 +8,22 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_IMPL_STRAND_EXECUTOR_SERVICE_HPP
-#define BOOST_ASIO_DETAIL_IMPL_STRAND_EXECUTOR_SERVICE_HPP
+#ifndef ASIO_DETAIL_IMPL_STRAND_EXECUTOR_SERVICE_HPP
+#define ASIO_DETAIL_IMPL_STRAND_EXECUTOR_SERVICE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/fenced_block.hpp>
-#include <boost/asio/detail/recycling_allocator.hpp>
-#include <boost/asio/executor_work_guard.hpp>
-#include <boost/asio/defer.hpp>
-#include <boost/asio/dispatch.hpp>
-#include <boost/asio/post.hpp>
+#include "asio/detail/fenced_block.hpp"
+#include "asio/detail/recycling_allocator.hpp"
+#include "asio/executor_work_guard.hpp"
+#include "asio/defer.hpp"
+#include "asio/dispatch.hpp"
+#include "asio/post.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -76,7 +75,7 @@ class strand_executor_service::invoker<Executor,
 public:
   invoker(const implementation_type& impl, Executor& ex)
     : impl_(impl),
-      executor_(boost::asio::prefer(ex, execution::outstanding_work.tracked))
+      executor_(asio::prefer(ex, execution::outstanding_work.tracked))
   {
   }
 
@@ -102,8 +101,8 @@ public:
       {
         recycling_allocator<void> allocator;
         executor_type ex = this_->executor_;
-        boost::asio::prefer(
-            boost::asio::require(
+        asio::prefer(
+            asio::require(
               static_cast<executor_type&&>(ex),
               execution::blocking.never),
             execution::allocator(allocator)
@@ -133,7 +132,7 @@ private:
   executor_type executor_;
 };
 
-#if !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#if !defined(ASIO_NO_TS_EXECUTORS)
 
 template <typename Executor>
 class strand_executor_service::invoker<Executor,
@@ -189,7 +188,7 @@ private:
   executor_work_guard<Executor> work_;
 };
 
-#endif // !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#endif // !defined(ASIO_NO_TS_EXECUTORS)
 
 template <typename Executor, typename Function>
 inline void strand_executor_service::execute(const implementation_type& impl,
@@ -200,7 +199,7 @@ inline void strand_executor_service::execute(const implementation_type& impl,
 {
   return strand_executor_service::do_execute(impl, ex,
       static_cast<Function&&>(function),
-      boost::asio::query(ex, execution::allocator));
+      asio::query(ex, execution::allocator));
 }
 
 template <typename Executor, typename Function>
@@ -223,7 +222,7 @@ void strand_executor_service::do_execute(const implementation_type& impl,
 
   // If the executor is not never-blocking, and we are already in the strand,
   // then the function can run immediately.
-  if (boost::asio::query(ex, execution::blocking) != execution::blocking.never
+  if (asio::query(ex, execution::blocking) != execution::blocking.never
       && running_in_this_thread(impl))
   {
     // Make a local, non-const copy of the function.
@@ -239,7 +238,7 @@ void strand_executor_service::do_execute(const implementation_type& impl,
   typename op::ptr p = { detail::addressof(a), op::ptr::allocate(a), 0 };
   p.p = new (p.v) op(static_cast<Function&&>(function), a);
 
-  BOOST_ASIO_HANDLER_CREATION((impl->service_->context(), *p.p,
+  ASIO_HANDLER_CREATION((impl->service_->context(), *p.p,
         "strand_executor", impl.get(), 0, "execute"));
 
   // Add the function to the strand and schedule the strand if required.
@@ -273,7 +272,7 @@ void strand_executor_service::dispatch(const implementation_type& impl,
   typename op::ptr p = { detail::addressof(a), op::ptr::allocate(a), 0 };
   p.p = new (p.v) op(static_cast<Function&&>(function), a);
 
-  BOOST_ASIO_HANDLER_CREATION((impl->service_->context(), *p.p,
+  ASIO_HANDLER_CREATION((impl->service_->context(), *p.p,
         "strand_executor", impl.get(), 0, "dispatch"));
 
   // Add the function to the strand and schedule the strand if required.
@@ -281,7 +280,7 @@ void strand_executor_service::dispatch(const implementation_type& impl,
   p.v = p.p = 0;
   if (first)
   {
-    boost::asio::dispatch(ex,
+    asio::dispatch(ex,
         allocator_binder<invoker<Executor>, Allocator>(
           invoker<Executor>(impl, ex), a));
   }
@@ -299,7 +298,7 @@ void strand_executor_service::post(const implementation_type& impl,
   typename op::ptr p = { detail::addressof(a), op::ptr::allocate(a), 0 };
   p.p = new (p.v) op(static_cast<Function&&>(function), a);
 
-  BOOST_ASIO_HANDLER_CREATION((impl->service_->context(), *p.p,
+  ASIO_HANDLER_CREATION((impl->service_->context(), *p.p,
         "strand_executor", impl.get(), 0, "post"));
 
   // Add the function to the strand and schedule the strand if required.
@@ -307,7 +306,7 @@ void strand_executor_service::post(const implementation_type& impl,
   p.v = p.p = 0;
   if (first)
   {
-    boost::asio::post(ex,
+    asio::post(ex,
         allocator_binder<invoker<Executor>, Allocator>(
           invoker<Executor>(impl, ex), a));
   }
@@ -325,7 +324,7 @@ void strand_executor_service::defer(const implementation_type& impl,
   typename op::ptr p = { detail::addressof(a), op::ptr::allocate(a), 0 };
   p.p = new (p.v) op(static_cast<Function&&>(function), a);
 
-  BOOST_ASIO_HANDLER_CREATION((impl->service_->context(), *p.p,
+  ASIO_HANDLER_CREATION((impl->service_->context(), *p.p,
         "strand_executor", impl.get(), 0, "defer"));
 
   // Add the function to the strand and schedule the strand if required.
@@ -333,7 +332,7 @@ void strand_executor_service::defer(const implementation_type& impl,
   p.v = p.p = 0;
   if (first)
   {
-    boost::asio::defer(ex,
+    asio::defer(ex,
         allocator_binder<invoker<Executor>, Allocator>(
           invoker<Executor>(impl, ex), a));
   }
@@ -341,8 +340,7 @@ void strand_executor_service::defer(const implementation_type& impl,
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_IMPL_STRAND_EXECUTOR_SERVICE_HPP
+#endif // ASIO_DETAIL_IMPL_STRAND_EXECUTOR_SERVICE_HPP

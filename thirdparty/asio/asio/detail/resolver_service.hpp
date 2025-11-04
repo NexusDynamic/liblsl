@@ -8,27 +8,26 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_RESOLVER_SERVICE_HPP
-#define BOOST_ASIO_DETAIL_RESOLVER_SERVICE_HPP
+#ifndef ASIO_DETAIL_RESOLVER_SERVICE_HPP
+#define ASIO_DETAIL_RESOLVER_SERVICE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if !defined(BOOST_ASIO_WINDOWS_RUNTIME)
+#if !defined(ASIO_WINDOWS_RUNTIME)
 
-#include <boost/asio/ip/basic_resolver_query.hpp>
-#include <boost/asio/ip/basic_resolver_results.hpp>
-#include <boost/asio/detail/memory.hpp>
-#include <boost/asio/detail/resolve_endpoint_op.hpp>
-#include <boost/asio/detail/resolve_query_op.hpp>
-#include <boost/asio/detail/resolver_service_base.hpp>
+#include "asio/ip/basic_resolver_query.hpp"
+#include "asio/ip/basic_resolver_results.hpp"
+#include "asio/detail/memory.hpp"
+#include "asio/detail/resolve_endpoint_op.hpp"
+#include "asio/detail/resolve_query_op.hpp"
+#include "asio/detail/resolver_service_base.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -46,10 +45,10 @@ public:
   typedef typename Protocol::endpoint endpoint_type;
 
   // The query type.
-  typedef boost::asio::ip::basic_resolver_query<Protocol> query_type;
+  typedef asio::ip::basic_resolver_query<Protocol> query_type;
 
   // The results type.
-  typedef boost::asio::ip::basic_resolver_results<Protocol> results_type;
+  typedef asio::ip::basic_resolver_results<Protocol> results_type;
 
   // Constructor.
   resolver_service(execution_context& context)
@@ -65,15 +64,15 @@ public:
 
   // Resolve a query to a list of entries.
   results_type resolve(implementation_type&, const query_type& qry,
-      boost::system::error_code& ec)
+      asio::error_code& ec)
   {
-    boost::asio::detail::addrinfo_type* address_info = 0;
+    asio::detail::addrinfo_type* address_info = 0;
 
     socket_ops::getaddrinfo(qry.host_name().c_str(),
         qry.service_name().c_str(), qry.hints(), &address_info, ec);
     auto_addrinfo auto_address_info(address_info);
 
-    BOOST_ASIO_ERROR_LOCATION(ec);
+    ASIO_ERROR_LOCATION(ec);
     return ec ? results_type() : results_type::create(
         address_info, qry.host_name(), qry.service_name());
   }
@@ -85,11 +84,11 @@ public:
   {
     // Allocate and construct an operation to wrap the handler.
     typedef resolve_query_op<Protocol, Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl, qry, thread_pool_.scheduler(), handler, io_ex);
 
-    BOOST_ASIO_HANDLER_CREATION((thread_pool_.context(),
+    ASIO_HANDLER_CREATION((thread_pool_.context(),
           *p.p, "resolver", &impl, 0, "async_resolve"));
 
     thread_pool_.start_resolve_op(p.p);
@@ -98,7 +97,7 @@ public:
 
   // Resolve an endpoint to a list of entries.
   results_type resolve(implementation_type&,
-      const endpoint_type& endpoint, boost::system::error_code& ec)
+      const endpoint_type& endpoint, asio::error_code& ec)
   {
     char host_name[NI_MAXHOST];
     char service_name[NI_MAXSERV];
@@ -106,7 +105,7 @@ public:
         host_name, NI_MAXHOST, service_name, NI_MAXSERV,
         endpoint.protocol().type(), ec);
 
-    BOOST_ASIO_ERROR_LOCATION(ec);
+    ASIO_ERROR_LOCATION(ec);
     return ec ? results_type() : results_type::create(
         endpoint, host_name, service_name);
   }
@@ -118,12 +117,12 @@ public:
   {
     // Allocate and construct an operation to wrap the handler.
     typedef resolve_endpoint_op<Protocol, Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl, endpoint,
         thread_pool_.scheduler(), handler, io_ex);
 
-    BOOST_ASIO_HANDLER_CREATION((thread_pool_.context(),
+    ASIO_HANDLER_CREATION((thread_pool_.context(),
           *p.p, "resolver", &impl, 0, "async_resolve"));
 
     thread_pool_.start_resolve_op(p.p);
@@ -133,10 +132,9 @@ public:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // !defined(BOOST_ASIO_WINDOWS_RUNTIME)
+#endif // !defined(ASIO_WINDOWS_RUNTIME)
 
-#endif // BOOST_ASIO_DETAIL_RESOLVER_SERVICE_HPP
+#endif // ASIO_DETAIL_RESOLVER_SERVICE_HPP

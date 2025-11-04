@@ -9,26 +9,25 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXPERIMENTAL_DETAIL_PARTIAL_PROMISE_HPP
-#define BOOST_ASIO_EXPERIMENTAL_DETAIL_PARTIAL_PROMISE_HPP
+#ifndef ASIO_EXPERIMENTAL_DETAIL_PARTIAL_PROMISE_HPP
+#define ASIO_EXPERIMENTAL_DETAIL_PARTIAL_PROMISE_HPP
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/append.hpp>
-#include <boost/asio/awaitable.hpp>
-#include <boost/asio/experimental/coro_traits.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/append.hpp"
+#include "asio/awaitable.hpp"
+#include "asio/experimental/coro_traits.hpp"
 
-#if defined(BOOST_ASIO_HAS_STD_COROUTINE)
+#if defined(ASIO_HAS_STD_COROUTINE)
 # include <coroutine>
-#else // defined(BOOST_ASIO_HAS_STD_COROUTINE)
+#else // defined(ASIO_HAS_STD_COROUTINE)
 # include <experimental/coroutine>
-#endif // defined(BOOST_ASIO_HAS_STD_COROUTINE)
+#endif // defined(ASIO_HAS_STD_COROUTINE)
 
-namespace boost {
 namespace asio {
 namespace experimental {
 namespace detail {
 
-#if defined(BOOST_ASIO_HAS_STD_COROUTINE)
+#if defined(ASIO_HAS_STD_COROUTINE)
 
 using std::coroutine_handle;
 using std::coroutine_traits;
@@ -36,7 +35,7 @@ using std::suspend_never;
 using std::suspend_always;
 using std::noop_coroutine;
 
-#else // defined(BOOST_ASIO_HAS_STD_COROUTINE)
+#else // defined(ASIO_HAS_STD_COROUTINE)
 
 using std::experimental::coroutine_handle;
 using std::experimental::coroutine_traits;
@@ -44,7 +43,7 @@ using std::experimental::suspend_never;
 using std::experimental::suspend_always;
 using std::experimental::noop_coroutine;
 
-#endif // defined(BOOST_ASIO_HAS_STD_COROUTINE)
+#endif // defined(ASIO_HAS_STD_COROUTINE)
 
 struct partial_coro
 {
@@ -76,7 +75,7 @@ struct partial_promise : partial_promise_base<Allocator>
 {
   auto initial_suspend() noexcept
   {
-    return boost::asio::detail::suspend_always{};
+    return asio::detail::suspend_always{};
   }
 
   auto final_suspend() noexcept
@@ -87,7 +86,7 @@ struct partial_promise : partial_promise_base<Allocator>
 
       constexpr bool await_ready() noexcept { return true; }
 
-      auto await_suspend(boost::asio::detail::coroutine_handle<>) noexcept
+      auto await_suspend(asio::detail::coroutine_handle<>) noexcept
       {
         p->get_return_object().handle.destroy();
       }
@@ -114,43 +113,41 @@ struct partial_promise : partial_promise_base<Allocator>
 } // namespace detail
 } // namespace experimental
 } // namespace asio
-} // namespace boost
 
-#if defined(BOOST_ASIO_HAS_STD_COROUTINE)
+#if defined(ASIO_HAS_STD_COROUTINE)
 
 namespace std {
 
 template <typename Executor, typename Completion, typename... Args>
 struct coroutine_traits<
-    boost::asio::experimental::detail::partial_coro,
+    asio::experimental::detail::partial_coro,
     Executor, Completion, Args...>
 {
   using promise_type =
-    boost::asio::experimental::detail::partial_promise<
-      boost::asio::associated_allocator_t<Completion>>;
+    asio::experimental::detail::partial_promise<
+      asio::associated_allocator_t<Completion>>;
 };
 
 } // namespace std
 
-#else // defined(BOOST_ASIO_HAS_STD_COROUTINE)
+#else // defined(ASIO_HAS_STD_COROUTINE)
 
 namespace std { namespace experimental {
 
 template <typename Executor, typename Completion, typename... Args>
 struct coroutine_traits<
-    boost::asio::experimental::detail::partial_coro,
+    asio::experimental::detail::partial_coro,
     Executor, Completion, Args...>
 {
   using promise_type =
-    boost::asio::experimental::detail::partial_promise<
-      boost::asio::associated_allocator_t<Completion>>;
+    asio::experimental::detail::partial_promise<
+      asio::associated_allocator_t<Completion>>;
 };
 
 }} // namespace std::experimental
 
-#endif // defined(BOOST_ASIO_HAS_STD_COROUTINE)
+#endif // defined(ASIO_HAS_STD_COROUTINE)
 
-namespace boost {
 namespace asio {
 namespace experimental {
 namespace detail {
@@ -160,7 +157,7 @@ template <execution::executor Executor,
 partial_coro post_coroutine(Executor exec,
     CompletionToken token, Args&&... args) noexcept
 {
-  post(exec, boost::asio::append(std::move(token), std::move(args)...));
+  post(exec, asio::append(std::move(token), std::move(args)...));
   co_return;
 }
 
@@ -169,7 +166,7 @@ template <detail::execution_context Context,
 partial_coro post_coroutine(Context& ctx,
     CompletionToken token, Args&&... args) noexcept
 {
-  post(ctx, boost::asio::append(std::move(token), std::move(args)...));
+  post(ctx, asio::append(std::move(token), std::move(args)...));
   co_return;
 }
 
@@ -178,7 +175,7 @@ template <execution::executor Executor,
 partial_coro dispatch_coroutine(Executor exec,
     CompletionToken token, Args&&... args) noexcept
 {
-  dispatch(exec, boost::asio::append(std::move(token), std::move(args)...));
+  dispatch(exec, asio::append(std::move(token), std::move(args)...));
   co_return;
 }
 
@@ -187,13 +184,12 @@ template <detail::execution_context Context,
 partial_coro dispatch_coroutine(Context& ctx,
     CompletionToken token, Args &&... args) noexcept
 {
-  dispatch(ctx, boost::asio::append(std::move(token), std::move(args)...));
+  dispatch(ctx, asio::append(std::move(token), std::move(args)...));
   co_return;
 }
 
 } // namespace detail
 } // namespace experimental
 } // namespace asio
-} // namespace boost
 
-#endif // BOOST_ASIO_EXPERIMENTAL_DETAIL_PARTIAL_PROMISE_HPP
+#endif // ASIO_EXPERIMENTAL_DETAIL_PARTIAL_PROMISE_HPP

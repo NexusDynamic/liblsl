@@ -8,31 +8,30 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_BASIC_STREAMBUF_HPP
-#define BOOST_ASIO_BASIC_STREAMBUF_HPP
+#ifndef ASIO_BASIC_STREAMBUF_HPP
+#define ASIO_BASIC_STREAMBUF_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if !defined(BOOST_ASIO_NO_IOSTREAM)
+#if !defined(ASIO_NO_IOSTREAM)
 
 #include <algorithm>
 #include <cstring>
 #include <stdexcept>
 #include <streambuf>
 #include <vector>
-#include <boost/asio/basic_streambuf_fwd.hpp>
-#include <boost/asio/buffer.hpp>
-#include <boost/asio/detail/limits.hpp>
-#include <boost/asio/detail/noncopyable.hpp>
-#include <boost/asio/detail/throw_exception.hpp>
+#include "asio/basic_streambuf_fwd.hpp"
+#include "asio/buffer.hpp"
+#include "asio/detail/limits.hpp"
+#include "asio/detail/noncopyable.hpp"
+#include "asio/detail/throw_exception.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 /// Automatically resizable buffer class based on std::streambuf.
@@ -76,7 +75,7 @@ namespace asio {
  * @par Examples
  * Writing directly from an streambuf to a socket:
  * @code
- * boost::asio::streambuf b;
+ * asio::streambuf b;
  * std::ostream os(&b);
  * os << "Hello, World!\n";
  *
@@ -88,10 +87,10 @@ namespace asio {
  *
  * Reading from a socket directly into a streambuf:
  * @code
- * boost::asio::streambuf b;
+ * asio::streambuf b;
  *
  * // reserve 512 bytes in output sequence
- * boost::asio::streambuf::mutable_buffers_type bufs = b.prepare(512);
+ * asio::streambuf::mutable_buffers_type bufs = b.prepare(512);
  *
  * size_t n = sock.receive(bufs);
  *
@@ -192,7 +191,7 @@ public:
    */
   const_buffers_type data() const noexcept
   {
-    return boost::asio::buffer(boost::asio::const_buffer(gptr(),
+    return asio::buffer(asio::const_buffer(gptr(),
           (pptr() - gptr()) * sizeof(char_type)));
   }
 
@@ -215,7 +214,7 @@ public:
   mutable_buffers_type prepare(std::size_t n)
   {
     reserve(n);
-    return boost::asio::buffer(boost::asio::mutable_buffer(
+    return asio::buffer(asio::mutable_buffer(
           pptr(), n * sizeof(char_type)));
   }
 
@@ -336,8 +335,8 @@ protected:
       }
       else
       {
-        std::length_error ex("boost::asio::streambuf too long");
-        boost::asio::detail::throw_exception(ex);
+        std::length_error ex("asio::streambuf too long");
+        asio::detail::throw_exception(ex);
       }
     }
 
@@ -443,10 +442,9 @@ private:
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // !defined(BOOST_ASIO_NO_IOSTREAM)
+#endif // !defined(ASIO_NO_IOSTREAM)
 
-#endif // BOOST_ASIO_BASIC_STREAMBUF_HPP
+#endif // ASIO_BASIC_STREAMBUF_HPP

@@ -8,24 +8,23 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_BASIC_SOCKET_IOSTREAM_HPP
-#define BOOST_ASIO_BASIC_SOCKET_IOSTREAM_HPP
+#ifndef ASIO_BASIC_SOCKET_IOSTREAM_HPP
+#define ASIO_BASIC_SOCKET_IOSTREAM_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if !defined(BOOST_ASIO_NO_IOSTREAM)
+#if !defined(ASIO_NO_IOSTREAM)
 
 #include <istream>
 #include <ostream>
-#include <boost/asio/basic_socket_streambuf.hpp>
+#include "asio/basic_socket_streambuf.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -60,8 +59,8 @@ protected:
 
 } // namespace detail
 
-#if !defined(BOOST_ASIO_BASIC_SOCKET_IOSTREAM_FWD_DECL)
-#define BOOST_ASIO_BASIC_SOCKET_IOSTREAM_FWD_DECL
+#if !defined(ASIO_BASIC_SOCKET_IOSTREAM_FWD_DECL)
+#define ASIO_BASIC_SOCKET_IOSTREAM_FWD_DECL
 
 // Forward declaration with defaulted arguments.
 template <typename Protocol,
@@ -69,7 +68,7 @@ template <typename Protocol,
     typename WaitTraits = wait_traits<Clock>>
 class basic_socket_iostream;
 
-#endif // !defined(BOOST_ASIO_BASIC_SOCKET_IOSTREAM_FWD_DECL)
+#endif // !defined(ASIO_BASIC_SOCKET_IOSTREAM_FWD_DECL)
 
 /// Iostream interface for a socket.
 #if defined(GENERATING_DOCUMENTATION)
@@ -209,7 +208,7 @@ public:
    *   std::cout << "Error: " << s.error().message() << std::endl;
    * } @endcode
    */
-  const boost::system::error_code& error() const
+  const asio::error_code& error() const
   {
     return rdbuf()->error();
   }
@@ -228,7 +227,7 @@ public:
    * This function sets the expiry time associated with the stream. Stream
    * operations performed after this time (where the operations cannot be
    * completed using the internal buffers) will fail with the error
-   * boost::asio::error::operation_aborted.
+   * asio::error::operation_aborted.
    *
    * @param expiry_time The expiry time to be used for the stream.
    */
@@ -242,7 +241,7 @@ public:
    * This function sets the expiry time associated with the stream. Stream
    * operations performed after this time (where the operations cannot be
    * completed using the internal buffers) will fail with the error
-   * boost::asio::error::operation_aborted.
+   * asio::error::operation_aborted.
    *
    * @param expiry_time The expiry time to be used for the timer.
    */
@@ -259,10 +258,9 @@ private:
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // !defined(BOOST_ASIO_NO_IOSTREAM)
+#endif // !defined(ASIO_NO_IOSTREAM)
 
-#endif // BOOST_ASIO_BASIC_SOCKET_IOSTREAM_HPP
+#endif // ASIO_BASIC_SOCKET_IOSTREAM_HPP

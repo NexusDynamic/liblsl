@@ -8,23 +8,22 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_STRAND_HPP
-#define BOOST_ASIO_STRAND_HPP
+#ifndef ASIO_STRAND_HPP
+#define ASIO_STRAND_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/strand_executor_service.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/execution/blocking.hpp>
-#include <boost/asio/execution/executor.hpp>
-#include <boost/asio/is_executor.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/strand_executor_service.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/execution/blocking.hpp"
+#include "asio/execution/executor.hpp"
+#include "asio/is_executor.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 /// Provides serialised function invocation for any executor type.
@@ -157,12 +156,12 @@ public:
   /// Forward a query to the underlying executor.
   /**
    * Do not call this function directly. It is intended for use with the
-   * boost::asio::query customisation point.
+   * asio::query customisation point.
    *
    * For example:
-   * @code boost::asio::strand<my_executor_type> ex = ...;
-   * if (boost::asio::query(ex, boost::asio::execution::blocking)
-   *       == boost::asio::execution::blocking.never)
+   * @code asio::strand<my_executor_type> ex = ...;
+   * if (asio::query(ex, asio::execution::blocking)
+   *       == asio::execution::blocking.never)
    *   ... @endcode
    */
   template <typename Property>
@@ -183,12 +182,12 @@ public:
   /// Forward a requirement to the underlying executor.
   /**
    * Do not call this function directly. It is intended for use with the
-   * boost::asio::require customisation point.
+   * asio::require customisation point.
    *
    * For example:
-   * @code boost::asio::strand<my_executor_type> ex1 = ...;
-   * auto ex2 = boost::asio::require(ex1,
-   *     boost::asio::execution::blocking.never); @endcode
+   * @code asio::strand<my_executor_type> ex1 = ...;
+   * auto ex2 = asio::require(ex1,
+   *     asio::execution::blocking.never); @endcode
    */
   template <typename Property>
   constraint_t<
@@ -199,18 +198,18 @@ public:
     noexcept(is_nothrow_require<const Executor&, Property>::value)
   {
     return strand<decay_t<require_result_t<const Executor&, Property>>>(
-        boost::asio::require(executor_, p), impl_);
+        asio::require(executor_, p), impl_);
   }
 
   /// Forward a preference to the underlying executor.
   /**
    * Do not call this function directly. It is intended for use with the
-   * boost::asio::prefer customisation point.
+   * asio::prefer customisation point.
    *
    * For example:
-   * @code boost::asio::strand<my_executor_type> ex1 = ...;
-   * auto ex2 = boost::asio::prefer(ex1,
-   *     boost::asio::execution::blocking.never); @endcode
+   * @code asio::strand<my_executor_type> ex1 = ...;
+   * auto ex2 = asio::prefer(ex1,
+   *     asio::execution::blocking.never); @endcode
    */
   template <typename Property>
   constraint_t<
@@ -221,10 +220,10 @@ public:
     noexcept(is_nothrow_prefer<const Executor&, Property>::value)
   {
     return strand<decay_t<prefer_result_t<const Executor&, Property>>>(
-        boost::asio::prefer(executor_, p), impl_);
+        asio::prefer(executor_, p), impl_);
   }
 
-#if !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#if !defined(ASIO_NO_TS_EXECUTORS)
   /// Obtain the underlying execution context.
   execution_context& context() const noexcept
   {
@@ -248,7 +247,7 @@ public:
   {
     executor_.on_work_finished();
   }
-#endif // !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#endif // !defined(ASIO_NO_TS_EXECUTORS)
 
   /// Request the strand to invoke the given function object.
   /**
@@ -270,7 +269,7 @@ public:
         executor_, static_cast<Function&&>(f));
   }
 
-#if !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#if !defined(ASIO_NO_TS_EXECUTORS)
   /// Request the strand to invoke the given function object.
   /**
    * This function is used to ask the strand to execute the given function
@@ -332,7 +331,7 @@ public:
     detail::strand_executor_service::defer(impl_,
         executor_, static_cast<Function&&>(f), a);
   }
-#endif // !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#endif // !defined(ASIO_NO_TS_EXECUTORS)
 
   /// Determine whether the strand is running in the current thread.
   /**
@@ -378,7 +377,7 @@ private:
       > = 0)
   {
     return use_service<detail::strand_executor_service>(
-        boost::asio::query(ex, execution::context)).create_implementation();
+        asio::query(ex, execution::context)).create_implementation();
   }
 
   template <typename InnerExecutor>
@@ -401,13 +400,13 @@ private:
   query_result_t<const Executor&, Property> query_helper(
       false_type, const Property& property) const
   {
-    return boost::asio::query(executor_, property);
+    return asio::query(executor_, property);
   }
 
   template <typename Property>
   execution::blocking_t query_helper(true_type, const Property& property) const
   {
-    execution::blocking_t result = boost::asio::query(executor_, property);
+    execution::blocking_t result = asio::query(executor_, property);
     return result == execution::blocking.always
       ? execution::blocking.possibly : result;
   }
@@ -416,9 +415,9 @@ private:
   implementation_type impl_;
 };
 
-/** @defgroup make_strand boost::asio::make_strand
+/** @defgroup make_strand asio::make_strand
  *
- * @brief The boost::asio::make_strand function creates a @ref strand object for
+ * @brief The asio::make_strand function creates a @ref strand object for
  * an executor or execution context.
  */
 /*@{*/
@@ -461,7 +460,7 @@ make_strand(ExecutionContext& ctx,
 
 namespace traits {
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
 
 template <typename Executor>
 struct equality_comparable<strand<Executor>>
@@ -470,9 +469,9 @@ struct equality_comparable<strand<Executor>>
   static constexpr bool is_noexcept = true;
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT)
 
 template <typename Executor, typename Function>
 struct execute_member<strand<Executor>, Function,
@@ -485,9 +484,9 @@ struct execute_member<strand<Executor>, Function,
   typedef void result_type;
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT)
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
 
 template <typename Executor, typename Property>
 struct query_member<strand<Executor>, Property,
@@ -503,9 +502,9 @@ struct query_member<strand<Executor>, Property,
       execution::blocking_t, query_result_t<Executor, Property>> result_type;
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_REQUIRE_MEMBER_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_REQUIRE_MEMBER_TRAIT)
 
 template <typename Executor, typename Property>
 struct require_member<strand<Executor>, Property,
@@ -520,9 +519,9 @@ struct require_member<strand<Executor>, Property,
   typedef strand<decay_t<require_result_t<Executor, Property>>> result_type;
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_REQUIRE_MEMBER_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_REQUIRE_MEMBER_TRAIT)
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_PREFER_MEMBER_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_PREFER_MEMBER_TRAIT)
 
 template <typename Executor, typename Property>
 struct prefer_member<strand<Executor>, Property,
@@ -537,23 +536,22 @@ struct prefer_member<strand<Executor>, Property,
   typedef strand<decay_t<prefer_result_t<Executor, Property>>> result_type;
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_PREFER_MEMBER_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_PREFER_MEMBER_TRAIT)
 
 } // namespace traits
 
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
 // If both io_context.hpp and strand.hpp have been included, automatically
 // include the header file needed for the io_context::strand class.
-#if !defined(BOOST_ASIO_NO_EXTENSIONS)
-# if defined(BOOST_ASIO_IO_CONTEXT_HPP)
-#  include <boost/asio/io_context_strand.hpp>
-# endif // defined(BOOST_ASIO_IO_CONTEXT_HPP)
-#endif // !defined(BOOST_ASIO_NO_EXTENSIONS)
+#if !defined(ASIO_NO_EXTENSIONS)
+# if defined(ASIO_IO_CONTEXT_HPP)
+#  include "asio/io_context_strand.hpp"
+# endif // defined(ASIO_IO_CONTEXT_HPP)
+#endif // !defined(ASIO_NO_EXTENSIONS)
 
-#endif // BOOST_ASIO_STRAND_HPP
+#endif // ASIO_STRAND_HPP

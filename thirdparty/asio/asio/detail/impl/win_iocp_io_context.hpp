@@ -8,25 +8,24 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_IMPL_WIN_IOCP_IO_CONTEXT_HPP
-#define BOOST_ASIO_DETAIL_IMPL_WIN_IOCP_IO_CONTEXT_HPP
+#ifndef ASIO_DETAIL_IMPL_WIN_IOCP_IO_CONTEXT_HPP
+#define ASIO_DETAIL_IMPL_WIN_IOCP_IO_CONTEXT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
 
-#include <boost/asio/detail/completion_handler.hpp>
-#include <boost/asio/detail/fenced_block.hpp>
-#include <boost/asio/detail/handler_alloc_helpers.hpp>
-#include <boost/asio/detail/memory.hpp>
+#include "asio/detail/completion_handler.hpp"
+#include "asio/detail/fenced_block.hpp"
+#include "asio/detail/handler_alloc_helpers.hpp"
+#include "asio/detail/memory.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -106,7 +105,7 @@ void win_iocp_io_context::move_timer(timer_queue<TimeTraits, Allocator>& queue,
     typename timer_queue<TimeTraits, Allocator>::per_timer_data& to,
     typename timer_queue<TimeTraits, Allocator>::per_timer_data& from)
 {
-  boost::asio::detail::mutex::scoped_lock lock(dispatch_mutex_);
+  asio::detail::mutex::scoped_lock lock(dispatch_mutex_);
   op_queue<operation> ops;
   queue.cancel_timer(to, ops);
   queue.move_timer(to, from);
@@ -116,10 +115,9 @@ void win_iocp_io_context::move_timer(timer_queue<TimeTraits, Allocator>& queue,
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // defined(BOOST_ASIO_HAS_IOCP)
+#endif // defined(ASIO_HAS_IOCP)
 
-#endif // BOOST_ASIO_DETAIL_IMPL_WIN_IOCP_IO_CONTEXT_HPP
+#endif // ASIO_DETAIL_IMPL_WIN_IOCP_IO_CONTEXT_HPP

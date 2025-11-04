@@ -8,24 +8,23 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_INITIATE_DISPATCH_HPP
-#define BOOST_ASIO_DETAIL_INITIATE_DISPATCH_HPP
+#ifndef ASIO_DETAIL_INITIATE_DISPATCH_HPP
+#define ASIO_DETAIL_INITIATE_DISPATCH_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/associated_allocator.hpp>
-#include <boost/asio/associated_executor.hpp>
-#include <boost/asio/detail/work_dispatcher.hpp>
-#include <boost/asio/execution/allocator.hpp>
-#include <boost/asio/execution/blocking.hpp>
-#include <boost/asio/prefer.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/associated_allocator.hpp"
+#include "asio/associated_executor.hpp"
+#include "asio/detail/work_dispatcher.hpp"
+#include "asio/execution/allocator.hpp"
+#include "asio/execution/blocking.hpp"
+#include "asio/prefer.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -46,8 +45,8 @@ public:
     associated_allocator_t<decay_t<CompletionHandler>> alloc(
         (get_associated_allocator)(handler));
 
-    boost::asio::prefer(ex, execution::allocator(alloc)).execute(
-        boost::asio::detail::bind_handler(
+    asio::prefer(ex, execution::allocator(alloc)).execute(
+        asio::detail::bind_handler(
           static_cast<CompletionHandler&&>(handler)));
   }
 
@@ -65,7 +64,7 @@ public:
     associated_allocator_t<decay_t<CompletionHandler>> alloc(
         (get_associated_allocator)(handler));
 
-    ex.dispatch(boost::asio::detail::bind_handler(
+    ex.dispatch(asio::detail::bind_handler(
           static_cast<CompletionHandler&&>(handler)), alloc);
   }
 };
@@ -103,8 +102,8 @@ public:
     associated_allocator_t<decay_t<CompletionHandler>> alloc(
         (get_associated_allocator)(handler));
 
-    boost::asio::prefer(ex_, execution::allocator(alloc)).execute(
-        boost::asio::detail::bind_handler(
+    asio::prefer(ex_, execution::allocator(alloc)).execute(
+        asio::detail::bind_handler(
           static_cast<CompletionHandler&&>(handler)));
   }
 
@@ -130,7 +129,7 @@ public:
     associated_allocator_t<handler_t> alloc(
         (get_associated_allocator)(handler));
 
-    boost::asio::prefer(ex_, execution::allocator(alloc)).execute(
+    asio::prefer(ex_, execution::allocator(alloc)).execute(
         detail::work_dispatcher<handler_t, handler_ex_t>(
           static_cast<CompletionHandler&&>(handler), handler_ex));
   }
@@ -152,7 +151,7 @@ public:
     associated_allocator_t<decay_t<CompletionHandler>> alloc(
         (get_associated_allocator)(handler));
 
-    ex_.dispatch(boost::asio::detail::bind_handler(
+    ex_.dispatch(asio::detail::bind_handler(
           static_cast<CompletionHandler&&>(handler)), alloc);
   }
 
@@ -188,8 +187,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_INITIATE_DISPATCH_HPP
+#endif // ASIO_DETAIL_INITIATE_DISPATCH_HPP

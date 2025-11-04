@@ -8,33 +8,32 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_BUFFER_REGISTRATION_HPP
-#define BOOST_ASIO_BUFFER_REGISTRATION_HPP
+#ifndef ASIO_BUFFER_REGISTRATION_HPP
+#define ASIO_BUFFER_REGISTRATION_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <iterator>
 #include <utility>
 #include <vector>
-#include <boost/asio/detail/memory.hpp>
-#include <boost/asio/execution/context.hpp>
-#include <boost/asio/execution/executor.hpp>
-#include <boost/asio/execution_context.hpp>
-#include <boost/asio/is_executor.hpp>
-#include <boost/asio/query.hpp>
-#include <boost/asio/registered_buffer.hpp>
+#include "asio/detail/memory.hpp"
+#include "asio/execution/context.hpp"
+#include "asio/execution/executor.hpp"
+#include "asio/execution_context.hpp"
+#include "asio/is_executor.hpp"
+#include "asio/query.hpp"
+#include "asio/registered_buffer.hpp"
 
-#if defined(BOOST_ASIO_HAS_IO_URING)
-# include <boost/asio/detail/scheduler.hpp>
-# include <boost/asio/detail/io_uring_service.hpp>
-#endif // defined(BOOST_ASIO_HAS_IO_URING)
+#if defined(ASIO_HAS_IO_URING)
+# include "asio/detail/scheduler.hpp"
+# include "asio/detail/io_uring_service.hpp"
+#endif // defined(ASIO_HAS_IO_URING)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -85,12 +84,12 @@ public:
       > = 0)
     : buffer_sequence_(buffer_sequence),
       buffers_(
-          BOOST_ASIO_REBIND_ALLOC(allocator_type,
+          ASIO_REBIND_ALLOC(allocator_type,
             mutable_registered_buffer)(alloc))
   {
     init_buffers(buffer_registration::get_context(ex),
-        boost::asio::buffer_sequence_begin(buffer_sequence_),
-        boost::asio::buffer_sequence_end(buffer_sequence_));
+        asio::buffer_sequence_begin(buffer_sequence_),
+        asio::buffer_sequence_end(buffer_sequence_));
   }
 
   /// Register buffers with an execution context.
@@ -103,12 +102,12 @@ public:
       > = 0)
     : buffer_sequence_(buffer_sequence),
       buffers_(
-          BOOST_ASIO_REBIND_ALLOC(allocator_type,
+          ASIO_REBIND_ALLOC(allocator_type,
             mutable_registered_buffer)(alloc))
   {
     init_buffers(ctx,
-        boost::asio::buffer_sequence_begin(buffer_sequence_),
-        boost::asio::buffer_sequence_end(buffer_sequence_));
+        asio::buffer_sequence_begin(buffer_sequence_),
+        asio::buffer_sequence_end(buffer_sequence_));
   }
 
   /// Move constructor.
@@ -116,19 +115,19 @@ public:
     : buffer_sequence_(std::move(other.buffer_sequence_)),
       buffers_(std::move(other.buffers_))
   {
-#if defined(BOOST_ASIO_HAS_IO_URING)
+#if defined(ASIO_HAS_IO_URING)
     service_ = other.service_;
     other.service_ = 0;
-#endif // defined(BOOST_ASIO_HAS_IO_URING)
+#endif // defined(ASIO_HAS_IO_URING)
   }
 
   /// Unregisters the buffers.
   ~buffer_registration()
   {
-#if defined(BOOST_ASIO_HAS_IO_URING)
+#if defined(ASIO_HAS_IO_URING)
     if (service_)
       service_->unregister_buffers();
-#endif // defined(BOOST_ASIO_HAS_IO_URING)
+#endif // defined(ASIO_HAS_IO_URING)
   }
 
   /// Move assignment.
@@ -138,12 +137,12 @@ public:
     {
       buffer_sequence_ = std::move(other.buffer_sequence_);
       buffers_ = std::move(other.buffers_);
-#if defined(BOOST_ASIO_HAS_IO_URING)
+#if defined(ASIO_HAS_IO_URING)
       if (service_)
         service_->unregister_buffers();
       service_ = other.service_;
       other.service_ = 0;
-#endif // defined(BOOST_ASIO_HAS_IO_URING)
+#endif // defined(ASIO_HAS_IO_URING)
     }
     return *this;
   }
@@ -200,7 +199,7 @@ private:
   static execution_context& get_context(const T& t,
       enable_if_t<execution::is_executor<T>::value>* = 0)
   {
-    return boost::asio::query(t, execution::context);
+    return asio::query(t, execution::context);
   }
 
   // Helper function to get an executor's context.
@@ -218,13 +217,13 @@ private:
     std::size_t n = std::distance(begin, end);
     buffers_.resize(n);
 
-#if defined(BOOST_ASIO_HAS_IO_URING)
+#if defined(ASIO_HAS_IO_URING)
     service_ = &use_service<detail::io_uring_service>(ctx);
     std::vector<iovec,
-      BOOST_ASIO_REBIND_ALLOC(allocator_type, iovec)> iovecs(n,
-          BOOST_ASIO_REBIND_ALLOC(allocator_type, iovec)(
+      ASIO_REBIND_ALLOC(allocator_type, iovec)> iovecs(n,
+          ASIO_REBIND_ALLOC(allocator_type, iovec)(
             buffers_.get_allocator()));
-#endif // defined(BOOST_ASIO_HAS_IO_URING)
+#endif // defined(ASIO_HAS_IO_URING)
 
     Iterator iter = begin;
     for (int index = 0; iter != end; ++index, ++iter)
@@ -233,33 +232,33 @@ private:
       std::size_t i = static_cast<std::size_t>(index);
       buffers_[i] = this->make_buffer(b, &ctx, index);
 
-#if defined(BOOST_ASIO_HAS_IO_URING)
+#if defined(ASIO_HAS_IO_URING)
       iovecs[i].iov_base = buffers_[i].data();
       iovecs[i].iov_len = buffers_[i].size();
-#endif // defined(BOOST_ASIO_HAS_IO_URING)
+#endif // defined(ASIO_HAS_IO_URING)
     }
 
-#if defined(BOOST_ASIO_HAS_IO_URING)
+#if defined(ASIO_HAS_IO_URING)
     if (n > 0)
     {
       service_->register_buffers(&iovecs[0],
           static_cast<unsigned>(iovecs.size()));
     }
-#endif // defined(BOOST_ASIO_HAS_IO_URING)
+#endif // defined(ASIO_HAS_IO_URING)
   }
 
   MutableBufferSequence buffer_sequence_;
   std::vector<mutable_registered_buffer,
-    BOOST_ASIO_REBIND_ALLOC(allocator_type,
+    ASIO_REBIND_ALLOC(allocator_type,
       mutable_registered_buffer)> buffers_;
-#if defined(BOOST_ASIO_HAS_IO_URING)
+#if defined(ASIO_HAS_IO_URING)
   detail::io_uring_service* service_;
-#endif // defined(BOOST_ASIO_HAS_IO_URING)
+#endif // defined(ASIO_HAS_IO_URING)
 };
 
 /// Register buffers with an execution context.
 template <typename Executor, typename MutableBufferSequence>
-BOOST_ASIO_NODISCARD inline
+ASIO_NODISCARD inline
 buffer_registration<MutableBufferSequence>
 register_buffers(const Executor& ex,
     const MutableBufferSequence& buffer_sequence,
@@ -272,7 +271,7 @@ register_buffers(const Executor& ex,
 
 /// Register buffers with an execution context.
 template <typename Executor, typename MutableBufferSequence, typename Allocator>
-BOOST_ASIO_NODISCARD inline
+ASIO_NODISCARD inline
 buffer_registration<MutableBufferSequence, Allocator>
 register_buffers(const Executor& ex,
     const MutableBufferSequence& buffer_sequence, const Allocator& alloc,
@@ -286,7 +285,7 @@ register_buffers(const Executor& ex,
 
 /// Register buffers with an execution context.
 template <typename ExecutionContext, typename MutableBufferSequence>
-BOOST_ASIO_NODISCARD inline
+ASIO_NODISCARD inline
 buffer_registration<MutableBufferSequence>
 register_buffers(ExecutionContext& ctx,
     const MutableBufferSequence& buffer_sequence,
@@ -300,7 +299,7 @@ register_buffers(ExecutionContext& ctx,
 /// Register buffers with an execution context.
 template <typename ExecutionContext,
     typename MutableBufferSequence, typename Allocator>
-BOOST_ASIO_NODISCARD inline
+ASIO_NODISCARD inline
 buffer_registration<MutableBufferSequence, Allocator>
 register_buffers(ExecutionContext& ctx,
     const MutableBufferSequence& buffer_sequence, const Allocator& alloc,
@@ -313,8 +312,7 @@ register_buffers(ExecutionContext& ctx,
 }
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_BUFFER_REGISTRATION_HPP
+#endif // ASIO_BUFFER_REGISTRATION_HPP

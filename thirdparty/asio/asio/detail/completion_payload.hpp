@@ -8,27 +8,26 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_COMPLETION_PAYLOAD_HPP
-#define BOOST_ASIO_DETAIL_COMPLETION_PAYLOAD_HPP
+#ifndef ASIO_DETAIL_COMPLETION_PAYLOAD_HPP
+#define ASIO_DETAIL_COMPLETION_PAYLOAD_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/system/error_code.hpp>
-#include <boost/asio/detail/completion_message.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/error_code.hpp"
+#include "asio/detail/completion_message.hpp"
 
-#if defined(BOOST_ASIO_HAS_STD_VARIANT)
+#if defined(ASIO_HAS_STD_VARIANT)
 # include <variant>
-#else // defined(BOOST_ASIO_HAS_STD_VARIANT)
+#else // defined(ASIO_HAS_STD_VARIANT)
 # include <new>
-#endif // defined(BOOST_ASIO_HAS_STD_VARIANT)
+#endif // defined(ASIO_HAS_STD_VARIANT)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -69,7 +68,7 @@ private:
   completion_message<Signature> message_;
 };
 
-#if defined(BOOST_ASIO_HAS_STD_VARIANT)
+#if defined(ASIO_HAS_STD_VARIANT)
 
 template <typename... Signatures>
 class completion_payload
@@ -95,17 +94,17 @@ private:
   std::variant<completion_message<Signatures>...> message_;
 };
 
-#else // defined(BOOST_ASIO_HAS_STD_VARIANT)
+#else // defined(ASIO_HAS_STD_VARIANT)
 
 template <typename R1, typename R2>
-class completion_payload<R1(), R2(boost::system::error_code)>
+class completion_payload<R1(), R2(asio::error_code)>
 {
 public:
   typedef completion_message<R1()> void_message_type;
-  typedef completion_message<R2(boost::system::error_code)> error_message_type;
+  typedef completion_message<R2(asio::error_code)> error_message_type;
 
   completion_payload(void_message_type&&)
-    : message_(0, boost::system::error_code()),
+    : message_(0, asio::error_code()),
       empty_(true)
   {
   }
@@ -211,12 +210,11 @@ private:
   unsigned char index_;
 };
 
-#endif // defined(BOOST_ASIO_HAS_STD_VARIANT)
+#endif // defined(ASIO_HAS_STD_VARIANT)
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_COMPLETION_PAYLOAD_HPP
+#endif // ASIO_DETAIL_COMPLETION_PAYLOAD_HPP

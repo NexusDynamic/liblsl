@@ -8,24 +8,23 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXPERIMENTAL_BASIC_CHANNEL_HPP
-#define BOOST_ASIO_EXPERIMENTAL_BASIC_CHANNEL_HPP
+#ifndef ASIO_EXPERIMENTAL_BASIC_CHANNEL_HPP
+#define ASIO_EXPERIMENTAL_BASIC_CHANNEL_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/non_const_lvalue.hpp>
-#include <boost/asio/detail/null_mutex.hpp>
-#include <boost/asio/execution/executor.hpp>
-#include <boost/asio/execution_context.hpp>
-#include <boost/asio/experimental/detail/channel_send_functions.hpp>
-#include <boost/asio/experimental/detail/channel_service.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/non_const_lvalue.hpp"
+#include "asio/detail/null_mutex.hpp"
+#include "asio/execution/executor.hpp"
+#include "asio/execution_context.hpp"
+#include "asio/experimental/detail/channel_send_functions.hpp"
+#include "asio/experimental/detail/channel_service.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace experimental {
 namespace detail {
@@ -105,14 +104,14 @@ class basic_channel
 private:
   class initiate_async_send;
   class initiate_async_receive;
-  typedef detail::channel_service<boost::asio::detail::null_mutex> service_type;
+  typedef detail::channel_service<asio::detail::null_mutex> service_type;
   typedef typename service_type::template implementation_type<
       Traits, Signatures...>::payload_type payload_type;
 
   template <typename... PayloadSignatures,
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(PayloadSignatures...) CompletionToken>
+      ASIO_COMPLETION_TOKEN_FOR(PayloadSignatures...) CompletionToken>
   auto do_async_receive(
-      boost::asio::detail::completion_payload<PayloadSignatures...>*,
+      asio::detail::completion_payload<PayloadSignatures...>*,
       CompletionToken&& token)
     -> decltype(
         async_initiate<CompletionToken, PayloadSignatures...>(
@@ -148,7 +147,7 @@ public:
    * in the channel.
    */
   basic_channel(const executor_type& ex, std::size_t max_buffer_size = 0)
-    : service_(&boost::asio::use_service<service_type>(
+    : service_(&asio::use_service<service_type>(
             basic_channel::get_context(ex))),
       impl_(),
       executor_(ex)
@@ -173,7 +172,7 @@ public:
         is_convertible<ExecutionContext&, execution_context&>::value,
         defaulted_constraint
       > = defaulted_constraint())
-    : service_(&boost::asio::use_service<service_type>(context)),
+    : service_(&asio::use_service<service_type>(context)),
       impl_(),
       executor_(context.get_executor())
   {
@@ -314,7 +313,7 @@ public:
   /// Cancel all asynchronous operations waiting on the channel.
   /**
    * All outstanding send operations will complete with the error
-   * @c boost::asio::experimental::error::channel_cancelled. Outstanding receive
+   * @c asio::experimental::error::channel_cancelled. Outstanding receive
    * operations complete with the result as determined by the channel traits.
    */
   void cancel()
@@ -373,11 +372,11 @@ public:
   /// Asynchronously send a message.
   /**
    * @par Completion Signature
-   * @code void(boost::system::error_code) @endcode
+   * @code void(asio::error_code) @endcode
    */
   template <typename... Args,
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code))
-        CompletionToken BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
+      ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code))
+        CompletionToken ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   auto async_send(Args&&... args,
       CompletionToken&& token);
 
@@ -402,10 +401,10 @@ public:
    * channel traits.
    */
   template <typename CompletionToken
-      BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
+      ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   auto async_receive(
       CompletionToken&& token
-        BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(Executor))
+        ASIO_DEFAULT_COMPLETION_TOKEN(Executor))
 #if !defined(GENERATING_DOCUMENTATION)
     -> decltype(
         this->do_async_receive(static_cast<payload_type*>(0),
@@ -429,7 +428,7 @@ private:
   static execution_context& get_context(const T& t,
       enable_if_t<execution::is_executor<T>::value>* = 0)
   {
-    return boost::asio::query(t, execution::context);
+    return asio::query(t, execution::context);
   }
 
   // Helper function to get an executor's context.
@@ -459,7 +458,7 @@ private:
     void operator()(SendHandler&& handler,
         payload_type&& payload) const
     {
-      boost::asio::detail::non_const_lvalue<SendHandler> handler2(handler);
+      asio::detail::non_const_lvalue<SendHandler> handler2(handler);
       self_->service_->async_send(self_->impl_,
           static_cast<payload_type&&>(payload),
           handler2.value, self_->get_executor());
@@ -487,7 +486,7 @@ private:
     template <typename ReceiveHandler>
     void operator()(ReceiveHandler&& handler) const
     {
-      boost::asio::detail::non_const_lvalue<ReceiveHandler> handler2(handler);
+      asio::detail::non_const_lvalue<ReceiveHandler> handler2(handler);
       self_->service_->async_receive(self_->impl_,
           handler2.value, self_->get_executor());
     }
@@ -509,8 +508,7 @@ private:
 
 } // namespace experimental
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_EXPERIMENTAL_BASIC_CHANNEL_HPP
+#endif // ASIO_EXPERIMENTAL_BASIC_CHANNEL_HPP

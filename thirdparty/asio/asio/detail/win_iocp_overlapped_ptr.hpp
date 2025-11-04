@@ -8,28 +8,27 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_WIN_IOCP_OVERLAPPED_PTR_HPP
-#define BOOST_ASIO_DETAIL_WIN_IOCP_OVERLAPPED_PTR_HPP
+#ifndef ASIO_DETAIL_WIN_IOCP_OVERLAPPED_PTR_HPP
+#define ASIO_DETAIL_WIN_IOCP_OVERLAPPED_PTR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
 
-#include <boost/asio/io_context.hpp>
-#include <boost/asio/query.hpp>
-#include <boost/asio/detail/handler_alloc_helpers.hpp>
-#include <boost/asio/detail/memory.hpp>
-#include <boost/asio/detail/noncopyable.hpp>
-#include <boost/asio/detail/win_iocp_overlapped_op.hpp>
-#include <boost/asio/detail/win_iocp_io_context.hpp>
+#include "asio/io_context.hpp"
+#include "asio/query.hpp"
+#include "asio/detail/handler_alloc_helpers.hpp"
+#include "asio/detail/memory.hpp"
+#include "asio/detail/noncopyable.hpp"
+#include "asio/detail/win_iocp_overlapped_op.hpp"
+#include "asio/detail/win_iocp_io_context.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -81,11 +80,11 @@ public:
     win_iocp_io_context* iocp_service = this->get_iocp_service(ex);
 
     typedef win_iocp_overlapped_op<Handler, Executor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(handler, ex);
 
-    BOOST_ASIO_HANDLER_CREATION((ex.context(), *p.p,
+    ASIO_HANDLER_CREATION((ex.context(), *p.p,
           "iocp_service", iocp_service, 0, "overlapped"));
 
     iocp_service->work_started();
@@ -120,7 +119,7 @@ public:
   }
 
   // Post completion notification for overlapped operation. Releases ownership.
-  void complete(const boost::system::error_code& ec,
+  void complete(const asio::error_code& ec,
       std::size_t bytes_transferred)
   {
     if (ptr_)
@@ -140,7 +139,7 @@ private:
       >* = 0)
   {
     return &use_service<win_iocp_io_context>(
-        boost::asio::query(ex, execution::context));
+        asio::query(ex, execution::context));
   }
 
   template <typename Executor>
@@ -155,7 +154,7 @@ private:
   static win_iocp_io_context* get_iocp_service(
       const io_context::executor_type& ex)
   {
-    return &boost::asio::query(ex, execution::context).impl_;
+    return &asio::query(ex, execution::context).impl_;
   }
 
   win_iocp_operation* ptr_;
@@ -164,10 +163,9 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // defined(BOOST_ASIO_HAS_IOCP)
+#endif // defined(ASIO_HAS_IOCP)
 
-#endif // BOOST_ASIO_DETAIL_WIN_IOCP_OVERLAPPED_PTR_HPP
+#endif // ASIO_DETAIL_WIN_IOCP_OVERLAPPED_PTR_HPP

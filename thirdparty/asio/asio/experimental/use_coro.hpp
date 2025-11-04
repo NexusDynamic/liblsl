@@ -9,21 +9,20 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXPERIMENTAL_USE_CORO_HPP
-#define BOOST_ASIO_EXPERIMENTAL_USE_CORO_HPP
+#ifndef ASIO_EXPERIMENTAL_USE_CORO_HPP
+#define ASIO_EXPERIMENTAL_USE_CORO_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <memory>
-#include <boost/asio/deferred.hpp>
-#include <boost/asio/detail/source_location.hpp>
+#include "asio/deferred.hpp"
+#include "asio/detail/source_location.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 class any_io_executor;
@@ -49,7 +48,7 @@ namespace experimental {
  * returned.
  *
  * Note that this token is not the most efficient (use the default completion
- * token @c boost::asio::deferred for that) but does provide type erasure, as it
+ * token @c asio::deferred for that) but does provide type erasure, as it
  * will always return a @c coro.
  */
 template <typename Allocator = std::allocator<void>>
@@ -63,25 +62,25 @@ struct use_coro_t
   /// Default constructor.
   constexpr use_coro_t(
       allocator_type allocator = allocator_type{}
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
-# if defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-      , boost::asio::detail::source_location location =
-        boost::asio::detail::source_location::current()
-# endif // defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
+# if defined(ASIO_HAS_SOURCE_LOCATION)
+      , asio::detail::source_location location =
+        asio::detail::source_location::current()
+# endif // defined(ASIO_HAS_SOURCE_LOCATION)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
     )
     : allocator_(allocator)
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
-# if defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
+# if defined(ASIO_HAS_SOURCE_LOCATION)
     , file_name_(location.file_name()),
       line_(location.line()),
       function_name_(location.function_name())
-# else // defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
+# else // defined(ASIO_HAS_SOURCE_LOCATION)
     , file_name_(0),
       line_(0),
       function_name_(0)
-# endif // defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+# endif // defined(ASIO_HAS_SOURCE_LOCATION)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
   {
   }
 
@@ -102,18 +101,18 @@ struct use_coro_t
   constexpr use_coro_t(const char* file_name,
       int line, const char* function_name,
       allocator_type allocator = allocator_type{}) :
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
       file_name_(file_name),
       line_(line),
       function_name_(function_name),
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
       allocator_(allocator)
   {
-#if !defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#if !defined(ASIO_ENABLE_HANDLER_TRACKING)
     (void)file_name;
     (void)line;
     (void)function_name;
-#endif // !defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#endif // !defined(ASIO_ENABLE_HANDLER_TRACKING)
   }
 
   /// Adapts an executor to add the @c use_coro_t completion token as the
@@ -158,11 +157,11 @@ struct use_coro_t
       >::other(static_cast<T&&>(object));
   }
 
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
   const char* file_name_;
   int line_;
   const char* function_name_;
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
 
 private:
   Allocator allocator_;
@@ -171,21 +170,20 @@ private:
 /// A @ref completion_token object that represents the currently executing
 /// resumable coroutine.
 /**
- * See the documentation for boost::asio::use_coro_t for a usage example.
+ * See the documentation for asio::use_coro_t for a usage example.
  */
 #if defined(GENERATING_DOCUMENTATION)
-BOOST_ASIO_INLINE_VARIABLE constexpr use_coro_t<> use_coro;
+ASIO_INLINE_VARIABLE constexpr use_coro_t<> use_coro;
 #else
-BOOST_ASIO_INLINE_VARIABLE constexpr use_coro_t<> use_coro(0, 0, 0);
+ASIO_INLINE_VARIABLE constexpr use_coro_t<> use_coro(0, 0, 0);
 #endif
 
 } // namespace experimental
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#include <boost/asio/experimental/impl/use_coro.hpp>
-#include <boost/asio/experimental/coro.hpp>
+#include "asio/experimental/impl/use_coro.hpp"
+#include "asio/experimental/coro.hpp"
 
-#endif // BOOST_ASIO_EXPERIMENTAL_USE_CORO_HPP
+#endif // ASIO_EXPERIMENTAL_USE_CORO_HPP

@@ -8,32 +8,31 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_WINDOWS_BASIC_OVERLAPPED_HANDLE_HPP
-#define BOOST_ASIO_WINDOWS_BASIC_OVERLAPPED_HANDLE_HPP
+#ifndef ASIO_WINDOWS_BASIC_OVERLAPPED_HANDLE_HPP
+#define ASIO_WINDOWS_BASIC_OVERLAPPED_HANDLE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE) \
-  || defined(BOOST_ASIO_HAS_WINDOWS_STREAM_HANDLE) \
+#if defined(ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE) \
+  || defined(ASIO_HAS_WINDOWS_STREAM_HANDLE) \
   || defined(GENERATING_DOCUMENTATION)
 
 #include <cstddef>
 #include <utility>
-#include <boost/asio/any_io_executor.hpp>
-#include <boost/asio/async_result.hpp>
-#include <boost/asio/detail/io_object_impl.hpp>
-#include <boost/asio/detail/throw_error.hpp>
-#include <boost/asio/detail/win_iocp_handle_service.hpp>
-#include <boost/asio/error.hpp>
-#include <boost/asio/execution_context.hpp>
+#include "asio/any_io_executor.hpp"
+#include "asio/async_result.hpp"
+#include "asio/detail/io_object_impl.hpp"
+#include "asio/detail/throw_error.hpp"
+#include "asio/detail/win_iocp_handle_service.hpp"
+#include "asio/error.hpp"
+#include "asio/execution_context.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace windows {
 
@@ -67,7 +66,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined native_handle_type;
 #else
-  typedef boost::asio::detail::win_iocp_handle_service::native_handle_type
+  typedef asio::detail::win_iocp_handle_service::native_handle_type
     native_handle_type;
 #endif
 
@@ -116,15 +115,15 @@ public:
    *
    * @param native_handle The new underlying handle implementation.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    */
   basic_overlapped_handle(const executor_type& ex,
       const native_handle_type& native_handle)
     : impl_(0, ex)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(), native_handle, ec);
-    boost::asio::detail::throw_error(ec, "assign");
+    asio::detail::throw_error(ec, "assign");
   }
 
   /// Construct an overlapped handle on an existing native handle.
@@ -138,7 +137,7 @@ public:
    *
    * @param native_handle The new underlying handle implementation.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    */
   template <typename ExecutionContext>
   basic_overlapped_handle(ExecutionContext& context,
@@ -148,9 +147,9 @@ public:
       > = 0)
     : impl_(0, 0, context)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(), native_handle, ec);
-    boost::asio::detail::throw_error(ec, "assign");
+    asio::detail::throw_error(ec, "assign");
   }
 
   /// Move-construct an overlapped handle from another.
@@ -273,13 +272,13 @@ public:
    *
    * @param handle A native handle.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    */
   void assign(const native_handle_type& handle)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(), handle, ec);
-    boost::asio::detail::throw_error(ec, "assign");
+    asio::detail::throw_error(ec, "assign");
   }
 
   /// Assign an existing native handle to the handle.
@@ -290,11 +289,11 @@ public:
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  BOOST_ASIO_SYNC_OP_VOID assign(const native_handle_type& handle,
-      boost::system::error_code& ec)
+  ASIO_SYNC_OP_VOID assign(const native_handle_type& handle,
+      asio::error_code& ec)
   {
     impl_.get_service().assign(impl_.get_implementation(), handle, ec);
-    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
+    ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Determine whether the handle is open.
@@ -307,45 +306,45 @@ public:
   /**
    * This function is used to close the handle. Any asynchronous read or write
    * operations will be cancelled immediately, and will complete with the
-   * boost::asio::error::operation_aborted error.
+   * asio::error::operation_aborted error.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    */
   void close()
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().close(impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "close");
+    asio::detail::throw_error(ec, "close");
   }
 
   /// Close the handle.
   /**
    * This function is used to close the handle. Any asynchronous read or write
    * operations will be cancelled immediately, and will complete with the
-   * boost::asio::error::operation_aborted error.
+   * asio::error::operation_aborted error.
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  BOOST_ASIO_SYNC_OP_VOID close(boost::system::error_code& ec)
+  ASIO_SYNC_OP_VOID close(asio::error_code& ec)
   {
     impl_.get_service().close(impl_.get_implementation(), ec);
-    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
+    ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Release ownership of the underlying native handle.
   /**
    * This function causes all outstanding asynchronous operations to finish
    * immediately, and the handlers for cancelled operations will be passed the
-   * boost::asio::error::operation_aborted error. Ownership of the native handle
+   * asio::error::operation_aborted error. Ownership of the native handle
    * is then transferred to the caller.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    *
    * @note This function is unsupported on Windows versions prior to Windows
-   * 8.1, and will fail with boost::asio::error::operation_not_supported on
+   * 8.1, and will fail with asio::error::operation_not_supported on
    * these platforms.
    */
-#if defined(BOOST_ASIO_MSVC) && (BOOST_ASIO_MSVC >= 1400) \
+#if defined(ASIO_MSVC) && (ASIO_MSVC >= 1400) \
   && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0603)
   __declspec(deprecated("This function always fails with "
         "operation_not_supported when used on Windows versions "
@@ -353,10 +352,10 @@ public:
 #endif
   native_handle_type release()
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     native_handle_type s = impl_.get_service().release(
         impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "release");
+    asio::detail::throw_error(ec, "release");
     return s;
   }
 
@@ -364,22 +363,22 @@ public:
   /**
    * This function causes all outstanding asynchronous operations to finish
    * immediately, and the handlers for cancelled operations will be passed the
-   * boost::asio::error::operation_aborted error. Ownership of the native handle
+   * asio::error::operation_aborted error. Ownership of the native handle
    * is then transferred to the caller.
    *
    * @param ec Set to indicate what error occurred, if any.
    *
    * @note This function is unsupported on Windows versions prior to Windows
-   * 8.1, and will fail with boost::asio::error::operation_not_supported on
+   * 8.1, and will fail with asio::error::operation_not_supported on
    * these platforms.
    */
-#if defined(BOOST_ASIO_MSVC) && (BOOST_ASIO_MSVC >= 1400) \
+#if defined(ASIO_MSVC) && (ASIO_MSVC >= 1400) \
   && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0603)
   __declspec(deprecated("This function always fails with "
         "operation_not_supported when used on Windows versions "
         "prior to Windows 8.1."))
 #endif
-  native_handle_type release(boost::system::error_code& ec)
+  native_handle_type release(asio::error_code& ec)
   {
     return impl_.get_service().release(impl_.get_implementation(), ec);
   }
@@ -399,29 +398,29 @@ public:
   /**
    * This function causes all outstanding asynchronous read or write operations
    * to finish immediately, and the handlers for cancelled operations will be
-   * passed the boost::asio::error::operation_aborted error.
+   * passed the asio::error::operation_aborted error.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    */
   void cancel()
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().cancel(impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "cancel");
+    asio::detail::throw_error(ec, "cancel");
   }
 
   /// Cancel all asynchronous operations associated with the handle.
   /**
    * This function causes all outstanding asynchronous read or write operations
    * to finish immediately, and the handlers for cancelled operations will be
-   * passed the boost::asio::error::operation_aborted error.
+   * passed the asio::error::operation_aborted error.
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  BOOST_ASIO_SYNC_OP_VOID cancel(boost::system::error_code& ec)
+  ASIO_SYNC_OP_VOID cancel(asio::error_code& ec)
   {
     impl_.get_service().cancel(impl_.get_implementation(), ec);
-    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
+    ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
 protected:
@@ -434,8 +433,8 @@ protected:
   {
   }
 
-  boost::asio::detail::io_object_impl<
-    boost::asio::detail::win_iocp_handle_service, Executor> impl_;
+  asio::detail::io_object_impl<
+    asio::detail::win_iocp_handle_service, Executor> impl_;
 
 private:
   // Disallow copying and assignment.
@@ -446,12 +445,11 @@ private:
 
 } // namespace windows
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // defined(BOOST_ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE)
-       //   || defined(BOOST_ASIO_HAS_WINDOWS_STREAM_HANDLE)
+#endif // defined(ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE)
+       //   || defined(ASIO_HAS_WINDOWS_STREAM_HANDLE)
        //   || defined(GENERATING_DOCUMENTATION)
 
-#endif // BOOST_ASIO_WINDOWS_BASIC_OVERLAPPED_HANDLE_HPP
+#endif // ASIO_WINDOWS_BASIC_OVERLAPPED_HANDLE_HPP

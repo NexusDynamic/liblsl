@@ -8,32 +8,31 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXECUTOR_WORK_GUARD_HPP
-#define BOOST_ASIO_EXECUTOR_WORK_GUARD_HPP
+#ifndef ASIO_EXECUTOR_WORK_GUARD_HPP
+#define ASIO_EXECUTOR_WORK_GUARD_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#include <boost/asio/associated_executor.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/execution.hpp>
-#include <boost/asio/is_executor.hpp>
+#include "asio/associated_executor.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/execution.hpp"
+#include "asio/is_executor.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
-#if !defined(BOOST_ASIO_EXECUTOR_WORK_GUARD_DECL)
-#define BOOST_ASIO_EXECUTOR_WORK_GUARD_DECL
+#if !defined(ASIO_EXECUTOR_WORK_GUARD_DECL)
+#define ASIO_EXECUTOR_WORK_GUARD_DECL
 
 template <typename Executor, typename = void, typename = void>
 class executor_work_guard;
 
-#endif // !defined(BOOST_ASIO_EXECUTOR_WORK_GUARD_DECL)
+#endif // !defined(ASIO_EXECUTOR_WORK_GUARD_DECL)
 
 #if defined(GENERATING_DOCUMENTATION)
 
@@ -83,7 +82,7 @@ public:
 
 #if !defined(GENERATING_DOCUMENTATION)
 
-#if !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#if !defined(ASIO_NO_TS_EXECUTORS)
 
 template <typename Executor>
 class executor_work_guard<Executor,
@@ -149,7 +148,7 @@ private:
   bool owns_;
 };
 
-#endif // !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#endif // !defined(ASIO_NO_TS_EXECUTORS)
 
 template <typename Executor>
 class executor_work_guard<Executor,
@@ -167,7 +166,7 @@ public:
     : executor_(e),
       owns_(true)
   {
-    new (&work_) work_type(boost::asio::prefer(executor_,
+    new (&work_) work_type(asio::prefer(executor_,
           execution::outstanding_work.tracked));
   }
 
@@ -177,7 +176,7 @@ public:
   {
     if (owns_)
     {
-      new (&work_) work_type(boost::asio::prefer(executor_,
+      new (&work_) work_type(asio::prefer(executor_,
             execution::outstanding_work.tracked));
     }
   }
@@ -246,7 +245,7 @@ private:
  * @returns A work guard constructed with the specified executor.
  */
 template <typename Executor>
-BOOST_ASIO_NODISCARD inline executor_work_guard<Executor>
+ASIO_NODISCARD inline executor_work_guard<Executor>
 make_work_guard(const Executor& ex,
     constraint_t<
       is_executor<Executor>::value || execution::is_executor<Executor>::value
@@ -263,7 +262,7 @@ make_work_guard(const Executor& ex,
  * obtained by performing <tt>ctx.get_executor()</tt>.
  */
 template <typename ExecutionContext>
-BOOST_ASIO_NODISCARD inline
+ASIO_NODISCARD inline
 executor_work_guard<typename ExecutionContext::executor_type>
 make_work_guard(ExecutionContext& ctx,
     constraint_t<
@@ -283,7 +282,7 @@ make_work_guard(ExecutionContext& ctx,
  * @c t, which is obtained as if by calling <tt>get_associated_executor(t)</tt>.
  */
 template <typename T>
-BOOST_ASIO_NODISCARD inline
+ASIO_NODISCARD inline
 executor_work_guard<
     typename constraint_t<
       !is_executor<T>::value
@@ -310,7 +309,7 @@ make_work_guard(const T& t)
  * ex)</tt>.
  */
 template <typename T, typename Executor>
-BOOST_ASIO_NODISCARD inline
+ASIO_NODISCARD inline
 executor_work_guard<associated_executor_t<T, Executor>>
 make_work_guard(const T& t, const Executor& ex,
     constraint_t<
@@ -334,7 +333,7 @@ make_work_guard(const T& t, const Executor& ex,
  * ctx.get_executor())</tt>.
  */
 template <typename T, typename ExecutionContext>
-BOOST_ASIO_NODISCARD inline executor_work_guard<
+ASIO_NODISCARD inline executor_work_guard<
   associated_executor_t<T, typename ExecutionContext::executor_type>>
 make_work_guard(const T& t, ExecutionContext& ctx,
     constraint_t<
@@ -357,8 +356,7 @@ make_work_guard(const T& t, ExecutionContext& ctx,
 }
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_EXECUTOR_WORK_GUARD_HPP
+#endif // ASIO_EXECUTOR_WORK_GUARD_HPP

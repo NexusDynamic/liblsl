@@ -8,19 +8,18 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_SSL_CONTEXT_BASE_HPP
-#define BOOST_ASIO_SSL_CONTEXT_BASE_HPP
+#ifndef ASIO_SSL_CONTEXT_BASE_HPP
+#define ASIO_SSL_CONTEXT_BASE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/ssl/detail/openssl_types.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/ssl/detail/openssl_types.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace ssl {
 
@@ -136,30 +135,30 @@ public:
   /// Disable compression. Compression is disabled by default.
   static const uint64_t no_compression = implementation_defined;
 #else
-  BOOST_ASIO_STATIC_CONSTANT(uint64_t, default_workarounds = SSL_OP_ALL);
-  BOOST_ASIO_STATIC_CONSTANT(uint64_t, single_dh_use = SSL_OP_SINGLE_DH_USE);
-  BOOST_ASIO_STATIC_CONSTANT(uint64_t, no_sslv2 = SSL_OP_NO_SSLv2);
-  BOOST_ASIO_STATIC_CONSTANT(uint64_t, no_sslv3 = SSL_OP_NO_SSLv3);
-  BOOST_ASIO_STATIC_CONSTANT(uint64_t, no_tlsv1 = SSL_OP_NO_TLSv1);
+  ASIO_STATIC_CONSTANT(uint64_t, default_workarounds = SSL_OP_ALL);
+  ASIO_STATIC_CONSTANT(uint64_t, single_dh_use = SSL_OP_SINGLE_DH_USE);
+  ASIO_STATIC_CONSTANT(uint64_t, no_sslv2 = SSL_OP_NO_SSLv2);
+  ASIO_STATIC_CONSTANT(uint64_t, no_sslv3 = SSL_OP_NO_SSLv3);
+  ASIO_STATIC_CONSTANT(uint64_t, no_tlsv1 = SSL_OP_NO_TLSv1);
 # if defined(SSL_OP_NO_TLSv1_1)
-  BOOST_ASIO_STATIC_CONSTANT(uint64_t, no_tlsv1_1 = SSL_OP_NO_TLSv1_1);
+  ASIO_STATIC_CONSTANT(uint64_t, no_tlsv1_1 = SSL_OP_NO_TLSv1_1);
 # else // defined(SSL_OP_NO_TLSv1_1)
-  BOOST_ASIO_STATIC_CONSTANT(uint64_t, no_tlsv1_1 = 0x10000000L);
+  ASIO_STATIC_CONSTANT(uint64_t, no_tlsv1_1 = 0x10000000L);
 # endif // defined(SSL_OP_NO_TLSv1_1)
 # if defined(SSL_OP_NO_TLSv1_2)
-  BOOST_ASIO_STATIC_CONSTANT(uint64_t, no_tlsv1_2 = SSL_OP_NO_TLSv1_2);
+  ASIO_STATIC_CONSTANT(uint64_t, no_tlsv1_2 = SSL_OP_NO_TLSv1_2);
 # else // defined(SSL_OP_NO_TLSv1_2)
-  BOOST_ASIO_STATIC_CONSTANT(uint64_t, no_tlsv1_2 = 0x08000000L);
+  ASIO_STATIC_CONSTANT(uint64_t, no_tlsv1_2 = 0x08000000L);
 # endif // defined(SSL_OP_NO_TLSv1_2)
 # if defined(SSL_OP_NO_TLSv1_3)
-  BOOST_ASIO_STATIC_CONSTANT(uint64_t, no_tlsv1_3 = SSL_OP_NO_TLSv1_3);
+  ASIO_STATIC_CONSTANT(uint64_t, no_tlsv1_3 = SSL_OP_NO_TLSv1_3);
 # else // defined(SSL_OP_NO_TLSv1_3)
-  BOOST_ASIO_STATIC_CONSTANT(uint64_t, no_tlsv1_3 = 0x20000000L);
+  ASIO_STATIC_CONSTANT(uint64_t, no_tlsv1_3 = 0x20000000L);
 # endif // defined(SSL_OP_NO_TLSv1_3)
 # if defined(SSL_OP_NO_COMPRESSION)
-  BOOST_ASIO_STATIC_CONSTANT(uint64_t, no_compression = SSL_OP_NO_COMPRESSION);
+  ASIO_STATIC_CONSTANT(uint64_t, no_compression = SSL_OP_NO_COMPRESSION);
 # else // defined(SSL_OP_NO_COMPRESSION)
-  BOOST_ASIO_STATIC_CONSTANT(uint64_t, no_compression = 0x20000L);
+  ASIO_STATIC_CONSTANT(uint64_t, no_compression = 0x20000L);
 # endif // defined(SSL_OP_NO_COMPRESSION)
 #endif
 
@@ -176,13 +175,13 @@ public:
 #if !defined(GENERATING_DOCUMENTATION)
   // The following types and constants are preserved for backward compatibility.
   // New programs should use the equivalents of the same names that are defined
-  // in the boost::asio::ssl namespace.
+  // in the asio::ssl namespace.
   typedef int verify_mode;
-  BOOST_ASIO_STATIC_CONSTANT(int, verify_none = SSL_VERIFY_NONE);
-  BOOST_ASIO_STATIC_CONSTANT(int, verify_peer = SSL_VERIFY_PEER);
-  BOOST_ASIO_STATIC_CONSTANT(int,
+  ASIO_STATIC_CONSTANT(int, verify_none = SSL_VERIFY_NONE);
+  ASIO_STATIC_CONSTANT(int, verify_peer = SSL_VERIFY_PEER);
+  ASIO_STATIC_CONSTANT(int,
       verify_fail_if_no_peer_cert = SSL_VERIFY_FAIL_IF_NO_PEER_CERT);
-  BOOST_ASIO_STATIC_CONSTANT(int, verify_client_once = SSL_VERIFY_CLIENT_ONCE);
+  ASIO_STATIC_CONSTANT(int, verify_client_once = SSL_VERIFY_CLIENT_ONCE);
 #endif
 
   /// Purpose of PEM password.
@@ -204,8 +203,7 @@ protected:
 
 } // namespace ssl
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_SSL_CONTEXT_BASE_HPP
+#endif // ASIO_SSL_CONTEXT_BASE_HPP

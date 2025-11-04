@@ -8,20 +8,19 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_IMPL_STRAND_SERVICE_IPP
-#define BOOST_ASIO_DETAIL_IMPL_STRAND_SERVICE_IPP
+#ifndef ASIO_DETAIL_IMPL_STRAND_SERVICE_IPP
+#define ASIO_DETAIL_IMPL_STRAND_SERVICE_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/call_stack.hpp>
-#include <boost/asio/detail/strand_service.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/call_stack.hpp"
+#include "asio/detail/strand_service.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -42,10 +41,10 @@ struct strand_service::on_do_complete_exit
   }
 };
 
-strand_service::strand_service(boost::asio::io_context& io_context)
-  : boost::asio::detail::service_base<strand_service>(io_context),
+strand_service::strand_service(asio::io_context& io_context)
+  : asio::detail::service_base<strand_service>(io_context),
     io_context_(io_context),
-    io_context_impl_(boost::asio::use_service<io_context_impl>(io_context)),
+    io_context_impl_(asio::use_service<io_context_impl>(io_context)),
     mutex_(),
     salt_(0)
 {
@@ -55,7 +54,7 @@ void strand_service::shutdown()
 {
   op_queue<operation> ops;
 
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  asio::detail::mutex::scoped_lock lock(mutex_);
 
   for (std::size_t i = 0; i < num_implementations; ++i)
   {
@@ -69,16 +68,16 @@ void strand_service::shutdown()
 
 void strand_service::construct(strand_service::implementation_type& impl)
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  asio::detail::mutex::scoped_lock lock(mutex_);
 
   std::size_t salt = salt_++;
-#if defined(BOOST_ASIO_ENABLE_SEQUENTIAL_STRAND_ALLOCATION)
+#if defined(ASIO_ENABLE_SEQUENTIAL_STRAND_ALLOCATION)
   std::size_t index = salt;
-#else // defined(BOOST_ASIO_ENABLE_SEQUENTIAL_STRAND_ALLOCATION)
+#else // defined(ASIO_ENABLE_SEQUENTIAL_STRAND_ALLOCATION)
   std::size_t index = reinterpret_cast<std::size_t>(&impl);
   index += (reinterpret_cast<std::size_t>(&impl) >> 3);
   index ^= salt + 0x9e3779b9 + (index << 6) + (index >> 2);
-#endif // defined(BOOST_ASIO_ENABLE_SEQUENTIAL_STRAND_ALLOCATION)
+#endif // defined(ASIO_ENABLE_SEQUENTIAL_STRAND_ALLOCATION)
   index = index % num_implementations;
 
   if (!implementations_[index])
@@ -131,7 +130,7 @@ void strand_service::do_dispatch(implementation_type& impl, operation* op)
     on_dispatch_exit on_exit = { &io_context_impl_, impl };
     (void)on_exit;
 
-    op->complete(&io_context_impl_, boost::system::error_code(), 0);
+    op->complete(&io_context_impl_, asio::error_code(), 0);
     return;
   }
 
@@ -174,7 +173,7 @@ void strand_service::do_post(implementation_type& impl,
 }
 
 void strand_service::do_complete(void* owner, operation* base,
-    const boost::system::error_code& ec, std::size_t /*bytes_transferred*/)
+    const asio::error_code& ec, std::size_t /*bytes_transferred*/)
 {
   if (owner)
   {
@@ -200,8 +199,7 @@ void strand_service::do_complete(void* owner, operation* base,
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_IMPL_STRAND_SERVICE_IPP
+#endif // ASIO_DETAIL_IMPL_STRAND_SERVICE_IPP

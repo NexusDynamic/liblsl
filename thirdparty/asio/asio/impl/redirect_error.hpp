@@ -8,25 +8,24 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IMPL_REDIRECT_ERROR_HPP
-#define BOOST_ASIO_IMPL_REDIRECT_ERROR_HPP
+#ifndef ASIO_IMPL_REDIRECT_ERROR_HPP
+#define ASIO_IMPL_REDIRECT_ERROR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/associated_executor.hpp>
-#include <boost/asio/associator.hpp>
-#include <boost/asio/async_result.hpp>
-#include <boost/asio/detail/handler_cont_helpers.hpp>
-#include <boost/asio/detail/initiation_base.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/system/system_error.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/associated_executor.hpp"
+#include "asio/associator.hpp"
+#include "asio/async_result.hpp"
+#include "asio/detail/handler_cont_helpers.hpp"
+#include "asio/detail/initiation_base.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/system_error.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -45,7 +44,7 @@ public:
   }
 
   template <typename RedirectedHandler>
-  redirect_error_handler(boost::system::error_code& ec,
+  redirect_error_handler(asio::error_code& ec,
       RedirectedHandler&& h)
     : ec_(ec),
       handler_(static_cast<RedirectedHandler&&>(h))
@@ -59,7 +58,7 @@ public:
 
   template <typename Arg, typename... Args>
   enable_if_t<
-    !is_same<decay_t<Arg>, boost::system::error_code>::value
+    !is_same<decay_t<Arg>, asio::error_code>::value
   >
   operator()(Arg&& arg, Args&&... args)
   {
@@ -69,14 +68,14 @@ public:
   }
 
   template <typename... Args>
-  void operator()(const boost::system::error_code& ec, Args&&... args)
+  void operator()(const asio::error_code& ec, Args&&... args)
   {
     ec_ = ec;
     static_cast<Handler&&>(handler_)(static_cast<Args&&>(args)...);
   }
 
 //private:
-  boost::system::error_code& ec_;
+  asio::error_code& ec_;
   Handler handler_;
 };
 
@@ -84,7 +83,7 @@ template <typename Handler>
 inline bool asio_handler_is_continuation(
     redirect_error_handler<Handler>* this_handler)
 {
-  return boost_asio_handler_cont_helpers::is_continuation(
+  return asio_handler_cont_helpers::is_continuation(
         this_handler->handler_);
 }
 
@@ -95,86 +94,86 @@ struct redirect_error_signature
 };
 
 template <typename R, typename... Args>
-struct redirect_error_signature<R(boost::system::error_code, Args...)>
+struct redirect_error_signature<R(asio::error_code, Args...)>
 {
   typedef R type(Args...);
 };
 
 template <typename R, typename... Args>
-struct redirect_error_signature<R(const boost::system::error_code&, Args...)>
+struct redirect_error_signature<R(const asio::error_code&, Args...)>
 {
   typedef R type(Args...);
 };
 
 template <typename R, typename... Args>
-struct redirect_error_signature<R(boost::system::error_code, Args...) &>
+struct redirect_error_signature<R(asio::error_code, Args...) &>
 {
   typedef R type(Args...) &;
 };
 
 template <typename R, typename... Args>
-struct redirect_error_signature<R(const boost::system::error_code&, Args...) &>
+struct redirect_error_signature<R(const asio::error_code&, Args...) &>
 {
   typedef R type(Args...) &;
 };
 
 template <typename R, typename... Args>
-struct redirect_error_signature<R(boost::system::error_code, Args...) &&>
+struct redirect_error_signature<R(asio::error_code, Args...) &&>
 {
   typedef R type(Args...) &&;
 };
 
 template <typename R, typename... Args>
-struct redirect_error_signature<R(const boost::system::error_code&, Args...) &&>
+struct redirect_error_signature<R(const asio::error_code&, Args...) &&>
 {
   typedef R type(Args...) &&;
 };
 
-#if defined(BOOST_ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
+#if defined(ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
 
 template <typename R, typename... Args>
 struct redirect_error_signature<
-  R(boost::system::error_code, Args...) noexcept>
+  R(asio::error_code, Args...) noexcept>
 {
   typedef R type(Args...) & noexcept;
 };
 
 template <typename R, typename... Args>
 struct redirect_error_signature<
-  R(const boost::system::error_code&, Args...) noexcept>
+  R(const asio::error_code&, Args...) noexcept>
 {
   typedef R type(Args...) & noexcept;
 };
 
 template <typename R, typename... Args>
 struct redirect_error_signature<
-  R(boost::system::error_code, Args...) & noexcept>
+  R(asio::error_code, Args...) & noexcept>
 {
   typedef R type(Args...) & noexcept;
 };
 
 template <typename R, typename... Args>
 struct redirect_error_signature<
-  R(const boost::system::error_code&, Args...) & noexcept>
+  R(const asio::error_code&, Args...) & noexcept>
 {
   typedef R type(Args...) & noexcept;
 };
 
 template <typename R, typename... Args>
 struct redirect_error_signature<
-  R(boost::system::error_code, Args...) && noexcept>
+  R(asio::error_code, Args...) && noexcept>
 {
   typedef R type(Args...) && noexcept;
 };
 
 template <typename R, typename... Args>
 struct redirect_error_signature<
-  R(const boost::system::error_code&, Args...) && noexcept>
+  R(const asio::error_code&, Args...) && noexcept>
 {
   typedef R type(Args...) && noexcept;
 };
 
-#endif // defined(BOOST_ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
+#endif // defined(ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
 
 } // namespace detail
 
@@ -192,7 +191,7 @@ struct async_result<redirect_error_t<CompletionToken>, Signature>
 
     template <typename Handler, typename... Args>
     void operator()(Handler&& handler,
-        boost::system::error_code* ec, Args&&... args) &&
+        asio::error_code* ec, Args&&... args) &&
     {
       static_cast<Initiation&&>(*this)(
           detail::redirect_error_handler<decay_t<Handler>>(
@@ -202,7 +201,7 @@ struct async_result<redirect_error_t<CompletionToken>, Signature>
 
     template <typename Handler, typename... Args>
     void operator()(Handler&& handler,
-        boost::system::error_code* ec, Args&&... args) const &
+        asio::error_code* ec, Args&&... args) const &
     {
       static_cast<const Initiation&>(*this)(
           detail::redirect_error_handler<decay_t<Handler>>(
@@ -282,8 +281,7 @@ struct async_result<partial_redirect_error, Signatures...>
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_IMPL_REDIRECT_ERROR_HPP
+#endif // ASIO_IMPL_REDIRECT_ERROR_HPP

@@ -8,20 +8,19 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_STD_FENCED_BLOCK_HPP
-#define BOOST_ASIO_DETAIL_STD_FENCED_BLOCK_HPP
+#ifndef ASIO_DETAIL_STD_FENCED_BLOCK_HPP
+#define ASIO_DETAIL_STD_FENCED_BLOCK_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <atomic>
-#include <boost/asio/detail/noncopyable.hpp>
+#include "asio/detail/noncopyable.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -52,8 +51,7 @@ public:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_STD_FENCED_BLOCK_HPP
+#endif // ASIO_DETAIL_STD_FENCED_BLOCK_HPP

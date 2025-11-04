@@ -8,33 +8,32 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_SSL_DETAIL_IO_HPP
-#define BOOST_ASIO_SSL_DETAIL_IO_HPP
+#ifndef ASIO_SSL_DETAIL_IO_HPP
+#define ASIO_SSL_DETAIL_IO_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#include <boost/asio/detail/base_from_cancellation_state.hpp>
-#include <boost/asio/detail/handler_tracking.hpp>
-#include <boost/asio/ssl/detail/engine.hpp>
-#include <boost/asio/ssl/detail/stream_core.hpp>
-#include <boost/asio/write.hpp>
+#include "asio/detail/base_from_cancellation_state.hpp"
+#include "asio/detail/handler_tracking.hpp"
+#include "asio/ssl/detail/engine.hpp"
+#include "asio/ssl/detail/stream_core.hpp"
+#include "asio/write.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace ssl {
 namespace detail {
 
 template <typename Stream, typename Operation>
 std::size_t io(Stream& next_layer, stream_core& core,
-    const Operation& op, boost::system::error_code& ec)
+    const Operation& op, asio::error_code& ec)
 {
-  boost::system::error_code io_ec;
+  asio::error_code io_ec;
   std::size_t bytes_transferred = 0;
   do switch (op(core.engine_, ec, bytes_transferred))
   {
@@ -44,7 +43,7 @@ std::size_t io(Stream& next_layer, stream_core& core,
     // the underlying transport.
     if (core.input_.size() == 0)
     {
-      core.input_ = boost::asio::buffer(core.input_buffer_,
+      core.input_ = asio::buffer(core.input_buffer_,
           next_layer.read_some(core.input_buffer_, io_ec));
       if (!ec)
         ec = io_ec;
@@ -60,7 +59,7 @@ std::size_t io(Stream& next_layer, stream_core& core,
 
     // Get output data from the engine and write it to the underlying
     // transport.
-    boost::asio::write(next_layer,
+    asio::write(next_layer,
         core.engine_.get_output(core.output_buffer_), io_ec);
     if (!ec)
       ec = io_ec;
@@ -72,7 +71,7 @@ std::size_t io(Stream& next_layer, stream_core& core,
 
     // Get output data from the engine and write it to the underlying
     // transport.
-    boost::asio::write(next_layer,
+    asio::write(next_layer,
         core.engine_.get_output(core.output_buffer_), io_ec);
     if (!ec)
       ec = io_ec;
@@ -96,12 +95,12 @@ std::size_t io(Stream& next_layer, stream_core& core,
 
 template <typename Stream, typename Operation, typename Handler>
 class io_op
-  : public boost::asio::detail::base_from_cancellation_state<Handler>
+  : public asio::detail::base_from_cancellation_state<Handler>
 {
 public:
   io_op(Stream& next_layer, stream_core& core,
       const Operation& op, Handler& handler)
-    : boost::asio::detail::base_from_cancellation_state<Handler>(handler),
+    : asio::detail::base_from_cancellation_state<Handler>(handler),
       next_layer_(next_layer),
       core_(core),
       op_(op),
@@ -113,7 +112,7 @@ public:
   }
 
   io_op(const io_op& other)
-    : boost::asio::detail::base_from_cancellation_state<Handler>(other),
+    : asio::detail::base_from_cancellation_state<Handler>(other),
       next_layer_(other.next_layer_),
       core_(other.core_),
       op_(other.op_),
@@ -126,9 +125,9 @@ public:
   }
 
   io_op(io_op&& other)
-    : boost::asio::detail::base_from_cancellation_state<Handler>(
+    : asio::detail::base_from_cancellation_state<Handler>(
         static_cast<
-          boost::asio::detail::base_from_cancellation_state<Handler>&&>(other)),
+          asio::detail::base_from_cancellation_state<Handler>&&>(other)),
       next_layer_(other.next_layer_),
       core_(other.core_),
       op_(static_cast<Operation&&>(other.op_)),
@@ -140,7 +139,7 @@ public:
   {
   }
 
-  void operator()(boost::system::error_code ec,
+  void operator()(asio::error_code ec,
       std::size_t bytes_transferred = ~std::size_t(0), int start = 0)
   {
     switch (start_ = start)
@@ -169,17 +168,17 @@ public:
             // Prevent other read operations from being started.
             core_.pending_read_.expires_at(core_.pos_infin());
 
-            BOOST_ASIO_HANDLER_LOCATION((
+            ASIO_HANDLER_LOCATION((
                   __FILE__, __LINE__, Operation::tracking_name()));
 
             // Start reading some data from the underlying transport.
             next_layer_.async_read_some(
-                boost::asio::buffer(core_.input_buffer_),
+                asio::buffer(core_.input_buffer_),
                 static_cast<io_op&&>(*this));
           }
           else
           {
-            BOOST_ASIO_HANDLER_LOCATION((
+            ASIO_HANDLER_LOCATION((
                   __FILE__, __LINE__, Operation::tracking_name()));
 
             // Wait until the current read operation completes.
@@ -202,17 +201,17 @@ public:
             // Prevent other write operations from being started.
             core_.pending_write_.expires_at(core_.pos_infin());
 
-            BOOST_ASIO_HANDLER_LOCATION((
+            ASIO_HANDLER_LOCATION((
                   __FILE__, __LINE__, Operation::tracking_name()));
 
             // Start writing all the data to the underlying transport.
-            boost::asio::async_write(next_layer_,
+            asio::async_write(next_layer_,
                 core_.engine_.get_output(core_.output_buffer_),
                 static_cast<io_op&&>(*this));
           }
           else
           {
-            BOOST_ASIO_HANDLER_LOCATION((
+            ASIO_HANDLER_LOCATION((
                   __FILE__, __LINE__, Operation::tracking_name()));
 
             // Wait until the current write operation completes.
@@ -232,11 +231,11 @@ public:
           // read so the handler runs "as-if" posted using io_context::post().
           if (start)
           {
-            BOOST_ASIO_HANDLER_LOCATION((
+            ASIO_HANDLER_LOCATION((
                   __FILE__, __LINE__, Operation::tracking_name()));
 
             next_layer_.async_read_some(
-                boost::asio::buffer(core_.input_buffer_, 0),
+                asio::buffer(core_.input_buffer_, 0),
                 static_cast<io_op&&>(*this));
 
             // Yield control until asynchronous operation completes. Control
@@ -261,7 +260,7 @@ public:
         case engine::want_input_and_retry:
 
           // Add received data to the engine's input.
-          core_.input_ = boost::asio::buffer(
+          core_.input_ = asio::buffer(
               core_.input_buffer_, bytes_transferred);
           core_.input_ = core_.engine_.put_input(core_.input_);
 
@@ -271,7 +270,7 @@ public:
           // Check for cancellation before continuing.
           if (this->cancelled() != cancellation_type::none)
           {
-            ec_ = boost::asio::error::operation_aborted;
+            ec_ = asio::error::operation_aborted;
             break;
           }
 
@@ -286,7 +285,7 @@ public:
           // Check for cancellation before continuing.
           if (this->cancelled() != cancellation_type::none)
           {
-            ec_ = boost::asio::error::operation_aborted;
+            ec_ = asio::error::operation_aborted;
             break;
           }
 
@@ -323,7 +322,7 @@ public:
   Operation op_;
   int start_;
   engine::want want_;
-  boost::system::error_code ec_;
+  asio::error_code ec_;
   std::size_t bytes_transferred_;
   Handler handler_;
 };
@@ -333,7 +332,7 @@ inline bool asio_handler_is_continuation(
     io_op<Stream, Operation, Handler>* this_handler)
 {
   return this_handler->start_ == 0 ? true
-    : boost_asio_handler_cont_helpers::is_continuation(this_handler->handler_);
+    : asio_handler_cont_helpers::is_continuation(this_handler->handler_);
 }
 
 template <typename Stream, typename Operation, typename Handler>
@@ -342,7 +341,7 @@ inline void async_io(Stream& next_layer, stream_core& core,
 {
   io_op<Stream, Operation, Handler>(
     next_layer, core, op, handler)(
-      boost::system::error_code(), 0, 1);
+      asio::error_code(), 0, 1);
 }
 
 } // namespace detail
@@ -371,8 +370,7 @@ struct associator<Associator,
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_SSL_DETAIL_IO_HPP
+#endif // ASIO_SSL_DETAIL_IO_HPP

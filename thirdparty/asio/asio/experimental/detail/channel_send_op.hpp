@@ -8,23 +8,22 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXPERIMENTAL_DETAIL_CHANNEL_SEND_OP_HPP
-#define BOOST_ASIO_EXPERIMENTAL_DETAIL_CHANNEL_SEND_OP_HPP
+#ifndef ASIO_EXPERIMENTAL_DETAIL_CHANNEL_SEND_OP_HPP
+#define ASIO_EXPERIMENTAL_DETAIL_CHANNEL_SEND_OP_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/bind_handler.hpp>
-#include <boost/asio/detail/handler_alloc_helpers.hpp>
-#include <boost/asio/error.hpp>
-#include <boost/asio/experimental/channel_error.hpp>
-#include <boost/asio/experimental/detail/channel_operation.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/bind_handler.hpp"
+#include "asio/detail/handler_alloc_helpers.hpp"
+#include "asio/error.hpp"
+#include "asio/experimental/channel_error.hpp"
+#include "asio/experimental/detail/channel_operation.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace experimental {
 namespace detail {
@@ -73,7 +72,7 @@ template <typename Payload, typename Handler, typename IoExecutor>
 class channel_send_op : public channel_send<Payload>
 {
 public:
-  BOOST_ASIO_DEFINE_HANDLER_PTR(channel_send_op);
+  ASIO_DEFINE_HANDLER_PTR(channel_send_op);
 
   channel_send_op(Payload&& payload,
       Handler& handler, const IoExecutor& io_ex)
@@ -89,16 +88,16 @@ public:
   {
     // Take ownership of the operation object.
     channel_send_op* o(static_cast<channel_send_op*>(base));
-    ptr p = { boost::asio::detail::addressof(o->handler_), o, o };
+    ptr p = { asio::detail::addressof(o->handler_), o, o };
 
-    BOOST_ASIO_HANDLER_COMPLETION((*o));
+    ASIO_HANDLER_COMPLETION((*o));
 
     // Take ownership of the operation's outstanding work.
     channel_operation::handler_work<Handler, IoExecutor> w(
         static_cast<channel_operation::handler_work<Handler, IoExecutor>&&>(
           o->work_));
 
-    boost::system::error_code ec;
+    asio::error_code ec;
     switch (a)
     {
     case channel_operation::cancel_op:
@@ -117,20 +116,20 @@ public:
     // with the handler. Consequently, a local copy of the handler is required
     // to ensure that any owning sub-object remains valid until after we have
     // deallocated the memory here.
-    boost::asio::detail::binder1<Handler, boost::system::error_code>
+    asio::detail::binder1<Handler, asio::error_code>
       handler(o->handler_, ec);
-    p.h = boost::asio::detail::addressof(handler.handler_);
+    p.h = asio::detail::addressof(handler.handler_);
     p.reset();
 
     // Post the completion if required.
     if (a != channel_operation::destroy_op)
     {
-      BOOST_ASIO_HANDLER_INVOCATION_BEGIN((handler.arg1_));
+      ASIO_HANDLER_INVOCATION_BEGIN((handler.arg1_));
       if (a == channel_operation::immediate_op)
         w.immediate(handler, handler.handler_, 0);
       else
         w.post(handler, handler.handler_);
-      BOOST_ASIO_HANDLER_INVOCATION_END;
+      ASIO_HANDLER_INVOCATION_END;
     }
   }
 
@@ -142,8 +141,7 @@ private:
 } // namespace detail
 } // namespace experimental
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_EXPERIMENTAL_DETAIL_CHANNEL_SEND_OP_HPP
+#endif // ASIO_EXPERIMENTAL_DETAIL_CHANNEL_SEND_OP_HPP

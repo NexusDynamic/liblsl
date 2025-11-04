@@ -8,23 +8,22 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_CONDITIONALLY_ENABLED_EVENT_HPP
-#define BOOST_ASIO_DETAIL_CONDITIONALLY_ENABLED_EVENT_HPP
+#ifndef ASIO_DETAIL_CONDITIONALLY_ENABLED_EVENT_HPP
+#define ASIO_DETAIL_CONDITIONALLY_ENABLED_EVENT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/conditionally_enabled_mutex.hpp>
-#include <boost/asio/detail/event.hpp>
-#include <boost/asio/detail/noncopyable.hpp>
-#include <boost/asio/detail/null_event.hpp>
-#include <boost/asio/detail/scoped_lock.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/conditionally_enabled_mutex.hpp"
+#include "asio/detail/event.hpp"
+#include "asio/detail/noncopyable.hpp"
+#include "asio/detail/null_event.hpp"
+#include "asio/detail/scoped_lock.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -110,13 +109,12 @@ public:
   }
 
 private:
-  boost::asio::detail::event event_;
+  asio::detail::event event_;
 };
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_CONDITIONALLY_ENABLED_EVENT_HPP
+#endif // ASIO_DETAIL_CONDITIONALLY_ENABLED_EVENT_HPP

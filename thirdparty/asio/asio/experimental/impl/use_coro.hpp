@@ -9,19 +9,18 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXPERIMENTAL_IMPL_USE_CORO_HPP
-#define BOOST_ASIO_EXPERIMENTAL_IMPL_USE_CORO_HPP
+#ifndef ASIO_EXPERIMENTAL_IMPL_USE_CORO_HPP
+#define ASIO_EXPERIMENTAL_IMPL_USE_CORO_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/deferred.hpp>
-#include <boost/asio/experimental/coro.hpp>
+#include "asio/deferred.hpp"
+#include "asio/experimental/coro.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 #if !defined(GENERATING_DOCUMENTATION)
@@ -33,17 +32,17 @@ struct async_result<experimental::use_coro_t<Allocator>, R()>
   static auto initiate_impl(Initiation initiation,
       std::allocator_arg_t, Allocator, InitArgs... args)
     -> experimental::coro<void() noexcept, void,
-      boost::asio::associated_executor_t<Initiation>, Allocator>
+      asio::associated_executor_t<Initiation>, Allocator>
   {
     co_await deferred_async_operation<R(), Initiation, InitArgs...>(
         deferred_init_tag{}, std::move(initiation), std::move(args)...);
   }
 
   template <typename... InitArgs>
-  static auto initiate_impl(boost::asio::detail::initiation_archetype<R()>,
+  static auto initiate_impl(asio::detail::initiation_archetype<R()>,
       std::allocator_arg_t, Allocator, InitArgs... args)
     -> experimental::coro<void(), void,
-      boost::asio::any_io_executor, Allocator>;
+      asio::any_io_executor, Allocator>;
 
   template <typename Initiation, typename... InitArgs>
   static auto initiate(Initiation initiation,
@@ -56,25 +55,25 @@ struct async_result<experimental::use_coro_t<Allocator>, R()>
 
 template <typename Allocator, typename R>
 struct async_result<
-    experimental::use_coro_t<Allocator>, R(boost::system::error_code)>
+    experimental::use_coro_t<Allocator>, R(asio::error_code)>
 {
   template <typename Initiation, typename... InitArgs>
   static auto initiate_impl(Initiation initiation,
       std::allocator_arg_t, Allocator, InitArgs... args)
     -> experimental::coro<void() noexcept, void,
-      boost::asio::associated_executor_t<Initiation>, Allocator>
+      asio::associated_executor_t<Initiation>, Allocator>
   {
     co_await deferred_async_operation<
-      R(boost::system::error_code), Initiation, InitArgs...>(
+      R(asio::error_code), Initiation, InitArgs...>(
         deferred_init_tag{}, std::move(initiation), std::move(args)...);
   }
 
   template <typename... InitArgs>
   static auto initiate_impl(
-      boost::asio::detail::initiation_archetype<R(boost::system::error_code)>,
+      asio::detail::initiation_archetype<R(asio::error_code)>,
       std::allocator_arg_t, Allocator, InitArgs... args)
     -> experimental::coro<void(), void,
-      boost::asio::any_io_executor, Allocator>;
+      asio::any_io_executor, Allocator>;
 
   template <typename Initiation, typename... InitArgs>
   static auto initiate(Initiation initiation,
@@ -93,7 +92,7 @@ struct async_result<
   static auto initiate_impl(Initiation initiation,
       std::allocator_arg_t, Allocator, InitArgs... args)
     -> experimental::coro<void(), void,
-      boost::asio::associated_executor_t<Initiation>, Allocator>
+      asio::associated_executor_t<Initiation>, Allocator>
   {
     co_await deferred_async_operation<
       R(std::exception_ptr), Initiation, InitArgs...>(
@@ -102,10 +101,10 @@ struct async_result<
 
   template <typename... InitArgs>
   static auto initiate_impl(
-      boost::asio::detail::initiation_archetype<R(std::exception_ptr)>,
+      asio::detail::initiation_archetype<R(std::exception_ptr)>,
       std::allocator_arg_t, Allocator, InitArgs... args)
     -> experimental::coro<void(), void,
-      boost::asio::any_io_executor, Allocator>;
+      asio::any_io_executor, Allocator>;
 
   template <typename Initiation, typename... InitArgs>
   static auto initiate(Initiation initiation,
@@ -124,17 +123,17 @@ struct async_result<experimental::use_coro_t<Allocator>, R(T)>
   static auto initiate_impl(Initiation initiation,
       std::allocator_arg_t, Allocator, InitArgs... args)
     -> experimental::coro<void() noexcept, T,
-      boost::asio::associated_executor_t<Initiation>, Allocator>
+      asio::associated_executor_t<Initiation>, Allocator>
   {
     co_return co_await deferred_async_operation<R(T), Initiation, InitArgs...>(
         deferred_init_tag{}, std::move(initiation), std::move(args)...);
   }
 
   template <typename... InitArgs>
-  static auto initiate_impl(boost::asio::detail::initiation_archetype<R(T)>,
+  static auto initiate_impl(asio::detail::initiation_archetype<R(T)>,
       std::allocator_arg_t, Allocator, InitArgs... args)
     -> experimental::coro<void() noexcept, T,
-      boost::asio::any_io_executor, Allocator>;
+      asio::any_io_executor, Allocator>;
 
   template <typename Initiation, typename... InitArgs>
   static auto initiate(Initiation initiation,
@@ -147,25 +146,25 @@ struct async_result<experimental::use_coro_t<Allocator>, R(T)>
 
 template <typename Allocator, typename R, typename T>
 struct async_result<
-    experimental::use_coro_t<Allocator>, R(boost::system::error_code, T)>
+    experimental::use_coro_t<Allocator>, R(asio::error_code, T)>
 {
   template <typename Initiation, typename... InitArgs>
   static auto initiate_impl(Initiation initiation,
       std::allocator_arg_t, Allocator, InitArgs... args)
     -> experimental::coro<void(), T,
-      boost::asio::associated_executor_t<Initiation>, Allocator>
+      asio::associated_executor_t<Initiation>, Allocator>
   {
     co_return co_await deferred_async_operation<
-      R(boost::system::error_code, T), Initiation, InitArgs...>(
+      R(asio::error_code, T), Initiation, InitArgs...>(
         deferred_init_tag{}, std::move(initiation), std::move(args)...);
   }
 
   template <typename... InitArgs>
   static auto initiate_impl(
-      boost::asio::detail::initiation_archetype<
-        R(boost::system::error_code, T)>,
+      asio::detail::initiation_archetype<
+        R(asio::error_code, T)>,
       std::allocator_arg_t, Allocator, InitArgs... args)
-    -> experimental::coro<void(), T, boost::asio::any_io_executor, Allocator>;
+    -> experimental::coro<void(), T, asio::any_io_executor, Allocator>;
 
   template <typename Initiation, typename... InitArgs>
   static auto initiate(Initiation initiation,
@@ -184,7 +183,7 @@ struct async_result<
   static auto initiate_impl(Initiation initiation,
       std::allocator_arg_t, Allocator, InitArgs... args)
     -> experimental::coro<void(), T,
-      boost::asio::associated_executor_t<Initiation>, Allocator>
+      asio::associated_executor_t<Initiation>, Allocator>
   {
     co_return co_await deferred_async_operation<
       R(std::exception_ptr, T), Initiation, InitArgs...>(
@@ -193,9 +192,9 @@ struct async_result<
 
   template <typename... InitArgs>
   static auto initiate_impl(
-      boost::asio::detail::initiation_archetype<R(std::exception_ptr, T)>,
+      asio::detail::initiation_archetype<R(std::exception_ptr, T)>,
       std::allocator_arg_t, Allocator, InitArgs... args)
-    -> experimental::coro<void(), T, boost::asio::any_io_executor, Allocator>;
+    -> experimental::coro<void(), T, asio::any_io_executor, Allocator>;
 
   template <typename Initiation, typename... InitArgs>
   static auto initiate(Initiation initiation,
@@ -209,8 +208,7 @@ struct async_result<
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_EXPERIMENTAL_IMPL_USE_CORO_HPP
+#endif // ASIO_EXPERIMENTAL_IMPL_USE_CORO_HPP

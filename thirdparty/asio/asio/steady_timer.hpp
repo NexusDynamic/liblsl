@@ -8,18 +8,17 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_STEADY_TIMER_HPP
-#define BOOST_ASIO_STEADY_TIMER_HPP
+#ifndef ASIO_STEADY_TIMER_HPP
+#define ASIO_STEADY_TIMER_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/basic_waitable_timer.hpp>
-#include <boost/asio/detail/chrono.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/basic_waitable_timer.hpp"
+#include "asio/detail/chrono.hpp"
 
-namespace boost {
 namespace asio {
 
 /// Typedef for a timer based on the steady clock.
@@ -34,6 +33,5 @@ namespace asio {
 typedef basic_waitable_timer<chrono::steady_clock> steady_timer;
 
 } // namespace asio
-} // namespace boost
 
-#endif // BOOST_ASIO_STEADY_TIMER_HPP
+#endif // ASIO_STEADY_TIMER_HPP

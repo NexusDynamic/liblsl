@@ -24,9 +24,9 @@
 // Intel C++
 
 # if (__GNUC__ == 4 && __GNUC_MINOR__ >= 1) || (__GNUC__ > 4)
-#  if !defined(BOOST_ASIO_DISABLE_VISIBILITY)
+#  if !defined(ASIO_DISABLE_VISIBILITY)
 #   pragma GCC visibility pop
-#  endif // !defined(BOOST_ASIO_DISABLE_VISIBILITY)
+#  endif // !defined(ASIO_DISABLE_VISIBILITY)
 # endif // (__GNUC__ == 4 && __GNUC_MINOR__ >= 1) || (__GNUC__ > 4)
 
 # pragma pop_macro ("emit")
@@ -39,18 +39,18 @@
 
 # if defined(__OBJC__)
 #  if !defined(__APPLE_CC__) || (__APPLE_CC__ <= 1)
-#   if defined(BOOST_ASIO_OBJC_WORKAROUND)
+#   if defined(ASIO_OBJC_WORKAROUND)
 #    undef Protocol
 #    undef id
-#    undef BOOST_ASIO_OBJC_WORKAROUND
+#    undef ASIO_OBJC_WORKAROUND
 #   endif
 #  endif
 # endif
 
 # if !defined(_WIN32) && !defined(__WIN32__) && !defined(WIN32)
-#  if !defined(BOOST_ASIO_DISABLE_VISIBILITY)
+#  if !defined(ASIO_DISABLE_VISIBILITY)
 #   pragma GCC visibility pop
-#  endif // !defined(BOOST_ASIO_DISABLE_VISIBILITY)
+#  endif // !defined(ASIO_DISABLE_VISIBILITY)
 # endif // !defined(_WIN32) && !defined(__WIN32__) && !defined(WIN32)
 
 # pragma GCC diagnostic pop
@@ -69,18 +69,18 @@
 
 # if defined(__OBJC__)
 #  if !defined(__APPLE_CC__) || (__APPLE_CC__ <= 1)
-#   if defined(BOOST_ASIO_OBJC_WORKAROUND)
+#   if defined(ASIO_OBJC_WORKAROUND)
 #    undef Protocol
 #    undef id
-#    undef BOOST_ASIO_OBJC_WORKAROUND
+#    undef ASIO_OBJC_WORKAROUND
 #   endif
 #  endif
 # endif
 
 # if (__GNUC__ == 4 && __GNUC_MINOR__ >= 1) || (__GNUC__ > 4)
-#  if !defined(BOOST_ASIO_DISABLE_VISIBILITY)
+#  if !defined(ASIO_DISABLE_VISIBILITY)
 #   pragma GCC visibility pop
-#  endif // !defined(BOOST_ASIO_DISABLE_VISIBILITY)
+#  endif // !defined(ASIO_DISABLE_VISIBILITY)
 # endif // (__GNUC__ == 4 && __GNUC_MINOR__ >= 1) || (__GNUC__ > 4)
 
 # pragma GCC diagnostic pop
@@ -144,9 +144,9 @@
 # pragma pack (pop)
 
 # if defined(__cplusplus_cli) || defined(__cplusplus_winrt)
-#  if defined(BOOST_ASIO_CLR_WORKAROUND)
+#  if defined(ASIO_CLR_WORKAROUND)
 #   undef generic
-#   undef BOOST_ASIO_CLR_WORKAROUND
+#   undef ASIO_CLR_WORKAROUND
 #  endif
 # endif
 

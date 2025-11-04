@@ -8,26 +8,25 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_ASSOCIATED_IMMEDIATE_EXECUTOR_HPP
-#define BOOST_ASIO_ASSOCIATED_IMMEDIATE_EXECUTOR_HPP
+#ifndef ASIO_ASSOCIATED_IMMEDIATE_EXECUTOR_HPP
+#define ASIO_ASSOCIATED_IMMEDIATE_EXECUTOR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/associator.hpp>
-#include <boost/asio/detail/functional.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/execution/blocking.hpp>
-#include <boost/asio/execution/executor.hpp>
-#include <boost/asio/execution_context.hpp>
-#include <boost/asio/is_executor.hpp>
-#include <boost/asio/require.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/associator.hpp"
+#include "asio/detail/functional.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/execution/blocking.hpp"
+#include "asio/execution/executor.hpp"
+#include "asio/execution_context.hpp"
+#include "asio/is_executor.hpp"
+#include "asio/require.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 template <typename T, typename Executor>
@@ -53,9 +52,9 @@ struct default_immediate_executor
   typedef decay_t<require_result_t<E, execution::blocking_t::never_t>> type;
 
   static auto get(const E& e) noexcept
-    -> decltype(boost::asio::require(e, execution::blocking.never))
+    -> decltype(asio::require(e, execution::blocking.never))
   {
-    return boost::asio::require(e, execution::blocking.never);
+    return asio::require(e, execution::blocking.never);
   }
 };
 
@@ -191,7 +190,7 @@ struct associated_immediate_executor
 
   /// If @c T has a nested type @c immediate_executor_type, returns
   /// <tt>t.get_immediate_executor()</tt>. Otherwise returns
-  /// <tt>boost::asio::require(ex, boost::asio::execution::blocking.never)</tt>.
+  /// <tt>asio::require(ex, asio::execution::blocking.never)</tt>.
   static decltype(auto) get(const T& t, const Executor& ex) noexcept;
 #endif // defined(GENERATING_DOCUMENTATION)
 };
@@ -201,7 +200,7 @@ struct associated_immediate_executor
  * @returns <tt>associated_immediate_executor<T, Executor>::get(t, ex)</tt>
  */
 template <typename T, typename Executor>
-BOOST_ASIO_NODISCARD inline auto get_associated_immediate_executor(
+ASIO_NODISCARD inline auto get_associated_immediate_executor(
     const T& t, const Executor& ex,
     constraint_t<
       is_executor<Executor>::value || execution::is_executor<Executor>::value
@@ -217,7 +216,7 @@ BOOST_ASIO_NODISCARD inline auto get_associated_immediate_executor(
  * ExecutionContext::executor_type>::get(t, ctx.get_executor())</tt>
  */
 template <typename T, typename ExecutionContext>
-BOOST_ASIO_NODISCARD inline typename associated_immediate_executor<T,
+ASIO_NODISCARD inline typename associated_immediate_executor<T,
     typename ExecutionContext::executor_type>::type
 get_associated_immediate_executor(const T& t, ExecutionContext& ctx,
     constraint_t<
@@ -276,8 +275,7 @@ struct associated_immediate_executor<reference_wrapper<T>, Executor>
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_ASSOCIATED_IMMEDIATE_EXECUTOR_HPP
+#endif // ASIO_ASSOCIATED_IMMEDIATE_EXECUTOR_HPP

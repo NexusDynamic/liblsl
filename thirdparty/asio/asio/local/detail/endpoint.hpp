@@ -9,25 +9,24 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_LOCAL_DETAIL_ENDPOINT_HPP
-#define BOOST_ASIO_LOCAL_DETAIL_ENDPOINT_HPP
+#ifndef ASIO_LOCAL_DETAIL_ENDPOINT_HPP
+#define ASIO_LOCAL_DETAIL_ENDPOINT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)
+#if defined(ASIO_HAS_LOCAL_SOCKETS)
 
 #include <cstddef>
 #include <string>
-#include <boost/asio/detail/socket_types.hpp>
-#include <boost/asio/detail/string_view.hpp>
+#include "asio/detail/socket_types.hpp"
+#include "asio/detail/string_view.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace local {
 namespace detail {
@@ -37,18 +36,18 @@ class endpoint
 {
 public:
   // Default constructor.
-  BOOST_ASIO_DECL endpoint() noexcept;
+  ASIO_DECL endpoint() noexcept;
 
   // Construct an endpoint using the specified path name.
-  BOOST_ASIO_DECL endpoint(const char* path_name);
+  ASIO_DECL endpoint(const char* path_name);
 
   // Construct an endpoint using the specified path name.
-  BOOST_ASIO_DECL endpoint(const std::string& path_name);
+  ASIO_DECL endpoint(const std::string& path_name);
 
-  #if defined(BOOST_ASIO_HAS_STRING_VIEW)
+  #if defined(ASIO_HAS_STRING_VIEW)
   // Construct an endpoint using the specified path name.
-  BOOST_ASIO_DECL endpoint(string_view path_name);
-  #endif // defined(BOOST_ASIO_HAS_STRING_VIEW)
+  ASIO_DECL endpoint(string_view path_name);
+  #endif // defined(ASIO_HAS_STRING_VIEW)
 
   // Copy constructor.
   endpoint(const endpoint& other) noexcept
@@ -66,13 +65,13 @@ public:
   }
 
   // Get the underlying endpoint in the native type.
-  boost::asio::detail::socket_addr_type* data() noexcept
+  asio::detail::socket_addr_type* data() noexcept
   {
     return &data_.base;
   }
 
   // Get the underlying endpoint in the native type.
-  const boost::asio::detail::socket_addr_type* data() const noexcept
+  const asio::detail::socket_addr_type* data() const noexcept
   {
     return &data_.base;
   }
@@ -81,61 +80,60 @@ public:
   std::size_t size() const noexcept
   {
     return path_length_
-      + offsetof(boost::asio::detail::sockaddr_un_type, sun_path);
+      + offsetof(asio::detail::sockaddr_un_type, sun_path);
   }
 
   // Set the underlying size of the endpoint in the native type.
-  BOOST_ASIO_DECL void resize(std::size_t size);
+  ASIO_DECL void resize(std::size_t size);
 
   // Get the capacity of the endpoint in the native type.
   std::size_t capacity() const noexcept
   {
-    return sizeof(boost::asio::detail::sockaddr_un_type);
+    return sizeof(asio::detail::sockaddr_un_type);
   }
 
   // Get the path associated with the endpoint.
-  BOOST_ASIO_DECL std::string path() const;
+  ASIO_DECL std::string path() const;
 
   // Set the path associated with the endpoint.
-  BOOST_ASIO_DECL void path(const char* p);
+  ASIO_DECL void path(const char* p);
 
   // Set the path associated with the endpoint.
-  BOOST_ASIO_DECL void path(const std::string& p);
+  ASIO_DECL void path(const std::string& p);
 
   // Compare two endpoints for equality.
-  BOOST_ASIO_DECL friend bool operator==(
+  ASIO_DECL friend bool operator==(
       const endpoint& e1, const endpoint& e2) noexcept;
 
   // Compare endpoints for ordering.
-  BOOST_ASIO_DECL friend bool operator<(
+  ASIO_DECL friend bool operator<(
       const endpoint& e1, const endpoint& e2) noexcept;
 
 private:
   // The underlying UNIX socket address.
   union data_union
   {
-    boost::asio::detail::socket_addr_type base;
-    boost::asio::detail::sockaddr_un_type local;
+    asio::detail::socket_addr_type base;
+    asio::detail::sockaddr_un_type local;
   } data_;
 
   // The length of the path associated with the endpoint.
   std::size_t path_length_;
 
   // Initialise with a specified path.
-  BOOST_ASIO_DECL void init(const char* path, std::size_t path_length);
+  ASIO_DECL void init(const char* path, std::size_t path_length);
 };
 
 } // namespace detail
 } // namespace local
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#if defined(BOOST_ASIO_HEADER_ONLY)
-# include <boost/asio/local/detail/impl/endpoint.ipp>
-#endif // defined(BOOST_ASIO_HEADER_ONLY)
+#if defined(ASIO_HEADER_ONLY)
+# include "asio/local/detail/impl/endpoint.ipp"
+#endif // defined(ASIO_HEADER_ONLY)
 
-#endif // defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)
+#endif // defined(ASIO_HAS_LOCAL_SOCKETS)
 
-#endif // BOOST_ASIO_LOCAL_DETAIL_ENDPOINT_HPP
+#endif // ASIO_LOCAL_DETAIL_ENDPOINT_HPP

@@ -8,19 +8,18 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_COMPOSE_HPP
-#define BOOST_ASIO_COMPOSE_HPP
+#ifndef ASIO_COMPOSE_HPP
+#define ASIO_COMPOSE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/composed.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/composed.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 /// Launch an asynchronous operation with a stateful implementation.
@@ -53,12 +52,12 @@ namespace asio {
  * @code struct async_echo_implementation
  * {
  *   tcp::socket& socket_;
- *   boost::asio::mutable_buffer buffer_;
+ *   asio::mutable_buffer buffer_;
  *   enum { starting, reading, writing } state_;
  *
  *   template <typename Self>
  *   void operator()(Self& self,
- *       boost::system::error_code error = {},
+ *       asio::error_code error = {},
  *       std::size_t n = 0)
  *   {
  *     switch (state_)
@@ -76,8 +75,8 @@ namespace asio {
  *       else
  *       {
  *         state_ = writing;
- *         boost::asio::async_write(socket_, buffer_,
- *             boost::asio::transfer_exactly(n),
+ *         asio::async_write(socket_, buffer_,
+ *             asio::transfer_exactly(n),
  *             std::move(self));
  *       }
  *       break;
@@ -90,16 +89,16 @@ namespace asio {
  *
  * template <typename CompletionToken>
  * auto async_echo(tcp::socket& socket,
- *     boost::asio::mutable_buffer buffer,
+ *     asio::mutable_buffer buffer,
  *     CompletionToken&& token)
  *   -> decltype(
- *     boost::asio::async_compose<CompletionToken,
- *       void(boost::system::error_code, std::size_t)>(
+ *     asio::async_compose<CompletionToken,
+ *       void(asio::error_code, std::size_t)>(
  *         std::declval<async_echo_implementation>(),
  *         token, socket))
  * {
- *   return boost::asio::async_compose<CompletionToken,
- *     void(boost::system::error_code, std::size_t)>(
+ *   return asio::async_compose<CompletionToken,
+ *     void(asio::error_code, std::size_t)>(
  *       async_echo_implementation{socket, buffer,
  *         async_echo_implementation::starting},
  *       token, socket);
@@ -123,8 +122,7 @@ inline auto async_compose(Implementation&& implementation,
 }
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_COMPOSE_HPP
+#endif // ASIO_COMPOSE_HPP

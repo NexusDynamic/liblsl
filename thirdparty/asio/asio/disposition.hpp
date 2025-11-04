@@ -8,23 +8,22 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DISPOSITION_HPP
-#define BOOST_ASIO_DISPOSITION_HPP
+#ifndef ASIO_DISPOSITION_HPP
+#define ASIO_DISPOSITION_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/throw_exception.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/system/error_code.hpp>
-#include <boost/system/system_error.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/throw_exception.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/error_code.hpp"
+#include "asio/system_error.hpp"
 #include <exception>
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 /// Traits type to adapt arbitrary error types as dispositions.
@@ -116,45 +115,45 @@ struct is_disposition :
 {
 };
 
-#if defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
 template <typename T>
 constexpr const bool is_disposition_v = is_disposition<T>::value;
 
-#endif // defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
-#if defined(BOOST_ASIO_HAS_CONCEPTS)
+#if defined(ASIO_HAS_CONCEPTS)
 
 template <typename T>
-BOOST_ASIO_CONCEPT disposition = is_disposition<T>::value;
+ASIO_CONCEPT disposition = is_disposition<T>::value;
 
-#define BOOST_ASIO_DISPOSITION ::boost::asio::disposition
+#define ASIO_DISPOSITION ::asio::disposition
 
-#else // defined(BOOST_ASIO_HAS_CONCEPTS)
+#else // defined(ASIO_HAS_CONCEPTS)
 
-#define BOOST_ASIO_DISPOSITION typename
+#define ASIO_DISPOSITION typename
 
-#endif // defined(BOOST_ASIO_HAS_CONCEPTS)
+#endif // defined(ASIO_HAS_CONCEPTS)
 
 /// Specialisation of @c disposition_traits for @c error_code.
 template <>
-struct disposition_traits<boost::system::error_code>
+struct disposition_traits<asio::error_code>
 {
-  static bool not_an_error(const boost::system::error_code& ec) noexcept
+  static bool not_an_error(const asio::error_code& ec) noexcept
   {
     return !ec;
   }
 
-  static void throw_exception(const boost::system::error_code& ec)
+  static void throw_exception(const asio::error_code& ec)
   {
-    detail::throw_exception(boost::system::system_error(ec));
+    detail::throw_exception(asio::system_error(ec));
   }
 
   static std::exception_ptr to_exception_ptr(
-      const boost::system::error_code& ec) noexcept
+      const asio::error_code& ec) noexcept
   {
     return ec
-      ? std::make_exception_ptr(boost::system::system_error(ec))
+      ? std::make_exception_ptr(asio::system_error(ec))
       : nullptr;
   }
 };
@@ -203,7 +202,7 @@ struct no_error_t
 
   /// Equality operator, returns true if the disposition does not contain an
   /// error.
-  template <BOOST_ASIO_DISPOSITION Disposition>
+  template <ASIO_DISPOSITION Disposition>
   friend constexpr constraint_t<is_disposition<Disposition>::value, bool>
   operator==(const no_error_t&, const Disposition& d) noexcept
   {
@@ -212,7 +211,7 @@ struct no_error_t
 
   /// Equality operator, returns true if the disposition does not contain an
   /// error.
-  template <BOOST_ASIO_DISPOSITION Disposition>
+  template <ASIO_DISPOSITION Disposition>
   friend constexpr constraint_t<is_disposition<Disposition>::value, bool>
   operator==(const Disposition& d, const no_error_t&) noexcept
   {
@@ -220,7 +219,7 @@ struct no_error_t
   }
 
   /// Inequality operator, returns true if the disposition contains an error.
-  template <BOOST_ASIO_DISPOSITION Disposition>
+  template <ASIO_DISPOSITION Disposition>
   friend constexpr constraint_t<is_disposition<Disposition>::value, bool>
   operator!=(const no_error_t&, const Disposition& d) noexcept
   {
@@ -228,7 +227,7 @@ struct no_error_t
   }
 
   /// Inequality operator, returns true if the disposition contains an error.
-  template <BOOST_ASIO_DISPOSITION Disposition>
+  template <ASIO_DISPOSITION Disposition>
   friend constexpr constraint_t<is_disposition<Disposition>::value, bool>
   operator!=(const Disposition& d, const no_error_t&) noexcept
   {
@@ -237,7 +236,7 @@ struct no_error_t
 };
 
 /// A special value used to indicate the absence of an error.
-BOOST_ASIO_INLINE_VARIABLE constexpr no_error_t no_error;
+ASIO_INLINE_VARIABLE constexpr no_error_t no_error;
 
 /// Specialisation of @c disposition_traits for @c no_error_t.
 template <>
@@ -277,8 +276,7 @@ inline std::exception_ptr to_exception_ptr(Disposition&& d,
 }
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DISPOSITION_HPP
+#endif // ASIO_DISPOSITION_HPP

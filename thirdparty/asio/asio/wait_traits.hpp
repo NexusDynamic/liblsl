@@ -8,16 +8,15 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_WAIT_TRAITS_HPP
-#define BOOST_ASIO_WAIT_TRAITS_HPP
+#ifndef ASIO_WAIT_TRAITS_HPP
+#define ASIO_WAIT_TRAITS_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 /// Wait traits suitable for use with the basic_waitable_timer class template.
@@ -51,8 +50,7 @@ struct wait_traits
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_WAIT_TRAITS_HPP
+#endif // ASIO_WAIT_TRAITS_HPP

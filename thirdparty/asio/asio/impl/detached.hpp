@@ -8,19 +8,18 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IMPL_DETACHED_HPP
-#define BOOST_ASIO_IMPL_DETACHED_HPP
+#ifndef ASIO_IMPL_DETACHED_HPP
+#define ASIO_IMPL_DETACHED_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/async_result.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/async_result.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -47,7 +46,7 @@ namespace detail {
 template <typename... Signatures>
 struct async_result<detached_t, Signatures...>
 {
-  typedef boost::asio::detail::detached_handler completion_handler_type;
+  typedef asio::detail::detached_handler completion_handler_type;
 
   typedef void return_type;
 
@@ -72,8 +71,7 @@ struct async_result<detached_t, Signatures...>
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_IMPL_DETACHED_HPP
+#endif // ASIO_IMPL_DETACHED_HPP

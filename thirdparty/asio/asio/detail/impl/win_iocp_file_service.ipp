@@ -8,25 +8,24 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_IMPL_WIN_IOCP_FILE_SERVICE_IPP
-#define BOOST_ASIO_DETAIL_IMPL_WIN_IOCP_FILE_SERVICE_IPP
+#ifndef ASIO_DETAIL_IMPL_WIN_IOCP_FILE_SERVICE_IPP
+#define ASIO_DETAIL_IMPL_WIN_IOCP_FILE_SERVICE_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_FILE) \
-  && defined(BOOST_ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE)
+#if defined(ASIO_HAS_FILE) \
+  && defined(ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE)
 
 #include <cstring>
 #include <sys/stat.h>
-#include <boost/asio/detail/win_iocp_file_service.hpp>
+#include "asio/detail/win_iocp_file_service.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -49,15 +48,15 @@ void win_iocp_file_service::shutdown()
   handle_service_.shutdown();
 }
 
-boost::system::error_code win_iocp_file_service::open(
+asio::error_code win_iocp_file_service::open(
     win_iocp_file_service::implementation_type& impl,
     const char* path, file_base::flags open_flags,
-    boost::system::error_code& ec)
+    asio::error_code& ec)
 {
   if (is_open(impl))
   {
-    ec = boost::asio::error::already_open;
-    BOOST_ASIO_ERROR_LOCATION(ec);
+    ec = asio::error::already_open;
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -107,8 +106,8 @@ boost::system::error_code win_iocp_file_service::open(
         {
           DWORD last_error = ::GetLastError();
           ::CloseHandle(handle);
-          ec.assign(last_error, boost::asio::error::get_system_category());
-          BOOST_ASIO_ERROR_LOCATION(ec);
+          ec.assign(last_error, asio::error::get_system_category());
+          ASIO_ERROR_LOCATION(ec);
           return ec;
         }
       }
@@ -127,8 +126,8 @@ boost::system::error_code win_iocp_file_service::open(
         {
           DWORD last_error = ::GetLastError();
           ::CloseHandle(handle);
-          ec.assign(last_error, boost::asio::error::get_system_category());
-          BOOST_ASIO_ERROR_LOCATION(ec);
+          ec.assign(last_error, asio::error::get_system_category());
+          ASIO_ERROR_LOCATION(ec);
           return ec;
         }
       }
@@ -137,40 +136,40 @@ boost::system::error_code win_iocp_file_service::open(
     handle_service_.assign(impl, handle, ec);
     if (ec)
       ::CloseHandle(handle);
-    BOOST_ASIO_ERROR_LOCATION(ec);
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
   else
   {
     DWORD last_error = ::GetLastError();
-    ec.assign(last_error, boost::asio::error::get_system_category());
-    BOOST_ASIO_ERROR_LOCATION(ec);
+    ec.assign(last_error, asio::error::get_system_category());
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 }
 
 uint64_t win_iocp_file_service::size(
     const win_iocp_file_service::implementation_type& impl,
-    boost::system::error_code& ec) const
+    asio::error_code& ec) const
 {
   LARGE_INTEGER result;
   if (::GetFileSizeEx(native_handle(impl), &result))
   {
-    boost::asio::error::clear(ec);
+    asio::error::clear(ec);
     return static_cast<uint64_t>(result.QuadPart);
   }
   else
   {
     DWORD last_error = ::GetLastError();
-    ec.assign(last_error, boost::asio::error::get_system_category());
-    BOOST_ASIO_ERROR_LOCATION(ec);
+    ec.assign(last_error, asio::error::get_system_category());
+    ASIO_ERROR_LOCATION(ec);
     return 0;
   }
 }
 
-boost::system::error_code win_iocp_file_service::resize(
+asio::error_code win_iocp_file_service::resize(
     win_iocp_file_service::implementation_type& impl,
-    uint64_t n, boost::system::error_code& ec)
+    uint64_t n, asio::error_code& ec)
 {
   LARGE_INTEGER distance;
   distance.QuadPart = n;
@@ -187,43 +186,43 @@ boost::system::error_code win_iocp_file_service::resize(
     }
 
     if (result)
-      boost::asio::error::clear(ec);
+      asio::error::clear(ec);
     else
-      ec.assign(last_error, boost::asio::error::get_system_category());
-    BOOST_ASIO_ERROR_LOCATION(ec);
+      ec.assign(last_error, asio::error::get_system_category());
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
   else
   {
     DWORD last_error = ::GetLastError();
-    ec.assign(last_error, boost::asio::error::get_system_category());
-    BOOST_ASIO_ERROR_LOCATION(ec);
+    ec.assign(last_error, asio::error::get_system_category());
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 }
 
-boost::system::error_code win_iocp_file_service::sync_all(
+asio::error_code win_iocp_file_service::sync_all(
     win_iocp_file_service::implementation_type& impl,
-    boost::system::error_code& ec)
+    asio::error_code& ec)
 {
   BOOL result = ::FlushFileBuffers(native_handle(impl));
   if (result)
   {
-    boost::asio::error::clear(ec);
+    asio::error::clear(ec);
     return ec;
   }
   else
   {
     DWORD last_error = ::GetLastError();
-    ec.assign(last_error, boost::asio::error::get_system_category());
-    BOOST_ASIO_ERROR_LOCATION(ec);
+    ec.assign(last_error, asio::error::get_system_category());
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 }
 
-boost::system::error_code win_iocp_file_service::sync_data(
+asio::error_code win_iocp_file_service::sync_data(
     win_iocp_file_service::implementation_type& impl,
-    boost::system::error_code& ec)
+    asio::error_code& ec)
 {
   if (nt_flush_buffers_file_ex_)
   {
@@ -231,7 +230,7 @@ boost::system::error_code win_iocp_file_service::sync_data(
     if (!nt_flush_buffers_file_ex_(native_handle(impl),
           flush_flags_file_data_sync_only, 0, 0, &status))
     {
-      boost::asio::error::clear(ec);
+      asio::error::clear(ec);
       return ec;
     }
   }
@@ -240,7 +239,7 @@ boost::system::error_code win_iocp_file_service::sync_data(
 
 uint64_t win_iocp_file_service::seek(
     win_iocp_file_service::implementation_type& impl, int64_t offset,
-    file_base::seek_basis whence, boost::system::error_code& ec)
+    file_base::seek_basis whence, asio::error_code& ec)
 {
   DWORD method;
   switch (whence)
@@ -256,8 +255,8 @@ uint64_t win_iocp_file_service::seek(
     method = FILE_END;
     break;
   default:
-    ec = boost::asio::error::invalid_argument;
-    BOOST_ASIO_ERROR_LOCATION(ec);
+    ec = asio::error::invalid_argument;
+    ASIO_ERROR_LOCATION(ec);
     return 0;
   }
 
@@ -266,25 +265,24 @@ uint64_t win_iocp_file_service::seek(
   if (::SetFilePointerEx(native_handle(impl), distance, &new_offset, method))
   {
     impl.offset_ = new_offset.QuadPart;
-    boost::asio::error::clear(ec);
+    asio::error::clear(ec);
     return impl.offset_;
   }
   else
   {
     DWORD last_error = ::GetLastError();
-    ec.assign(last_error, boost::asio::error::get_system_category());
-    BOOST_ASIO_ERROR_LOCATION(ec);
+    ec.assign(last_error, asio::error::get_system_category());
+    ASIO_ERROR_LOCATION(ec);
     return 0;
   }
 }
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // defined(BOOST_ASIO_HAS_FILE)
-       //   && defined(BOOST_ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE)
+#endif // defined(ASIO_HAS_FILE)
+       //   && defined(ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE)
 
-#endif // BOOST_ASIO_DETAIL_IMPL_WIN_IOCP_FILE_SERVICE_IPP
+#endif // ASIO_DETAIL_IMPL_WIN_IOCP_FILE_SERVICE_IPP

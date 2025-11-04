@@ -8,37 +8,36 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_IMPL_HANDLER_TRACKING_IPP
-#define BOOST_ASIO_DETAIL_IMPL_HANDLER_TRACKING_IPP
+#ifndef ASIO_DETAIL_IMPL_HANDLER_TRACKING_IPP
+#define ASIO_DETAIL_IMPL_HANDLER_TRACKING_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_CUSTOM_HANDLER_TRACKING)
+#if defined(ASIO_CUSTOM_HANDLER_TRACKING)
 
 // The handler tracking implementation is provided by the user-specified header.
 
-#elif defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#elif defined(ASIO_ENABLE_HANDLER_TRACKING)
 
 #include <cstdarg>
 #include <cstdio>
-#include <boost/asio/detail/chrono.hpp>
-#include <boost/asio/detail/chrono_time_traits.hpp>
-#include <boost/asio/detail/handler_tracking.hpp>
-#include <boost/asio/wait_traits.hpp>
+#include "asio/detail/chrono.hpp"
+#include "asio/detail/chrono_time_traits.hpp"
+#include "asio/detail/handler_tracking.hpp"
+#include "asio/wait_traits.hpp"
 
-#if defined(BOOST_ASIO_WINDOWS_RUNTIME)
-# include <boost/asio/detail/socket_types.hpp>
-#elif !defined(BOOST_ASIO_WINDOWS)
+#if defined(ASIO_WINDOWS_RUNTIME)
+# include "asio/detail/socket_types.hpp"
+#elif !defined(ASIO_WINDOWS)
 # include <unistd.h>
-#endif // !defined(BOOST_ASIO_WINDOWS)
+#endif // !defined(ASIO_WINDOWS)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -50,7 +49,7 @@ struct handler_tracking_timestamp
   handler_tracking_timestamp()
   {
     typedef chrono_time_traits<chrono::system_clock,
-        boost::asio::wait_traits<chrono::system_clock>> traits_helper;
+        asio::wait_traits<chrono::system_clock>> traits_helper;
     traits_helper::posix_time_duration now(
         chrono::system_clock::now().time_since_epoch());
     seconds = static_cast<uint64_t>(now.total_seconds());
@@ -68,7 +67,7 @@ struct handler_tracking::tracking_state
 
 handler_tracking::tracking_state* handler_tracking::get_state()
 {
-  static tracking_state state = { BOOST_ASIO_STATIC_MUTEX_INIT, 1, 0, 0 };
+  static tracking_state state = { ASIO_STATIC_MUTEX_INIT, 1, 0, 0 };
   return &state;
 }
 
@@ -123,11 +122,11 @@ void handler_tracking::creation(execution_context&,
       current_location; current_location = current_location->next_)
   {
     write_line(
-#if defined(BOOST_ASIO_WINDOWS)
+#if defined(ASIO_WINDOWS)
         "@asio|%I64u.%06I64u|%I64u^%I64u|%s%s%.80s%s(%.80s:%d)\n",
-#else // defined(BOOST_ASIO_WINDOWS)
+#else // defined(ASIO_WINDOWS)
         "@asio|%llu.%06llu|%llu^%llu|%s%s%.80s%s(%.80s:%d)\n",
-#endif // defined(BOOST_ASIO_WINDOWS)
+#endif // defined(ASIO_WINDOWS)
         timestamp.seconds, timestamp.microseconds,
         current_id, h.id_,
         current_location == *state->current_location_ ? "in " : "called from ",
@@ -138,11 +137,11 @@ void handler_tracking::creation(execution_context&,
   }
 
   write_line(
-#if defined(BOOST_ASIO_WINDOWS)
+#if defined(ASIO_WINDOWS)
       "@asio|%I64u.%06I64u|%I64u*%I64u|%.20s@%p.%.50s\n",
-#else // defined(BOOST_ASIO_WINDOWS)
+#else // defined(ASIO_WINDOWS)
       "@asio|%llu.%06llu|%llu*%llu|%.20s@%p.%.50s\n",
-#endif // defined(BOOST_ASIO_WINDOWS)
+#endif // defined(ASIO_WINDOWS)
       timestamp.seconds, timestamp.microseconds,
       current_id, h.id_, object_type, object, op_name);
 }
@@ -163,11 +162,11 @@ handler_tracking::completion::~completion()
     handler_tracking_timestamp timestamp;
 
     write_line(
-#if defined(BOOST_ASIO_WINDOWS)
+#if defined(ASIO_WINDOWS)
         "@asio|%I64u.%06I64u|%c%I64u|\n",
-#else // defined(BOOST_ASIO_WINDOWS)
+#else // defined(ASIO_WINDOWS)
         "@asio|%llu.%06llu|%c%llu|\n",
-#endif // defined(BOOST_ASIO_WINDOWS)
+#endif // defined(ASIO_WINDOWS)
         timestamp.seconds, timestamp.microseconds,
         invoked_ ? '!' : '~', id_);
   }
@@ -180,27 +179,27 @@ void handler_tracking::completion::invocation_begin()
   handler_tracking_timestamp timestamp;
 
   write_line(
-#if defined(BOOST_ASIO_WINDOWS)
+#if defined(ASIO_WINDOWS)
       "@asio|%I64u.%06I64u|>%I64u|\n",
-#else // defined(BOOST_ASIO_WINDOWS)
+#else // defined(ASIO_WINDOWS)
       "@asio|%llu.%06llu|>%llu|\n",
-#endif // defined(BOOST_ASIO_WINDOWS)
+#endif // defined(ASIO_WINDOWS)
       timestamp.seconds, timestamp.microseconds, id_);
 
   invoked_ = true;
 }
 
 void handler_tracking::completion::invocation_begin(
-    const boost::system::error_code& ec)
+    const asio::error_code& ec)
 {
   handler_tracking_timestamp timestamp;
 
   write_line(
-#if defined(BOOST_ASIO_WINDOWS)
+#if defined(ASIO_WINDOWS)
       "@asio|%I64u.%06I64u|>%I64u|ec=%.20s:%d\n",
-#else // defined(BOOST_ASIO_WINDOWS)
+#else // defined(ASIO_WINDOWS)
       "@asio|%llu.%06llu|>%llu|ec=%.20s:%d\n",
-#endif // defined(BOOST_ASIO_WINDOWS)
+#endif // defined(ASIO_WINDOWS)
       timestamp.seconds, timestamp.microseconds,
       id_, ec.category().name(), ec.value());
 
@@ -208,16 +207,16 @@ void handler_tracking::completion::invocation_begin(
 }
 
 void handler_tracking::completion::invocation_begin(
-    const boost::system::error_code& ec, std::size_t bytes_transferred)
+    const asio::error_code& ec, std::size_t bytes_transferred)
 {
   handler_tracking_timestamp timestamp;
 
   write_line(
-#if defined(BOOST_ASIO_WINDOWS)
+#if defined(ASIO_WINDOWS)
       "@asio|%I64u.%06I64u|>%I64u|ec=%.20s:%d,bytes_transferred=%I64u\n",
-#else // defined(BOOST_ASIO_WINDOWS)
+#else // defined(ASIO_WINDOWS)
       "@asio|%llu.%06llu|>%llu|ec=%.20s:%d,bytes_transferred=%llu\n",
-#endif // defined(BOOST_ASIO_WINDOWS)
+#endif // defined(ASIO_WINDOWS)
       timestamp.seconds, timestamp.microseconds,
       id_, ec.category().name(), ec.value(),
       static_cast<uint64_t>(bytes_transferred));
@@ -226,16 +225,16 @@ void handler_tracking::completion::invocation_begin(
 }
 
 void handler_tracking::completion::invocation_begin(
-    const boost::system::error_code& ec, int signal_number)
+    const asio::error_code& ec, int signal_number)
 {
   handler_tracking_timestamp timestamp;
 
   write_line(
-#if defined(BOOST_ASIO_WINDOWS)
+#if defined(ASIO_WINDOWS)
       "@asio|%I64u.%06I64u|>%I64u|ec=%.20s:%d,signal_number=%d\n",
-#else // defined(BOOST_ASIO_WINDOWS)
+#else // defined(ASIO_WINDOWS)
       "@asio|%llu.%06llu|>%llu|ec=%.20s:%d,signal_number=%d\n",
-#endif // defined(BOOST_ASIO_WINDOWS)
+#endif // defined(ASIO_WINDOWS)
       timestamp.seconds, timestamp.microseconds,
       id_, ec.category().name(), ec.value(), signal_number);
 
@@ -243,16 +242,16 @@ void handler_tracking::completion::invocation_begin(
 }
 
 void handler_tracking::completion::invocation_begin(
-    const boost::system::error_code& ec, const char* arg)
+    const asio::error_code& ec, const char* arg)
 {
   handler_tracking_timestamp timestamp;
 
   write_line(
-#if defined(BOOST_ASIO_WINDOWS)
+#if defined(ASIO_WINDOWS)
       "@asio|%I64u.%06I64u|>%I64u|ec=%.20s:%d,%.50s\n",
-#else // defined(BOOST_ASIO_WINDOWS)
+#else // defined(ASIO_WINDOWS)
       "@asio|%llu.%06llu|>%llu|ec=%.20s:%d,%.50s\n",
-#endif // defined(BOOST_ASIO_WINDOWS)
+#endif // defined(ASIO_WINDOWS)
       timestamp.seconds, timestamp.microseconds,
       id_, ec.category().name(), ec.value(), arg);
 
@@ -266,11 +265,11 @@ void handler_tracking::completion::invocation_end()
     handler_tracking_timestamp timestamp;
 
     write_line(
-#if defined(BOOST_ASIO_WINDOWS)
+#if defined(ASIO_WINDOWS)
         "@asio|%I64u.%06I64u|<%I64u|\n",
-#else // defined(BOOST_ASIO_WINDOWS)
+#else // defined(ASIO_WINDOWS)
         "@asio|%llu.%06llu|<%llu|\n",
-#endif // defined(BOOST_ASIO_WINDOWS)
+#endif // defined(ASIO_WINDOWS)
         timestamp.seconds, timestamp.microseconds, id_);
 
     id_ = 0;
@@ -290,11 +289,11 @@ void handler_tracking::operation(execution_context&,
     current_id = current_completion->id_;
 
   write_line(
-#if defined(BOOST_ASIO_WINDOWS)
+#if defined(ASIO_WINDOWS)
       "@asio|%I64u.%06I64u|%I64u|%.20s@%p.%.50s\n",
-#else // defined(BOOST_ASIO_WINDOWS)
+#else // defined(ASIO_WINDOWS)
       "@asio|%llu.%06llu|%llu|%.20s@%p.%.50s\n",
-#endif // defined(BOOST_ASIO_WINDOWS)
+#endif // defined(ASIO_WINDOWS)
       timestamp.seconds, timestamp.microseconds,
       current_id, object_type, object, op_name);
 }
@@ -316,32 +315,32 @@ void handler_tracking::reactor_events(execution_context& /*context*/,
 
 void handler_tracking::reactor_operation(
     const tracked_handler& h, const char* op_name,
-    const boost::system::error_code& ec)
+    const asio::error_code& ec)
 {
   handler_tracking_timestamp timestamp;
 
   write_line(
-#if defined(BOOST_ASIO_WINDOWS)
+#if defined(ASIO_WINDOWS)
       "@asio|%I64u.%06I64u|.%I64u|%s,ec=%.20s:%d\n",
-#else // defined(BOOST_ASIO_WINDOWS)
+#else // defined(ASIO_WINDOWS)
       "@asio|%llu.%06llu|.%llu|%s,ec=%.20s:%d\n",
-#endif // defined(BOOST_ASIO_WINDOWS)
+#endif // defined(ASIO_WINDOWS)
       timestamp.seconds, timestamp.microseconds,
       h.id_, op_name, ec.category().name(), ec.value());
 }
 
 void handler_tracking::reactor_operation(
     const tracked_handler& h, const char* op_name,
-    const boost::system::error_code& ec, std::size_t bytes_transferred)
+    const asio::error_code& ec, std::size_t bytes_transferred)
 {
   handler_tracking_timestamp timestamp;
 
   write_line(
-#if defined(BOOST_ASIO_WINDOWS)
+#if defined(ASIO_WINDOWS)
       "@asio|%I64u.%06I64u|.%I64u|%s,ec=%.20s:%d,bytes_transferred=%I64u\n",
-#else // defined(BOOST_ASIO_WINDOWS)
+#else // defined(ASIO_WINDOWS)
       "@asio|%llu.%06llu|.%llu|%s,ec=%.20s:%d,bytes_transferred=%llu\n",
-#endif // defined(BOOST_ASIO_WINDOWS)
+#endif // defined(ASIO_WINDOWS)
       timestamp.seconds, timestamp.microseconds,
       h.id_, op_name, ec.category().name(), ec.value(),
       static_cast<uint64_t>(bytes_transferred));
@@ -355,35 +354,34 @@ void handler_tracking::write_line(const char* format, ...)
   va_start(args, format);
 
   char line[256] = "";
-#if defined(BOOST_ASIO_HAS_SNPRINTF)
+#if defined(ASIO_HAS_SNPRINTF)
   int length = vsnprintf(line, sizeof(line), format, args);
-#elif defined(BOOST_ASIO_HAS_SECURE_RTL)
+#elif defined(ASIO_HAS_SECURE_RTL)
   int length = vsprintf_s(line, sizeof(line), format, args);
-#else // defined(BOOST_ASIO_HAS_SECURE_RTL)
+#else // defined(ASIO_HAS_SECURE_RTL)
   int length = vsprintf(line, format, args);
-#endif // defined(BOOST_ASIO_HAS_SECURE_RTL)
+#endif // defined(ASIO_HAS_SECURE_RTL)
 
   va_end(args);
 
-#if defined(BOOST_ASIO_WINDOWS_RUNTIME)
+#if defined(ASIO_WINDOWS_RUNTIME)
   wchar_t wline[256] = L"";
   mbstowcs_s(0, wline, sizeof(wline) / sizeof(wchar_t), line, length);
   ::OutputDebugStringW(wline);
-#elif defined(BOOST_ASIO_WINDOWS)
+#elif defined(ASIO_WINDOWS)
   HANDLE stderr_handle = ::GetStdHandle(STD_ERROR_HANDLE);
   DWORD bytes_written = 0;
   ::WriteFile(stderr_handle, line, length, &bytes_written, 0);
-#else // defined(BOOST_ASIO_WINDOWS)
+#else // defined(ASIO_WINDOWS)
   ::write(STDERR_FILENO, line, length);
-#endif // defined(BOOST_ASIO_WINDOWS)
+#endif // defined(ASIO_WINDOWS)
 }
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
 
-#endif // BOOST_ASIO_DETAIL_IMPL_HANDLER_TRACKING_IPP
+#endif // ASIO_DETAIL_IMPL_HANDLER_TRACKING_IPP

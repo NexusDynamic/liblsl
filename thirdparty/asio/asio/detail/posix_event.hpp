@@ -8,25 +8,24 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_POSIX_EVENT_HPP
-#define BOOST_ASIO_DETAIL_POSIX_EVENT_HPP
+#ifndef ASIO_DETAIL_POSIX_EVENT_HPP
+#define ASIO_DETAIL_POSIX_EVENT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_PTHREADS)
+#if defined(ASIO_HAS_PTHREADS)
 
 #include <cstddef>
 #include <pthread.h>
-#include <boost/asio/detail/assert.hpp>
-#include <boost/asio/detail/noncopyable.hpp>
+#include "asio/detail/assert.hpp"
+#include "asio/detail/noncopyable.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -35,7 +34,7 @@ class posix_event
 {
 public:
   // Constructor.
-  BOOST_ASIO_DECL posix_event();
+  ASIO_DECL posix_event();
 
   // Destructor.
   ~posix_event()
@@ -54,7 +53,7 @@ public:
   template <typename Lock>
   void signal_all(Lock& lock)
   {
-    BOOST_ASIO_ASSERT(lock.locked());
+    ASIO_ASSERT(lock.locked());
     (void)lock;
     state_ |= 1;
     ::pthread_cond_broadcast(&cond_); // Ignore EINVAL.
@@ -64,7 +63,7 @@ public:
   template <typename Lock>
   void unlock_and_signal_one(Lock& lock)
   {
-    BOOST_ASIO_ASSERT(lock.locked());
+    ASIO_ASSERT(lock.locked());
     state_ |= 1;
     bool have_waiters = (state_ > 1);
     lock.unlock();
@@ -76,7 +75,7 @@ public:
   template <typename Lock>
   void unlock_and_signal_one_for_destruction(Lock& lock)
   {
-    BOOST_ASIO_ASSERT(lock.locked());
+    ASIO_ASSERT(lock.locked());
     state_ |= 1;
     bool have_waiters = (state_ > 1);
     if (have_waiters)
@@ -88,7 +87,7 @@ public:
   template <typename Lock>
   bool maybe_unlock_and_signal_one(Lock& lock)
   {
-    BOOST_ASIO_ASSERT(lock.locked());
+    ASIO_ASSERT(lock.locked());
     state_ |= 1;
     if (state_ > 1)
     {
@@ -103,7 +102,7 @@ public:
   template <typename Lock>
   void clear(Lock& lock)
   {
-    BOOST_ASIO_ASSERT(lock.locked());
+    ASIO_ASSERT(lock.locked());
     (void)lock;
     state_ &= ~std::size_t(1);
   }
@@ -112,7 +111,7 @@ public:
   template <typename Lock>
   void wait(Lock& lock)
   {
-    BOOST_ASIO_ASSERT(lock.locked());
+    ASIO_ASSERT(lock.locked());
     while ((state_ & 1) == 0)
     {
       state_ += 2;
@@ -125,7 +124,7 @@ public:
   template <typename Lock>
   bool wait_for_usec(Lock& lock, long usec)
   {
-    BOOST_ASIO_ASSERT(lock.locked());
+    ASIO_ASSERT(lock.locked());
     if ((state_ & 1) == 0)
     {
       state_ += 2;
@@ -164,14 +163,13 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#if defined(BOOST_ASIO_HEADER_ONLY)
-# include <boost/asio/detail/impl/posix_event.ipp>
-#endif // defined(BOOST_ASIO_HEADER_ONLY)
+#if defined(ASIO_HEADER_ONLY)
+# include "asio/detail/impl/posix_event.ipp"
+#endif // defined(ASIO_HEADER_ONLY)
 
-#endif // defined(BOOST_ASIO_HAS_PTHREADS)
+#endif // defined(ASIO_HAS_PTHREADS)
 
-#endif // BOOST_ASIO_DETAIL_POSIX_EVENT_HPP
+#endif // ASIO_DETAIL_POSIX_EVENT_HPP

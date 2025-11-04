@@ -8,28 +8,27 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_IMPL_IO_URING_SOCKET_SERVICE_BASE_IPP
-#define BOOST_ASIO_DETAIL_IMPL_IO_URING_SOCKET_SERVICE_BASE_IPP
+#ifndef ASIO_DETAIL_IMPL_IO_URING_SOCKET_SERVICE_BASE_IPP
+#define ASIO_DETAIL_IMPL_IO_URING_SOCKET_SERVICE_BASE_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_IO_URING)
+#if defined(ASIO_HAS_IO_URING)
 
-#include <boost/asio/detail/io_uring_socket_service_base.hpp>
+#include "asio/detail/io_uring_socket_service_base.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
 io_uring_socket_service_base::io_uring_socket_service_base(
     execution_context& context)
-  : io_uring_service_(boost::asio::use_service<io_uring_service>(context))
+  : io_uring_service_(asio::use_service<io_uring_service>(context))
 {
   io_uring_service_.init_task();
 }
@@ -83,23 +82,23 @@ void io_uring_socket_service_base::destroy(
 {
   if (impl.socket_ != invalid_socket)
   {
-    BOOST_ASIO_HANDLER_OPERATION((io_uring_service_.context(),
+    ASIO_HANDLER_OPERATION((io_uring_service_.context(),
           "socket", &impl, impl.socket_, "close"));
 
     io_uring_service_.deregister_io_object(impl.io_object_data_);
-    boost::system::error_code ignored_ec;
+    asio::error_code ignored_ec;
     socket_ops::close(impl.socket_, impl.state_, true, ignored_ec);
     io_uring_service_.cleanup_io_object(impl.io_object_data_);
   }
 }
 
-boost::system::error_code io_uring_socket_service_base::close(
+asio::error_code io_uring_socket_service_base::close(
     io_uring_socket_service_base::base_implementation_type& impl,
-    boost::system::error_code& ec)
+    asio::error_code& ec)
 {
   if (is_open(impl))
   {
-    BOOST_ASIO_HANDLER_OPERATION((io_uring_service_.context(),
+    ASIO_HANDLER_OPERATION((io_uring_service_.context(),
           "socket", &impl, impl.socket_, "close"));
 
     io_uring_service_.deregister_io_object(impl.io_object_data_);
@@ -123,15 +122,15 @@ boost::system::error_code io_uring_socket_service_base::close(
 
 socket_type io_uring_socket_service_base::release(
     io_uring_socket_service_base::base_implementation_type& impl,
-    boost::system::error_code& ec)
+    asio::error_code& ec)
 {
   if (!is_open(impl))
   {
-    ec = boost::asio::error::bad_descriptor;
+    ec = asio::error::bad_descriptor;
     return invalid_socket;
   }
 
-  BOOST_ASIO_HANDLER_OPERATION((io_uring_service_.context(),
+  ASIO_HANDLER_OPERATION((io_uring_service_.context(),
         "socket", &impl, impl.socket_, "release"));
 
   io_uring_service_.deregister_io_object(impl.io_object_data_);
@@ -142,17 +141,17 @@ socket_type io_uring_socket_service_base::release(
   return sock;
 }
 
-boost::system::error_code io_uring_socket_service_base::cancel(
+asio::error_code io_uring_socket_service_base::cancel(
     io_uring_socket_service_base::base_implementation_type& impl,
-    boost::system::error_code& ec)
+    asio::error_code& ec)
 {
   if (!is_open(impl))
   {
-    ec = boost::asio::error::bad_descriptor;
+    ec = asio::error::bad_descriptor;
     return ec;
   }
 
-  BOOST_ASIO_HANDLER_OPERATION((io_uring_service_.context(),
+  ASIO_HANDLER_OPERATION((io_uring_service_.context(),
         "socket", &impl, impl.socket_, "cancel"));
 
   io_uring_service_.cancel_ops(impl.io_object_data_);
@@ -160,13 +159,13 @@ boost::system::error_code io_uring_socket_service_base::cancel(
   return ec;
 }
 
-boost::system::error_code io_uring_socket_service_base::do_open(
+asio::error_code io_uring_socket_service_base::do_open(
     io_uring_socket_service_base::base_implementation_type& impl,
-    int af, int type, int protocol, boost::system::error_code& ec)
+    int af, int type, int protocol, asio::error_code& ec)
 {
   if (is_open(impl))
   {
-    ec = boost::asio::error::already_open;
+    ec = asio::error::already_open;
     return ec;
   }
 
@@ -187,14 +186,14 @@ boost::system::error_code io_uring_socket_service_base::do_open(
   return ec;
 }
 
-boost::system::error_code io_uring_socket_service_base::do_assign(
+asio::error_code io_uring_socket_service_base::do_assign(
     io_uring_socket_service_base::base_implementation_type& impl, int type,
     const io_uring_socket_service_base::native_handle_type& native_socket,
-    boost::system::error_code& ec)
+    asio::error_code& ec)
 {
   if (is_open(impl))
   {
-    ec = boost::asio::error::already_open;
+    ec = asio::error::already_open;
     return ec;
   }
 
@@ -235,17 +234,16 @@ void io_uring_socket_service_base::start_accept_op(
     start_op(impl, io_uring_service::read_op, op, is_continuation, false);
   else
   {
-    op->ec_ = boost::asio::error::already_open;
+    op->ec_ = asio::error::already_open;
     io_uring_service_.post_immediate_completion(op, is_continuation);
   }
 }
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // defined(BOOST_ASIO_HAS_IO_URING)
+#endif // defined(ASIO_HAS_IO_URING)
 
-#endif // BOOST_ASIO_DETAIL_IMPL_IO_URING_SOCKET_SERVICE_BASE_IPP
+#endif // ASIO_DETAIL_IMPL_IO_URING_SOCKET_SERVICE_BASE_IPP

@@ -8,23 +8,22 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXECUTION_PREFER_ONLY_HPP
-#define BOOST_ASIO_EXECUTION_PREFER_ONLY_HPP
+#ifndef ASIO_EXECUTION_PREFER_ONLY_HPP
+#define ASIO_EXECUTION_PREFER_ONLY_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/is_applicable_property.hpp>
-#include <boost/asio/prefer.hpp>
-#include <boost/asio/query.hpp>
-#include <boost/asio/traits/static_query.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/is_applicable_property.hpp"
+#include "asio/prefer.hpp"
+#include "asio/query.hpp"
+#include "asio/traits/static_query.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 #if defined(GENERATING_DOCUMENTATION)
@@ -106,12 +105,12 @@ struct prefer_only_property
   }
 };
 
-#if defined(BOOST_ASIO_HAS_WORKING_EXPRESSION_SFINAE)
+#if defined(ASIO_HAS_WORKING_EXPRESSION_SFINAE)
 
 template <typename InnerProperty>
 struct prefer_only_property<InnerProperty,
     void_t<
-      decltype(boost::asio::declval<const InnerProperty>().value())
+      decltype(asio::declval<const InnerProperty>().value())
     >
   >
 {
@@ -123,14 +122,14 @@ struct prefer_only_property<InnerProperty,
   }
 
   constexpr auto value() const
-    noexcept(noexcept(boost::asio::declval<const InnerProperty>().value()))
-    -> decltype(boost::asio::declval<const InnerProperty>().value())
+    noexcept(noexcept(asio::declval<const InnerProperty>().value()))
+    -> decltype(asio::declval<const InnerProperty>().value())
   {
     return property.value();
   }
 };
 
-#else // defined(BOOST_ASIO_HAS_WORKING_EXPRESSION_SFINAE)
+#else // defined(ASIO_HAS_WORKING_EXPRESSION_SFINAE)
 
 struct prefer_only_memfns_base
 {
@@ -180,7 +179,7 @@ struct prefer_only_property<InnerProperty,
   }
 };
 
-#endif // defined(BOOST_ASIO_HAS_WORKING_EXPRESSION_SFINAE)
+#endif // defined(ASIO_HAS_WORKING_EXPRESSION_SFINAE)
 
 } // namespace detail
 
@@ -197,8 +196,8 @@ struct prefer_only :
   {
   }
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr
   typename traits::static_query<T, InnerProperty>::result_type
@@ -211,8 +210,8 @@ struct prefer_only :
   template <typename E, typename T = decltype(prefer_only::static_query<E>())>
   static constexpr const T static_query_v
     = prefer_only::static_query<E>();
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
   template <typename Executor, typename Property>
   friend constexpr
@@ -224,13 +223,13 @@ struct prefer_only :
       enable_if_t<
         can_prefer<const Executor&, const InnerProperty&>::value
       >* = 0)
-#if !defined(BOOST_ASIO_MSVC) \
+#if !defined(ASIO_MSVC) \
   && !defined(__clang__) // Clang crashes if noexcept is used here.
     noexcept(is_nothrow_prefer<const Executor&, const InnerProperty&>::value)
-#endif // !defined(BOOST_ASIO_MSVC)
+#endif // !defined(ASIO_MSVC)
        //   && !defined(__clang__)
   {
-    return boost::asio::prefer(ex, p.property);
+    return asio::prefer(ex, p.property);
   }
 
   template <typename Executor, typename Property>
@@ -243,22 +242,22 @@ struct prefer_only :
       enable_if_t<
         can_query<const Executor&, const InnerProperty&>::value
       >* = 0)
-#if !defined(BOOST_ASIO_MSVC) \
+#if !defined(ASIO_MSVC) \
   && !defined(__clang__) // Clang crashes if noexcept is used here.
     noexcept(is_nothrow_query<const Executor&, const InnerProperty&>::value)
-#endif // !defined(BOOST_ASIO_MSVC)
+#endif // !defined(ASIO_MSVC)
        //   && !defined(__clang__)
   {
-    return boost::asio::query(ex, p.property);
+    return asio::query(ex, p.property);
   }
 };
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 template <typename InnerProperty> template <typename E, typename T>
 const T prefer_only<InnerProperty>::static_query_v;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 } // namespace execution
 
@@ -270,8 +269,8 @@ struct is_applicable_property<T, execution::prefer_only<InnerProperty>>
 
 namespace traits {
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  || !defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if !defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  || !defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 template <typename T, typename InnerProperty>
 struct static_query<T, execution::prefer_only<InnerProperty>> :
@@ -279,10 +278,10 @@ struct static_query<T, execution::prefer_only<InnerProperty>> :
 {
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   || !defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // !defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   || !defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_PREFER_FREE_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_PREFER_FREE_TRAIT)
 
 template <typename T, typename InnerProperty>
 struct prefer_free_default<T, execution::prefer_only<InnerProperty>,
@@ -298,9 +297,9 @@ struct prefer_free_default<T, execution::prefer_only<InnerProperty>,
   typedef prefer_result_t<const T&, const InnerProperty&> result_type;
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_PREFER_FREE_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_PREFER_FREE_TRAIT)
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_FREE_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_QUERY_FREE_TRAIT)
 
 template <typename T, typename InnerProperty>
 struct query_free<T, execution::prefer_only<InnerProperty>,
@@ -316,15 +315,14 @@ struct query_free<T, execution::prefer_only<InnerProperty>,
   typedef query_result_t<const T&, const InnerProperty&> result_type;
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_FREE_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_QUERY_FREE_TRAIT)
 
 } // namespace traits
 
 #endif // defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_EXECUTION_PREFER_ONLY_HPP
+#endif // ASIO_EXECUTION_PREFER_ONLY_HPP

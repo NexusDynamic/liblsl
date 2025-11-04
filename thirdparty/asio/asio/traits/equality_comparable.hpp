@@ -8,21 +8,20 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_TRAITS_EQUALITY_COMPARABLE_HPP
-#define BOOST_ASIO_TRAITS_EQUALITY_COMPARABLE_HPP
+#ifndef ASIO_TRAITS_EQUALITY_COMPARABLE_HPP
+#define ASIO_TRAITS_EQUALITY_COMPARABLE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/type_traits.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/type_traits.hpp"
 
-#if defined(BOOST_ASIO_HAS_WORKING_EXPRESSION_SFINAE)
-# define BOOST_ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT 1
-#endif // defined(BOOST_ASIO_HAS_WORKING_EXPRESSION_SFINAE)
+#if defined(ASIO_HAS_WORKING_EXPRESSION_SFINAE)
+# define ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT 1
+#endif // defined(ASIO_HAS_WORKING_EXPRESSION_SFINAE)
 
-namespace boost {
 namespace asio {
 namespace traits {
 
@@ -41,7 +40,7 @@ struct no_equality_comparable
   static constexpr bool is_noexcept = false;
 };
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
+#if defined(ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
 
 template <typename T, typename = void>
 struct equality_comparable_trait : no_equality_comparable
@@ -68,7 +67,7 @@ struct equality_comparable_trait<T,
       && noexcept(declval<const T>() != declval<const T>());
 };
 
-#else // defined(BOOST_ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
+#else // defined(ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
 
 template <typename T, typename = void>
 struct equality_comparable_trait :
@@ -80,7 +79,7 @@ struct equality_comparable_trait :
 {
 };
 
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
+#endif // defined(ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
 
 } // namespace detail
 namespace traits {
@@ -97,6 +96,5 @@ struct equality_comparable : equality_comparable_default<T>
 
 } // namespace traits
 } // namespace asio
-} // namespace boost
 
-#endif // BOOST_ASIO_TRAITS_EQUALITY_COMPARABLE_HPP
+#endif // ASIO_TRAITS_EQUALITY_COMPARABLE_HPP

@@ -8,25 +8,24 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IMPL_AS_TUPLE_HPP
-#define BOOST_ASIO_IMPL_AS_TUPLE_HPP
+#ifndef ASIO_IMPL_AS_TUPLE_HPP
+#define ASIO_IMPL_AS_TUPLE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <tuple>
-#include <boost/asio/associated_executor.hpp>
-#include <boost/asio/associator.hpp>
-#include <boost/asio/async_result.hpp>
-#include <boost/asio/detail/handler_cont_helpers.hpp>
-#include <boost/asio/detail/initiation_base.hpp>
-#include <boost/asio/detail/type_traits.hpp>
+#include "asio/associated_executor.hpp"
+#include "asio/associator.hpp"
+#include "asio/async_result.hpp"
+#include "asio/detail/handler_cont_helpers.hpp"
+#include "asio/detail/initiation_base.hpp"
+#include "asio/detail/type_traits.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -64,7 +63,7 @@ template <typename Handler>
 inline bool asio_handler_is_continuation(
     as_tuple_handler<Handler>* this_handler)
 {
-  return boost_asio_handler_cont_helpers::is_continuation(
+  return asio_handler_cont_helpers::is_continuation(
         this_handler->handler_);
 }
 
@@ -89,7 +88,7 @@ struct as_tuple_signature<R(Args...) &&>
   typedef R type(std::tuple<decay_t<Args>...>) &&;
 };
 
-#if defined(BOOST_ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
+#if defined(ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
 
 template <typename R, typename... Args>
 struct as_tuple_signature<R(Args...) noexcept>
@@ -109,7 +108,7 @@ struct as_tuple_signature<R(Args...) && noexcept>
   typedef R type(std::tuple<decay_t<Args>...>) && noexcept;
 };
 
-#endif // defined(BOOST_ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
+#endif // defined(ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
 
 } // namespace detail
 
@@ -168,7 +167,7 @@ struct async_result<as_tuple_t<CompletionToken>, Signatures...>
   }
 };
 
-#if defined(BOOST_ASIO_MSVC)
+#if defined(ASIO_MSVC)
 
 // Workaround for MSVC internal compiler error.
 
@@ -225,7 +224,7 @@ struct async_result<as_tuple_t<CompletionToken>, Signature>
   }
 };
 
-#endif // defined(BOOST_ASIO_MSVC)
+#endif // defined(ASIO_MSVC)
 
 template <template <typename, typename> class Associator,
     typename Handler, typename DefaultCandidate>
@@ -271,8 +270,7 @@ struct async_result<partial_as_tuple, Signatures...>
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_IMPL_AS_TUPLE_HPP
+#endif // ASIO_IMPL_AS_TUPLE_HPP

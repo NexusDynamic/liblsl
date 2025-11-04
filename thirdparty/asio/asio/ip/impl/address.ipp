@@ -8,25 +8,24 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IP_IMPL_ADDRESS_IPP
-#define BOOST_ASIO_IP_IMPL_ADDRESS_IPP
+#ifndef ASIO_IP_IMPL_ADDRESS_IPP
+#define ASIO_IP_IMPL_ADDRESS_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <typeinfo>
-#include <boost/asio/detail/throw_error.hpp>
-#include <boost/asio/detail/throw_exception.hpp>
-#include <boost/asio/error.hpp>
-#include <boost/asio/ip/address.hpp>
-#include <boost/asio/ip/bad_address_cast.hpp>
-#include <boost/system/system_error.hpp>
+#include "asio/detail/throw_error.hpp"
+#include "asio/detail/throw_exception.hpp"
+#include "asio/error.hpp"
+#include "asio/ip/address.hpp"
+#include "asio/ip/bad_address_cast.hpp"
+#include "asio/system_error.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace ip {
 
@@ -38,7 +37,7 @@ address::address() noexcept
 }
 
 address::address(
-    const boost::asio::ip::address_v4& ipv4_address) noexcept
+    const asio::ip::address_v4& ipv4_address) noexcept
   : type_(ipv4),
     ipv4_address_(ipv4_address),
     ipv6_address_()
@@ -46,7 +45,7 @@ address::address(
 }
 
 address::address(
-    const boost::asio::ip::address_v6& ipv6_address) noexcept
+    const asio::ip::address_v6& ipv6_address) noexcept
   : type_(ipv6),
     ipv4_address_(),
     ipv6_address_(ipv6_address)
@@ -84,41 +83,41 @@ address& address::operator=(address&& other) noexcept
 }
 
 address& address::operator=(
-    const boost::asio::ip::address_v4& ipv4_address) noexcept
+    const asio::ip::address_v4& ipv4_address) noexcept
 {
   type_ = ipv4;
   ipv4_address_ = ipv4_address;
-  ipv6_address_ = boost::asio::ip::address_v6();
+  ipv6_address_ = asio::ip::address_v6();
   return *this;
 }
 
 address& address::operator=(
-    const boost::asio::ip::address_v6& ipv6_address) noexcept
+    const asio::ip::address_v6& ipv6_address) noexcept
 {
   type_ = ipv6;
-  ipv4_address_ = boost::asio::ip::address_v4();
+  ipv4_address_ = asio::ip::address_v4();
   ipv6_address_ = ipv6_address;
   return *this;
 }
 
 address make_address(const char* str)
 {
-  boost::system::error_code ec;
+  asio::error_code ec;
   address addr = make_address(str, ec);
-  boost::asio::detail::throw_error(ec);
+  asio::detail::throw_error(ec);
   return addr;
 }
 
 address make_address(const char* str,
-    boost::system::error_code& ec) noexcept
+    asio::error_code& ec) noexcept
 {
-  boost::asio::ip::address_v6 ipv6_address =
-    boost::asio::ip::make_address_v6(str, ec);
+  asio::ip::address_v6 ipv6_address =
+    asio::ip::make_address_v6(str, ec);
   if (!ec)
     return address(ipv6_address);
 
-  boost::asio::ip::address_v4 ipv4_address =
-    boost::asio::ip::make_address_v4(str, ec);
+  asio::ip::address_v4 ipv4_address =
+    asio::ip::make_address_v4(str, ec);
   if (!ec)
     return address(ipv4_address);
 
@@ -131,12 +130,12 @@ address make_address(const std::string& str)
 }
 
 address make_address(const std::string& str,
-    boost::system::error_code& ec) noexcept
+    asio::error_code& ec) noexcept
 {
   return make_address(str.c_str(), ec);
 }
 
-#if defined(BOOST_ASIO_HAS_STRING_VIEW)
+#if defined(ASIO_HAS_STRING_VIEW)
 
 address make_address(string_view str)
 {
@@ -144,29 +143,29 @@ address make_address(string_view str)
 }
 
 address make_address(string_view str,
-    boost::system::error_code& ec) noexcept
+    asio::error_code& ec) noexcept
 {
   return make_address(static_cast<std::string>(str), ec);
 }
 
-#endif // defined(BOOST_ASIO_HAS_STRING_VIEW)
+#endif // defined(ASIO_HAS_STRING_VIEW)
 
-boost::asio::ip::address_v4 address::to_v4() const
+asio::ip::address_v4 address::to_v4() const
 {
   if (type_ != ipv4)
   {
     bad_address_cast ex;
-    boost::asio::detail::throw_exception(ex);
+    asio::detail::throw_exception(ex);
   }
   return ipv4_address_;
 }
 
-boost::asio::ip::address_v6 address::to_v6() const
+asio::ip::address_v6 address::to_v6() const
 {
   if (type_ != ipv6)
   {
     bad_address_cast ex;
-    boost::asio::detail::throw_exception(ex);
+    asio::detail::throw_exception(ex);
   }
   return ipv6_address_;
 }
@@ -221,8 +220,7 @@ bool operator<(const address& a1, const address& a2) noexcept
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_IP_IMPL_ADDRESS_IPP
+#endif // ASIO_IP_IMPL_ADDRESS_IPP

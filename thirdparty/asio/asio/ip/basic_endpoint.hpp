@@ -8,26 +8,25 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IP_BASIC_ENDPOINT_HPP
-#define BOOST_ASIO_IP_BASIC_ENDPOINT_HPP
+#ifndef ASIO_IP_BASIC_ENDPOINT_HPP
+#define ASIO_IP_BASIC_ENDPOINT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <functional>
-#include <boost/asio/detail/cstdint.hpp>
-#include <boost/asio/ip/address.hpp>
-#include <boost/asio/ip/detail/endpoint.hpp>
+#include "asio/detail/cstdint.hpp"
+#include "asio/ip/address.hpp"
+#include "asio/ip/detail/endpoint.hpp"
 
-#if !defined(BOOST_ASIO_NO_IOSTREAM)
+#if !defined(ASIO_NO_IOSTREAM)
 # include <iosfwd>
-#endif // !defined(BOOST_ASIO_NO_IOSTREAM)
+#endif // !defined(ASIO_NO_IOSTREAM)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace ip {
 
@@ -36,7 +35,7 @@ typedef uint_least16_t port_type;
 
 /// Describes an endpoint for a version-independent IP socket.
 /**
- * The boost::asio::ip::basic_endpoint class template describes an endpoint that
+ * The asio::ip::basic_endpoint class template describes an endpoint that
  * may be associated with a particular socket.
  *
  * @par Thread Safety
@@ -58,7 +57,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined data_type;
 #else
-  typedef boost::asio::detail::socket_addr_type data_type;
+  typedef asio::detail::socket_addr_type data_type;
 #endif
 
   /// Default constructor.
@@ -75,12 +74,12 @@ public:
    * @par Examples
    * To initialise an IPv4 TCP endpoint for port 1234, use:
    * @code
-   * boost::asio::ip::tcp::endpoint ep(boost::asio::ip::tcp::v4(), 1234);
+   * asio::ip::tcp::endpoint ep(asio::ip::tcp::v4(), 1234);
    * @endcode
    *
    * To specify an IPv6 UDP endpoint for port 9876, use:
    * @code
-   * boost::asio::ip::udp::endpoint ep(boost::asio::ip::udp::v6(), 9876);
+   * asio::ip::udp::endpoint ep(asio::ip::udp::v6(), 9876);
    * @endcode
    */
   basic_endpoint(const InternetProtocol& internet_protocol,
@@ -92,7 +91,7 @@ public:
   /// Construct an endpoint using a port number and an IP address. This
   /// constructor may be used for accepting connections on a specific interface
   /// or for making a connection to a remote endpoint.
-  basic_endpoint(const boost::asio::ip::address& addr,
+  basic_endpoint(const asio::ip::address& addr,
       port_type port_num) noexcept
     : impl_(addr, port_num)
   {
@@ -177,13 +176,13 @@ public:
   }
 
   /// Get the IP address associated with the endpoint.
-  boost::asio::ip::address address() const noexcept
+  asio::ip::address address() const noexcept
   {
     return impl_.address();
   }
 
   /// Set the IP address associated with the endpoint.
-  void address(const boost::asio::ip::address& addr) noexcept
+  void address(const asio::ip::address& addr) noexcept
   {
     impl_.address(addr);
   }
@@ -232,10 +231,10 @@ public:
 
 private:
   // The underlying IP endpoint.
-  boost::asio::ip::detail::endpoint impl_;
+  asio::ip::detail::endpoint impl_;
 };
 
-#if !defined(BOOST_ASIO_NO_IOSTREAM)
+#if !defined(ASIO_NO_IOSTREAM)
 
 /// Output an endpoint as a string.
 /**
@@ -247,29 +246,28 @@ private:
  *
  * @return The output stream.
  *
- * @relates boost::asio::ip::basic_endpoint
+ * @relates asio::ip::basic_endpoint
  */
 template <typename Elem, typename Traits, typename InternetProtocol>
 std::basic_ostream<Elem, Traits>& operator<<(
     std::basic_ostream<Elem, Traits>& os,
     const basic_endpoint<InternetProtocol>& endpoint);
 
-#endif // !defined(BOOST_ASIO_NO_IOSTREAM)
+#endif // !defined(ASIO_NO_IOSTREAM)
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
 
 namespace std {
 
 template <typename InternetProtocol>
-struct hash<boost::asio::ip::basic_endpoint<InternetProtocol>>
+struct hash<asio::ip::basic_endpoint<InternetProtocol>>
 {
   std::size_t operator()(
-      const boost::asio::ip::basic_endpoint<InternetProtocol>& ep)
+      const asio::ip::basic_endpoint<InternetProtocol>& ep)
     const noexcept
   {
-    std::size_t hash1 = std::hash<boost::asio::ip::address>()(ep.address());
+    std::size_t hash1 = std::hash<asio::ip::address>()(ep.address());
     std::size_t hash2 = std::hash<unsigned short>()(ep.port());
     return hash1 ^ (hash2 + 0x9e3779b9 + (hash1 << 6) + (hash1 >> 2));
   }
@@ -277,8 +275,8 @@ struct hash<boost::asio::ip::basic_endpoint<InternetProtocol>>
 
 } // namespace std
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#include <boost/asio/ip/impl/basic_endpoint.hpp>
+#include "asio/ip/impl/basic_endpoint.hpp"
 
-#endif // BOOST_ASIO_IP_BASIC_ENDPOINT_HPP
+#endif // ASIO_IP_BASIC_ENDPOINT_HPP

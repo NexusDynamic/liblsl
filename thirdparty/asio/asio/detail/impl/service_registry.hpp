@@ -8,16 +8,15 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_IMPL_SERVICE_REGISTRY_HPP
-#define BOOST_ASIO_DETAIL_IMPL_SERVICE_REGISTRY_HPP
+#ifndef ASIO_DETAIL_IMPL_SERVICE_REGISTRY_HPP
+#define ASIO_DETAIL_IMPL_SERVICE_REGISTRY_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -74,7 +73,7 @@ inline void service_registry::init_key(
   init_key_from_id(key, Service::id);
 }
 
-#if !defined(BOOST_ASIO_NO_TYPEID)
+#if !defined(ASIO_NO_TYPEID)
 template <typename Service>
 void service_registry::init_key(execution_context::service::key& key,
     enable_if_t<is_base_of<typename Service::key_type, Service>::value>*)
@@ -90,7 +89,7 @@ void service_registry::init_key_from_id(execution_context::service::key& key,
   key.type_info_ = &typeid(typeid_wrapper<Service>);
   key.id_ = 0;
 }
-#endif // !defined(BOOST_ASIO_NO_TYPEID)
+#endif // !defined(ASIO_NO_TYPEID)
 
 template <typename Service, typename Owner, typename... Args>
 execution_context::service* service_registry::create(
@@ -112,8 +111,7 @@ void service_registry::destroy_allocated(execution_context::service* service)
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_IMPL_SERVICE_REGISTRY_HPP
+#endif // ASIO_DETAIL_IMPL_SERVICE_REGISTRY_HPP

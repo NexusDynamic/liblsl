@@ -8,19 +8,18 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_NULL_EVENT_HPP
-#define BOOST_ASIO_DETAIL_NULL_EVENT_HPP
+#ifndef ASIO_DETAIL_NULL_EVENT_HPP
+#define ASIO_DETAIL_NULL_EVENT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/noncopyable.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/noncopyable.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -91,18 +90,17 @@ public:
   }
 
 private:
-  BOOST_ASIO_DECL static void do_wait();
-  BOOST_ASIO_DECL static void do_wait_for_usec(long usec);
+  ASIO_DECL static void do_wait();
+  ASIO_DECL static void do_wait_for_usec(long usec);
 };
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#if defined(BOOST_ASIO_HEADER_ONLY)
-# include <boost/asio/detail/impl/null_event.ipp>
-#endif // defined(BOOST_ASIO_HEADER_ONLY)
+#if defined(ASIO_HEADER_ONLY)
+# include "asio/detail/impl/null_event.ipp"
+#endif // defined(ASIO_HEADER_ONLY)
 
-#endif // BOOST_ASIO_DETAIL_NULL_EVENT_HPP
+#endif // ASIO_DETAIL_NULL_EVENT_HPP

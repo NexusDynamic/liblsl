@@ -8,26 +8,25 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_ANY_COMPLETION_HANDLER_HPP
-#define BOOST_ASIO_ANY_COMPLETION_HANDLER_HPP
+#ifndef ASIO_ANY_COMPLETION_HANDLER_HPP
+#define ASIO_ANY_COMPLETION_HANDLER_HPP
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <cstring>
 #include <functional>
 #include <memory>
 #include <utility>
-#include <boost/asio/any_completion_executor.hpp>
-#include <boost/asio/any_io_executor.hpp>
-#include <boost/asio/associated_allocator.hpp>
-#include <boost/asio/associated_cancellation_slot.hpp>
-#include <boost/asio/associated_executor.hpp>
-#include <boost/asio/associated_immediate_executor.hpp>
-#include <boost/asio/cancellation_state.hpp>
-#include <boost/asio/recycling_allocator.hpp>
+#include "asio/any_completion_executor.hpp"
+#include "asio/any_io_executor.hpp"
+#include "asio/associated_allocator.hpp"
+#include "asio/associated_cancellation_slot.hpp"
+#include "asio/associated_executor.hpp"
+#include "asio/associated_immediate_executor.hpp"
+#include "asio/cancellation_state.hpp"
+#include "asio/recycling_allocator.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -65,7 +64,7 @@ public:
   {
     typename std::allocator_traits<
       associated_allocator_t<Handler,
-        boost::asio::recycling_allocator<void>>>::template
+        asio::recycling_allocator<void>>>::template
           rebind_alloc<any_completion_handler_impl> alloc;
 
     void operator()(any_completion_handler_impl* ptr)
@@ -78,7 +77,7 @@ public:
   {
     typename std::allocator_traits<
       associated_allocator_t<Handler,
-        boost::asio::recycling_allocator<void>>>::template
+        asio::recycling_allocator<void>>>::template
           rebind_alloc<any_completion_handler_impl> alloc;
 
     void operator()(any_completion_handler_impl* ptr)
@@ -93,7 +92,7 @@ public:
   {
     uninit_deleter d{
         (get_associated_allocator)(h,
-          boost::asio::recycling_allocator<void>())};
+          asio::recycling_allocator<void>())};
 
     std::unique_ptr<any_completion_handler_impl, uninit_deleter> uninit_ptr(
         std::allocator_traits<decltype(d.alloc)>::allocate(d.alloc, 1), d);
@@ -110,7 +109,7 @@ public:
   {
     deleter d{
         (get_associated_allocator)(handler_,
-          boost::asio::recycling_allocator<void>())};
+          asio::recycling_allocator<void>())};
 
     d(this);
   }
@@ -133,10 +132,10 @@ public:
   {
     typename std::allocator_traits<
       associated_allocator_t<Handler,
-        boost::asio::recycling_allocator<void>>>::template
+        asio::recycling_allocator<void>>>::template
           rebind_alloc<unsigned char> alloc(
             (get_associated_allocator)(handler_,
-              boost::asio::recycling_allocator<void>()));
+              asio::recycling_allocator<void>()));
 
     std::size_t space = size + align_size - 1;
     unsigned char* base =
@@ -152,7 +151,7 @@ public:
     }
 
     std::bad_alloc ex;
-    boost::asio::detail::throw_exception(ex);
+    asio::detail::throw_exception(ex);
     return nullptr;
   }
 
@@ -162,10 +161,10 @@ public:
     {
       typename std::allocator_traits<
         associated_allocator_t<Handler,
-          boost::asio::recycling_allocator<void>>>::template
+          asio::recycling_allocator<void>>>::template
             rebind_alloc<unsigned char> alloc(
               (get_associated_allocator)(handler_,
-                boost::asio::recycling_allocator<void>()));
+                asio::recycling_allocator<void>()));
 
       std::ptrdiff_t off;
       std::memcpy(&off, static_cast<unsigned char*>(p) + size, sizeof(off));
@@ -181,7 +180,7 @@ public:
   {
     deleter d{
         (get_associated_allocator)(handler_,
-          boost::asio::recycling_allocator<void>())};
+          asio::recycling_allocator<void>())};
 
     std::unique_ptr<any_completion_handler_impl, deleter> ptr(this, d);
     Handler handler(static_cast<Handler&&>(handler_));
@@ -522,7 +521,7 @@ public:
             impl_, sizeof(T) * n, alignof(T)));
     }
     std::bad_alloc ex;
-    boost::asio::detail::throw_exception(ex);
+    asio::detail::throw_exception(ex);
     return nullptr;
   }
 
@@ -753,7 +752,7 @@ public:
       return fn_table_->call(impl, static_cast<Args&&>(args)...);
     }
     std::bad_function_call ex;
-    boost::asio::detail::throw_exception(ex);
+    asio::detail::throw_exception(ex);
   }
 
   /// Equality operator.
@@ -817,8 +816,7 @@ struct associated_immediate_executor<
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_ANY_COMPLETION_HANDLER_HPP
+#endif // ASIO_ANY_COMPLETION_HANDLER_HPP

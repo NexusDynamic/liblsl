@@ -8,19 +8,18 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_USES_EXECUTOR_HPP
-#define BOOST_ASIO_USES_EXECUTOR_HPP
+#ifndef ASIO_USES_EXECUTOR_HPP
+#define ASIO_USES_EXECUTOR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/type_traits.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/type_traits.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 /// A special type, similar to std::nothrow_t, used to disambiguate
@@ -43,10 +42,10 @@ struct executor_arg_t
 /// A special value, similar to std::nothrow, used to disambiguate constructors
 /// that accept executor arguments.
 /**
- * See boost::asio::executor_arg_t and boost::asio::uses_executor
+ * See asio::executor_arg_t and asio::uses_executor
  * for more information.
  */
-BOOST_ASIO_INLINE_VARIABLE constexpr executor_arg_t executor_arg;
+ASIO_INLINE_VARIABLE constexpr executor_arg_t executor_arg;
 
 /// The uses_executor trait detects whether a type T has an associated executor
 /// that is convertible from type Executor.
@@ -62,8 +61,7 @@ template <typename T, typename Executor>
 struct uses_executor : false_type {};
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_USES_EXECUTOR_HPP
+#endif // ASIO_USES_EXECUTOR_HPP

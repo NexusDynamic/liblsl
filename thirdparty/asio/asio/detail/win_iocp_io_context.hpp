@@ -8,33 +8,32 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_WIN_IOCP_IO_CONTEXT_HPP
-#define BOOST_ASIO_DETAIL_WIN_IOCP_IO_CONTEXT_HPP
+#ifndef ASIO_DETAIL_WIN_IOCP_IO_CONTEXT_HPP
+#define ASIO_DETAIL_WIN_IOCP_IO_CONTEXT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
 
-#include <boost/asio/detail/limits.hpp>
-#include <boost/asio/detail/mutex.hpp>
-#include <boost/asio/detail/op_queue.hpp>
-#include <boost/asio/detail/socket_types.hpp>
-#include <boost/asio/detail/thread.hpp>
-#include <boost/asio/detail/thread_context.hpp>
-#include <boost/asio/detail/timer_queue_base.hpp>
-#include <boost/asio/detail/timer_queue_set.hpp>
-#include <boost/asio/detail/wait_op.hpp>
-#include <boost/asio/detail/win_iocp_operation.hpp>
-#include <boost/asio/detail/win_iocp_thread_info.hpp>
-#include <boost/asio/execution_context.hpp>
+#include "asio/detail/limits.hpp"
+#include "asio/detail/mutex.hpp"
+#include "asio/detail/op_queue.hpp"
+#include "asio/detail/socket_types.hpp"
+#include "asio/detail/thread.hpp"
+#include "asio/detail/thread_context.hpp"
+#include "asio/detail/timer_queue_base.hpp"
+#include "asio/detail/timer_queue_set.hpp"
+#include "asio/detail/wait_op.hpp"
+#include "asio/detail/win_iocp_operation.hpp"
+#include "asio/detail/win_iocp_thread_info.hpp"
+#include "asio/execution_context.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -49,18 +48,18 @@ public:
   struct internal {};
 
   // Constructor.
-  BOOST_ASIO_DECL win_iocp_io_context(
-      boost::asio::execution_context& ctx, bool own_thread = true);
+  ASIO_DECL win_iocp_io_context(
+      asio::execution_context& ctx, bool own_thread = true);
 
   // Construct as an internal scheduler.
-  BOOST_ASIO_DECL win_iocp_io_context(internal,
-      boost::asio::execution_context& ctx);
+  ASIO_DECL win_iocp_io_context(internal,
+      asio::execution_context& ctx);
 
   // Destructor.
-  BOOST_ASIO_DECL ~win_iocp_io_context();
+  ASIO_DECL ~win_iocp_io_context();
 
   // Destroy all user-defined handler objects owned by the service.
-  BOOST_ASIO_DECL void shutdown();
+  ASIO_DECL void shutdown();
 
   // Initialise the task. Nothing to do here.
   void init_task()
@@ -68,26 +67,26 @@ public:
   }
 
   // Register a handle with the IO completion port.
-  BOOST_ASIO_DECL boost::system::error_code register_handle(
-      HANDLE handle, boost::system::error_code& ec);
+  ASIO_DECL asio::error_code register_handle(
+      HANDLE handle, asio::error_code& ec);
 
   // Run the event loop until stopped or no more work.
-  BOOST_ASIO_DECL size_t run(boost::system::error_code& ec);
+  ASIO_DECL size_t run(asio::error_code& ec);
 
   // Run until stopped or one operation is performed.
-  BOOST_ASIO_DECL size_t run_one(boost::system::error_code& ec);
+  ASIO_DECL size_t run_one(asio::error_code& ec);
 
   // Run until timeout, interrupted, or one operation is performed.
-  BOOST_ASIO_DECL size_t wait_one(long usec, boost::system::error_code& ec);
+  ASIO_DECL size_t wait_one(long usec, asio::error_code& ec);
 
   // Poll for operations without blocking.
-  BOOST_ASIO_DECL size_t poll(boost::system::error_code& ec);
+  ASIO_DECL size_t poll(asio::error_code& ec);
 
   // Poll for one operation without blocking.
-  BOOST_ASIO_DECL size_t poll_one(boost::system::error_code& ec);
+  ASIO_DECL size_t poll_one(asio::error_code& ec);
 
   // Stop the event processing loop.
-  BOOST_ASIO_DECL void stop();
+  ASIO_DECL void stop();
 
   // Determine whether the io_context is stopped.
   bool stopped() const
@@ -115,10 +114,10 @@ public:
   }
 
   // Return whether a handler can be dispatched immediately.
-  BOOST_ASIO_DECL bool can_dispatch();
+  ASIO_DECL bool can_dispatch();
 
   /// Capture the current exception so it can be rethrown from a run function.
-  BOOST_ASIO_DECL void capture_current_exception();
+  ASIO_DECL void capture_current_exception();
 
   // Request invocation of the given operation and return immediately. Assumes
   // that work_started() has not yet been called for the operation.
@@ -130,11 +129,11 @@ public:
 
   // Request invocation of the given operation and return immediately. Assumes
   // that work_started() was previously called for the operation.
-  BOOST_ASIO_DECL void post_deferred_completion(win_iocp_operation* op);
+  ASIO_DECL void post_deferred_completion(win_iocp_operation* op);
 
   // Request invocation of the given operation and return immediately. Assumes
   // that work_started() was previously called for the operations.
-  BOOST_ASIO_DECL void post_deferred_completions(
+  ASIO_DECL void post_deferred_completions(
       op_queue<win_iocp_operation>& ops);
 
   // Request invocation of the given operation using the thread-private queue
@@ -162,24 +161,24 @@ public:
 
   // Process unfinished operations as part of a shutdown operation. Assumes
   // that work_started() was previously called for the operations.
-  BOOST_ASIO_DECL void abandon_operations(op_queue<operation>& ops);
+  ASIO_DECL void abandon_operations(op_queue<operation>& ops);
 
   // Called after starting an overlapped I/O operation that did not complete
   // immediately. The caller must have already called work_started() prior to
   // starting the operation.
-  BOOST_ASIO_DECL void on_pending(win_iocp_operation* op);
+  ASIO_DECL void on_pending(win_iocp_operation* op);
 
   // Called after starting an overlapped I/O operation that completed
   // immediately. The caller must have already called work_started() prior to
   // starting the operation.
-  BOOST_ASIO_DECL void on_completion(win_iocp_operation* op,
+  ASIO_DECL void on_completion(win_iocp_operation* op,
       DWORD last_error = 0, DWORD bytes_transferred = 0);
 
   // Called after starting an overlapped I/O operation that completed
   // immediately. The caller must have already called work_started() prior to
   // starting the operation.
-  BOOST_ASIO_DECL void on_completion(win_iocp_operation* op,
-      const boost::system::error_code& ec, DWORD bytes_transferred = 0);
+  ASIO_DECL void on_completion(win_iocp_operation* op,
+      const asio::error_code& ec, DWORD bytes_transferred = 0);
 
   // Add a new timer queue to the service.
   template <typename TimeTraits, typename Allocator>
@@ -228,20 +227,20 @@ private:
   // Dequeues at most one operation from the I/O completion port, and then
   // executes it. Returns the number of operations that were dequeued (i.e.
   // either 0 or 1).
-  BOOST_ASIO_DECL size_t do_one(DWORD msec,
-      win_iocp_thread_info& this_thread, boost::system::error_code& ec);
+  ASIO_DECL size_t do_one(DWORD msec,
+      win_iocp_thread_info& this_thread, asio::error_code& ec);
 
   // Helper to calculate the GetQueuedCompletionStatus timeout.
-  BOOST_ASIO_DECL static DWORD get_gqcs_timeout();
+  ASIO_DECL static DWORD get_gqcs_timeout();
 
   // Helper function to add a new timer queue.
-  BOOST_ASIO_DECL void do_add_timer_queue(timer_queue_base& queue);
+  ASIO_DECL void do_add_timer_queue(timer_queue_base& queue);
 
   // Helper function to remove a timer queue.
-  BOOST_ASIO_DECL void do_remove_timer_queue(timer_queue_base& queue);
+  ASIO_DECL void do_remove_timer_queue(timer_queue_base& queue);
 
   // Called to recalculate and update the timeout.
-  BOOST_ASIO_DECL void update_timeout();
+  ASIO_DECL void update_timeout();
 
   // Helper class to call work_finished() on block exit.
   struct work_finished_on_block_exit;
@@ -309,7 +308,7 @@ private:
   friend struct timer_thread_function;
 
   // Background thread used for processing timeouts.
-  boost::asio::detail::thread timer_thread_;
+  asio::detail::thread timer_thread_;
 
   // A waitable timer object used for waiting for timeouts.
   auto_handle waitable_timer_;
@@ -330,20 +329,19 @@ private:
   const int concurrency_hint_;
 
   // The thread that is running the io_context.
-  boost::asio::detail::thread thread_;
+  asio::detail::thread thread_;
 };
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#include <boost/asio/detail/impl/win_iocp_io_context.hpp>
-#if defined(BOOST_ASIO_HEADER_ONLY)
-# include <boost/asio/detail/impl/win_iocp_io_context.ipp>
-#endif // defined(BOOST_ASIO_HEADER_ONLY)
+#include "asio/detail/impl/win_iocp_io_context.hpp"
+#if defined(ASIO_HEADER_ONLY)
+# include "asio/detail/impl/win_iocp_io_context.ipp"
+#endif // defined(ASIO_HEADER_ONLY)
 
-#endif // defined(BOOST_ASIO_HAS_IOCP)
+#endif // defined(ASIO_HAS_IOCP)
 
-#endif // BOOST_ASIO_DETAIL_WIN_IOCP_IO_CONTEXT_HPP
+#endif // ASIO_DETAIL_WIN_IOCP_IO_CONTEXT_HPP

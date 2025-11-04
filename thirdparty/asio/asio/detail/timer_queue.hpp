@@ -8,27 +8,26 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_TIMER_QUEUE_HPP
-#define BOOST_ASIO_DETAIL_TIMER_QUEUE_HPP
+#ifndef ASIO_DETAIL_TIMER_QUEUE_HPP
+#define ASIO_DETAIL_TIMER_QUEUE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <cstddef>
 #include <vector>
-#include <boost/asio/detail/cstdint.hpp>
-#include <boost/asio/detail/date_time_fwd.hpp>
-#include <boost/asio/detail/limits.hpp>
-#include <boost/asio/detail/op_queue.hpp>
-#include <boost/asio/detail/timer_queue_base.hpp>
-#include <boost/asio/detail/wait_op.hpp>
-#include <boost/asio/error.hpp>
+#include "asio/detail/cstdint.hpp"
+#include "asio/detail/date_time_fwd.hpp"
+#include "asio/detail/limits.hpp"
+#include "asio/detail/op_queue.hpp"
+#include "asio/detail/timer_queue_base.hpp"
+#include "asio/detail/wait_op.hpp"
+#include "asio/error.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -156,7 +155,7 @@ public:
         while (wait_op* op = timer->op_queue_.front())
         {
           timer->op_queue_.pop();
-          op->ec_ = boost::system::error_code();
+          op->ec_ = asio::error_code();
           ops.push(op);
         }
         remove_timer(*timer);
@@ -189,7 +188,7 @@ public:
       while (wait_op* op = (num_cancelled != max_cancelled)
           ? timer.op_queue_.front() : 0)
       {
-        op->ec_ = boost::asio::error::operation_aborted;
+        op->ec_ = asio::error::operation_aborted;
         timer.op_queue_.pop();
         ops.push(op);
         ++num_cancelled;
@@ -212,7 +211,7 @@ public:
         timer->op_queue_.pop();
         if (op->cancellation_key_ == cancellation_key)
         {
-          op->ec_ = boost::asio::error::operation_aborted;
+          op->ec_ = asio::error::operation_aborted;
           ops.push(op);
         }
         else
@@ -388,8 +387,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_TIMER_QUEUE_HPP
+#endif // ASIO_DETAIL_TIMER_QUEUE_HPP

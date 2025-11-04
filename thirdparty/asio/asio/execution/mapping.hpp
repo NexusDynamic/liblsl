@@ -8,27 +8,26 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXECUTION_MAPPING_HPP
-#define BOOST_ASIO_EXECUTION_MAPPING_HPP
+#ifndef ASIO_EXECUTION_MAPPING_HPP
+#define ASIO_EXECUTION_MAPPING_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/execution/executor.hpp>
-#include <boost/asio/is_applicable_property.hpp>
-#include <boost/asio/query.hpp>
-#include <boost/asio/traits/query_free.hpp>
-#include <boost/asio/traits/query_member.hpp>
-#include <boost/asio/traits/query_static_constexpr_member.hpp>
-#include <boost/asio/traits/static_query.hpp>
-#include <boost/asio/traits/static_require.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/execution/executor.hpp"
+#include "asio/is_applicable_property.hpp"
+#include "asio/query.hpp"
+#include "asio/traits/query_free.hpp"
+#include "asio/traits/query_member.hpp"
+#include "asio/traits/query_static_constexpr_member.hpp"
+#include "asio/traits/static_query.hpp"
+#include "asio/traits/static_require.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 #if defined(GENERATING_DOCUMENTATION)
@@ -183,10 +182,10 @@ template <int I> struct other_t;
 template <int I = 0>
 struct mapping_t
 {
-#if defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr bool is_applicable_property_v = is_executor<T>::value;
-#endif // defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
   static constexpr bool is_requirable = false;
   static constexpr bool is_preferable = false;
@@ -219,7 +218,7 @@ struct mapping_t
   template <typename T>
   struct proxy
   {
-#if defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#if defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
     struct type
     {
       template <typename P>
@@ -233,15 +232,15 @@ struct mapping_t
           declval<conditional_t<true, T, P>>().query(static_cast<P&&>(p))
         );
     };
-#else // defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#else // defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
     typedef T type;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#endif // defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
   };
 
   template <typename T>
   struct static_proxy
   {
-#if defined(BOOST_ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
+#if defined(ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
     struct type
     {
       template <typename P>
@@ -258,9 +257,9 @@ struct mapping_t
         return T::query(static_cast<P&&>(p));
       }
     };
-#else // defined(BOOST_ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
+#else // defined(ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
     typedef T type;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
+#endif // defined(ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
   };
 
   template <typename T>
@@ -272,8 +271,8 @@ struct mapping_t
     traits::query_static_constexpr_member<
       typename static_proxy<T>::type, mapping_t> {};
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr
   typename query_static_constexpr_member<T>::result_type
@@ -346,8 +345,8 @@ struct mapping_t
   template <typename E, typename T = decltype(mapping_t::static_query<E>())>
   static constexpr const T static_query_v
     = mapping_t::static_query<E>();
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
   friend constexpr bool operator==(
       const mapping_t& a, const mapping_t& b)
@@ -373,14 +372,14 @@ struct mapping_t
         can_query<const Executor&, thread_t>::value
       >* = 0)
 #if !defined(__clang__) // Clang crashes if noexcept is used here.
-#if defined(BOOST_ASIO_MSVC) // Visual C++ wants the type to be qualified.
+#if defined(ASIO_MSVC) // Visual C++ wants the type to be qualified.
     noexcept(is_nothrow_query<const Executor&, mapping_t<>::thread_t>::value)
-#else // defined(BOOST_ASIO_MSVC)
+#else // defined(ASIO_MSVC)
     noexcept(is_nothrow_query<const Executor&, thread_t>::value)
-#endif // defined(BOOST_ASIO_MSVC)
+#endif // defined(ASIO_MSVC)
 #endif // !defined(__clang__)
   {
-    return boost::asio::query(ex, thread_t());
+    return asio::query(ex, thread_t());
   }
 
   template <typename Executor>
@@ -393,15 +392,15 @@ struct mapping_t
         can_query<const Executor&, new_thread_t>::value
       >* = 0)
 #if !defined(__clang__) // Clang crashes if noexcept is used here.
-#if defined(BOOST_ASIO_MSVC) // Visual C++ wants the type to be qualified.
+#if defined(ASIO_MSVC) // Visual C++ wants the type to be qualified.
     noexcept(
       is_nothrow_query<const Executor&, mapping_t<>::new_thread_t>::value)
-#else // defined(BOOST_ASIO_MSVC)
+#else // defined(ASIO_MSVC)
     noexcept(is_nothrow_query<const Executor&, new_thread_t>::value)
-#endif // defined(BOOST_ASIO_MSVC)
+#endif // defined(ASIO_MSVC)
 #endif // !defined(__clang__)
   {
-    return boost::asio::query(ex, new_thread_t());
+    return asio::query(ex, new_thread_t());
   }
 
   template <typename Executor>
@@ -417,30 +416,30 @@ struct mapping_t
         can_query<const Executor&, other_t>::value
       >* = 0)
 #if !defined(__clang__) // Clang crashes if noexcept is used here.
-#if defined(BOOST_ASIO_MSVC) // Visual C++ wants the type to be qualified.
+#if defined(ASIO_MSVC) // Visual C++ wants the type to be qualified.
     noexcept(is_nothrow_query<const Executor&, mapping_t<>::other_t>::value)
-#else // defined(BOOST_ASIO_MSVC)
+#else // defined(ASIO_MSVC)
     noexcept(is_nothrow_query<const Executor&, other_t>::value)
-#endif // defined(BOOST_ASIO_MSVC)
+#endif // defined(ASIO_MSVC)
 #endif // !defined(__clang__)
   {
-    return boost::asio::query(ex, other_t());
+    return asio::query(ex, other_t());
   }
 
-  BOOST_ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(thread_t, thread);
-  BOOST_ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(new_thread_t, new_thread);
-  BOOST_ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(other_t, other);
+  ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(thread_t, thread);
+  ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(new_thread_t, new_thread);
+  ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(other_t, other);
 
 private:
   int value_;
 };
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 template <int I> template <typename E, typename T>
 const T mapping_t<I>::static_query_v;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 template <int I>
 const typename mapping_t<I>::thread_t mapping_t<I>::thread;
@@ -456,10 +455,10 @@ namespace mapping {
 template <int I = 0>
 struct thread_t
 {
-#if defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr bool is_applicable_property_v = is_executor<T>::value;
-#endif // defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
   static constexpr bool is_requirable = true;
   static constexpr bool is_preferable = true;
@@ -479,8 +478,8 @@ struct thread_t
     traits::query_static_constexpr_member<
       typename mapping_t<I>::template static_proxy<T>::type, thread_t> {};
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr
   typename query_static_constexpr_member<T>::result_type
@@ -514,8 +513,8 @@ struct thread_t
   template <typename E, typename T = decltype(thread_t::static_query<E>())>
   static constexpr const T static_query_v
     = thread_t::static_query<E>();
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
   static constexpr mapping_t<I> value()
   {
@@ -553,20 +552,20 @@ struct thread_t
   }
 };
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 template <int I> template <typename E, typename T>
 const T thread_t<I>::static_query_v;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 template <int I = 0>
 struct new_thread_t
 {
-#if defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr bool is_applicable_property_v = is_executor<T>::value;
-#endif // defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
   static constexpr bool is_requirable = true;
   static constexpr bool is_preferable = true;
@@ -586,8 +585,8 @@ struct new_thread_t
     traits::query_static_constexpr_member<
       typename mapping_t<I>::template static_proxy<T>::type, new_thread_t> {};
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr typename query_static_constexpr_member<T>::result_type
   static_query()
@@ -598,8 +597,8 @@ struct new_thread_t
 
   template <typename E, typename T = decltype(new_thread_t::static_query<E>())>
   static constexpr const T static_query_v = new_thread_t::static_query<E>();
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
   static constexpr mapping_t<I> value()
   {
@@ -637,20 +636,20 @@ struct new_thread_t
   }
 };
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 template <int I> template <typename E, typename T>
 const T new_thread_t<I>::static_query_v;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 template <int I>
 struct other_t
 {
-#if defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr bool is_applicable_property_v = is_executor<T>::value;
-#endif // defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
   static constexpr bool is_requirable = true;
   static constexpr bool is_preferable = true;
@@ -670,8 +669,8 @@ struct other_t
     traits::query_static_constexpr_member<
       typename mapping_t<I>::template static_proxy<T>::type, other_t> {};
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr
   typename query_static_constexpr_member<T>::result_type
@@ -683,8 +682,8 @@ struct other_t
 
   template <typename E, typename T = decltype(other_t::static_query<E>())>
   static constexpr const T static_query_v = other_t::static_query<E>();
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
   static constexpr mapping_t<I> value()
   {
@@ -722,23 +721,23 @@ struct other_t
   }
 };
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 template <int I> template <typename E, typename T>
 const T other_t<I>::static_query_v;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 } // namespace mapping
 } // namespace detail
 
 typedef detail::mapping_t<> mapping_t;
 
-BOOST_ASIO_INLINE_VARIABLE constexpr mapping_t mapping;
+ASIO_INLINE_VARIABLE constexpr mapping_t mapping;
 
 } // namespace execution
 
-#if !defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#if !defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
 template <typename T>
 struct is_applicable_property<T, execution::mapping_t>
@@ -764,11 +763,11 @@ struct is_applicable_property<T, execution::mapping_t::other_t>
 {
 };
 
-#endif // !defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // !defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
 namespace traits {
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_FREE_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_QUERY_FREE_TRAIT)
 
 template <typename T>
 struct query_free_default<T, execution::mapping_t,
@@ -812,10 +811,10 @@ struct query_free_default<T, execution::mapping_t,
   typedef execution::mapping_t result_type;
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_FREE_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_QUERY_FREE_TRAIT)
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  || !defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if !defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  || !defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 template <typename T>
 struct static_query<T, execution::mapping_t,
@@ -989,16 +988,15 @@ struct static_query<T, execution::mapping_t::other_t,
   }
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   || !defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // !defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   || !defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 } // namespace traits
 
 #endif // defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_EXECUTION_MAPPING_HPP
+#endif // ASIO_EXECUTION_MAPPING_HPP

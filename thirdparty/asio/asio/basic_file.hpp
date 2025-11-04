@@ -8,51 +8,50 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_BASIC_FILE_HPP
-#define BOOST_ASIO_BASIC_FILE_HPP
+#ifndef ASIO_BASIC_FILE_HPP
+#define ASIO_BASIC_FILE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_FILE) \
+#if defined(ASIO_HAS_FILE) \
   || defined(GENERATING_DOCUMENTATION)
 
 #include <string>
 #include <utility>
-#include <boost/asio/any_io_executor.hpp>
-#include <boost/asio/async_result.hpp>
-#include <boost/asio/detail/cstdint.hpp>
-#include <boost/asio/detail/handler_type_requirements.hpp>
-#include <boost/asio/detail/io_object_impl.hpp>
-#include <boost/asio/detail/non_const_lvalue.hpp>
-#include <boost/asio/detail/throw_error.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/error.hpp>
-#include <boost/asio/execution_context.hpp>
-#include <boost/asio/post.hpp>
-#include <boost/asio/file_base.hpp>
-#if defined(BOOST_ASIO_HAS_IOCP)
-# include <boost/asio/detail/win_iocp_file_service.hpp>
-#elif defined(BOOST_ASIO_HAS_IO_URING)
-# include <boost/asio/detail/io_uring_file_service.hpp>
+#include "asio/any_io_executor.hpp"
+#include "asio/async_result.hpp"
+#include "asio/detail/cstdint.hpp"
+#include "asio/detail/handler_type_requirements.hpp"
+#include "asio/detail/io_object_impl.hpp"
+#include "asio/detail/non_const_lvalue.hpp"
+#include "asio/detail/throw_error.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/error.hpp"
+#include "asio/execution_context.hpp"
+#include "asio/post.hpp"
+#include "asio/file_base.hpp"
+#if defined(ASIO_HAS_IOCP)
+# include "asio/detail/win_iocp_file_service.hpp"
+#elif defined(ASIO_HAS_IO_URING)
+# include "asio/detail/io_uring_file_service.hpp"
 #endif
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
-#if !defined(BOOST_ASIO_BASIC_FILE_FWD_DECL)
-#define BOOST_ASIO_BASIC_FILE_FWD_DECL
+#if !defined(ASIO_BASIC_FILE_FWD_DECL)
+#define ASIO_BASIC_FILE_FWD_DECL
 
 // Forward declaration with defaulted arguments.
 template <typename Executor = any_io_executor>
 class basic_file;
 
-#endif // !defined(BOOST_ASIO_BASIC_FILE_FWD_DECL)
+#endif // !defined(ASIO_BASIC_FILE_FWD_DECL)
 
 /// Provides file functionality.
 /**
@@ -82,9 +81,9 @@ public:
   /// The native representation of a file.
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined native_handle_type;
-#elif defined(BOOST_ASIO_HAS_IOCP)
+#elif defined(ASIO_HAS_IOCP)
   typedef detail::win_iocp_file_service::native_handle_type native_handle_type;
-#elif defined(BOOST_ASIO_HAS_IO_URING)
+#elif defined(ASIO_HAS_IO_URING)
   typedef detail::io_uring_file_service::native_handle_type native_handle_type;
 #endif
 
@@ -148,9 +147,9 @@ public:
       const char* path, file_base::flags open_flags)
     : impl_(0, ex)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().open(impl_.get_implementation(), path, open_flags, ec);
-    boost::asio::detail::throw_error(ec, "open");
+    asio::detail::throw_error(ec, "open");
   }
 
   /// Construct and open a basic_file.
@@ -189,9 +188,9 @@ public:
       > = defaulted_constraint())
     : impl_(0, 0, context)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().open(impl_.get_implementation(), path, open_flags, ec);
-    boost::asio::detail::throw_error(ec, "open");
+    asio::detail::throw_error(ec, "open");
   }
 
   /// Construct and open a basic_file.
@@ -224,10 +223,10 @@ public:
       const std::string& path, file_base::flags open_flags)
     : impl_(0, ex)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().open(impl_.get_implementation(),
         path.c_str(), open_flags, ec);
-    boost::asio::detail::throw_error(ec, "open");
+    asio::detail::throw_error(ec, "open");
   }
 
   /// Construct and open a basic_file.
@@ -266,10 +265,10 @@ public:
       > = defaulted_constraint())
     : impl_(0, 0, context)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().open(impl_.get_implementation(),
         path.c_str(), open_flags, ec);
-    boost::asio::detail::throw_error(ec, "open");
+    asio::detail::throw_error(ec, "open");
   }
 
   /// Construct a basic_file on an existing native file handle.
@@ -281,15 +280,15 @@ public:
    *
    * @param native_file A native file handle.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    */
   basic_file(const executor_type& ex, const native_handle_type& native_file)
     : impl_(0, ex)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().assign(
         impl_.get_implementation(), native_file, ec);
-    boost::asio::detail::throw_error(ec, "assign");
+    asio::detail::throw_error(ec, "assign");
   }
 
   /// Construct a basic_file on an existing native file.
@@ -302,7 +301,7 @@ public:
    *
    * @param native_file A native file.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    */
   template <typename ExecutionContext>
   basic_file(ExecutionContext& context, const native_handle_type& native_file,
@@ -312,10 +311,10 @@ public:
       > = defaulted_constraint())
     : impl_(0, 0, context)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().assign(
         impl_.get_implementation(), native_file, ec);
-    boost::asio::detail::throw_error(ec, "assign");
+    asio::detail::throw_error(ec, "assign");
   }
 
   /// Move-construct a basic_file from another.
@@ -409,7 +408,7 @@ public:
    * @param open_flags A set of flags that determine how the file should be
    * opened.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    *
    * Exactly one of the following file_base::flags values must be specified:
    *
@@ -427,15 +426,15 @@ public:
    *
    * @par Example
    * @code
-   * boost::asio::stream_file file(my_context);
-   * file.open("/path/to/my/file", boost::asio::stream_file::read_only);
+   * asio::stream_file file(my_context);
+   * file.open("/path/to/my/file", asio::stream_file::read_only);
    * @endcode
    */
   void open(const char* path, file_base::flags open_flags)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().open(impl_.get_implementation(), path, open_flags, ec);
-    boost::asio::detail::throw_error(ec, "open");
+    asio::detail::throw_error(ec, "open");
   }
 
   /// Open the file using the specified path.
@@ -465,20 +464,20 @@ public:
    *
    * @par Example
    * @code
-   * boost::asio::stream_file file(my_context);
-   * boost::system::error_code ec;
-   * file.open("/path/to/my/file", boost::asio::stream_file::read_only, ec);
+   * asio::stream_file file(my_context);
+   * asio::error_code ec;
+   * file.open("/path/to/my/file", asio::stream_file::read_only, ec);
    * if (ec)
    * {
    *   // An error occurred.
    * }
    * @endcode
    */
-  BOOST_ASIO_SYNC_OP_VOID open(const char* path,
-      file_base::flags open_flags, boost::system::error_code& ec)
+  ASIO_SYNC_OP_VOID open(const char* path,
+      file_base::flags open_flags, asio::error_code& ec)
   {
     impl_.get_service().open(impl_.get_implementation(), path, open_flags, ec);
-    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
+    ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Open the file using the specified path.
@@ -490,7 +489,7 @@ public:
    * @param open_flags A set of flags that determine how the file should be
    * opened.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    *
    * Exactly one of the following file_base::flags values must be specified:
    *
@@ -508,16 +507,16 @@ public:
    *
    * @par Example
    * @code
-   * boost::asio::stream_file file(my_context);
-   * file.open("/path/to/my/file", boost::asio::stream_file::read_only);
+   * asio::stream_file file(my_context);
+   * file.open("/path/to/my/file", asio::stream_file::read_only);
    * @endcode
    */
   void open(const std::string& path, file_base::flags open_flags)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().open(impl_.get_implementation(),
         path.c_str(), open_flags, ec);
-    boost::asio::detail::throw_error(ec, "open");
+    asio::detail::throw_error(ec, "open");
   }
 
   /// Open the file using the specified path.
@@ -547,21 +546,21 @@ public:
    *
    * @par Example
    * @code
-   * boost::asio::stream_file file(my_context);
-   * boost::system::error_code ec;
-   * file.open("/path/to/my/file", boost::asio::stream_file::read_only, ec);
+   * asio::stream_file file(my_context);
+   * asio::error_code ec;
+   * file.open("/path/to/my/file", asio::stream_file::read_only, ec);
    * if (ec)
    * {
    *   // An error occurred.
    * }
    * @endcode
    */
-  BOOST_ASIO_SYNC_OP_VOID open(const std::string& path,
-      file_base::flags open_flags, boost::system::error_code& ec)
+  ASIO_SYNC_OP_VOID open(const std::string& path,
+      file_base::flags open_flags, asio::error_code& ec)
   {
     impl_.get_service().open(impl_.get_implementation(),
         path.c_str(), open_flags, ec);
-    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
+    ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Assign an existing native file to the file.
@@ -570,14 +569,14 @@ public:
    *
    * @param native_file A native file.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    */
   void assign(const native_handle_type& native_file)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().assign(
         impl_.get_implementation(), native_file, ec);
-    boost::asio::detail::throw_error(ec, "assign");
+    asio::detail::throw_error(ec, "assign");
   }
 
   /// Assign an existing native file to the file.
@@ -588,12 +587,12 @@ public:
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  BOOST_ASIO_SYNC_OP_VOID assign(const native_handle_type& native_file,
-      boost::system::error_code& ec)
+  ASIO_SYNC_OP_VOID assign(const native_handle_type& native_file,
+      asio::error_code& ec)
   {
     impl_.get_service().assign(
         impl_.get_implementation(), native_file, ec);
-    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
+    ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Determine whether the file is open.
@@ -606,32 +605,32 @@ public:
   /**
    * This function is used to close the file. Any asynchronous read or write
    * operations will be cancelled immediately, and will complete with the
-   * boost::asio::error::operation_aborted error.
+   * asio::error::operation_aborted error.
    *
-   * @throws boost::system::system_error Thrown on failure. Note that, even if
+   * @throws asio::system_error Thrown on failure. Note that, even if
    * the function indicates an error, the underlying descriptor is closed.
    */
   void close()
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().close(impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "close");
+    asio::detail::throw_error(ec, "close");
   }
 
   /// Close the file.
   /**
    * This function is used to close the file. Any asynchronous read or write
    * operations will be cancelled immediately, and will complete with the
-   * boost::asio::error::operation_aborted error.
+   * asio::error::operation_aborted error.
    *
    * @param ec Set to indicate what error occurred, if any. Note that, even if
    * the function indicates an error, the underlying descriptor is closed.
    *
    * @par Example
    * @code
-   * boost::asio::stream_file file(my_context);
+   * asio::stream_file file(my_context);
    * ...
-   * boost::system::error_code ec;
+   * asio::error_code ec;
    * file.close(ec);
    * if (ec)
    * {
@@ -639,26 +638,26 @@ public:
    * }
    * @endcode
    */
-  BOOST_ASIO_SYNC_OP_VOID close(boost::system::error_code& ec)
+  ASIO_SYNC_OP_VOID close(asio::error_code& ec)
   {
     impl_.get_service().close(impl_.get_implementation(), ec);
-    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
+    ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Release ownership of the underlying native file.
   /**
    * This function causes all outstanding asynchronous read and write
    * operations to finish immediately, and the handlers for cancelled
-   * operations will be passed the boost::asio::error::operation_aborted error.
+   * operations will be passed the asio::error::operation_aborted error.
    * Ownership of the native file is then transferred to the caller.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    *
    * @note This function is unsupported on Windows versions prior to Windows
-   * 8.1, and will fail with boost::asio::error::operation_not_supported on
+   * 8.1, and will fail with asio::error::operation_not_supported on
    * these platforms.
    */
-#if defined(BOOST_ASIO_MSVC) && (BOOST_ASIO_MSVC >= 1400) \
+#if defined(ASIO_MSVC) && (ASIO_MSVC >= 1400) \
   && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0603)
   __declspec(deprecated("This function always fails with "
         "operation_not_supported when used on Windows versions "
@@ -666,10 +665,10 @@ public:
 #endif
   native_handle_type release()
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     native_handle_type s = impl_.get_service().release(
         impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "release");
+    asio::detail::throw_error(ec, "release");
     return s;
   }
 
@@ -677,22 +676,22 @@ public:
   /**
    * This function causes all outstanding asynchronous read and write
    * operations to finish immediately, and the handlers for cancelled
-   * operations will be passed the boost::asio::error::operation_aborted error.
+   * operations will be passed the asio::error::operation_aborted error.
    * Ownership of the native file is then transferred to the caller.
    *
    * @param ec Set to indicate what error occurred, if any.
    *
    * @note This function is unsupported on Windows versions prior to Windows
-   * 8.1, and will fail with boost::asio::error::operation_not_supported on
+   * 8.1, and will fail with asio::error::operation_not_supported on
    * these platforms.
    */
-#if defined(BOOST_ASIO_MSVC) && (BOOST_ASIO_MSVC >= 1400) \
+#if defined(ASIO_MSVC) && (ASIO_MSVC >= 1400) \
   && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0603)
   __declspec(deprecated("This function always fails with "
         "operation_not_supported when used on Windows versions "
         "prior to Windows 8.1."))
 #endif
-  native_handle_type release(boost::system::error_code& ec)
+  native_handle_type release(asio::error_code& ec)
   {
     return impl_.get_service().release(impl_.get_implementation(), ec);
   }
@@ -712,14 +711,14 @@ public:
   /**
    * This function causes all outstanding asynchronous read and write
    * operations to finish immediately, and the handlers for cancelled
-   * operations will be passed the boost::asio::error::operation_aborted error.
+   * operations will be passed the asio::error::operation_aborted error.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    *
    * @note Calls to cancel() will always fail with
-   * boost::asio::error::operation_not_supported when run on Windows XP, Windows
+   * asio::error::operation_not_supported when run on Windows XP, Windows
    * Server 2003, and earlier versions of Windows, unless
-   * BOOST_ASIO_ENABLE_CANCELIO is defined. However, the CancelIo function has
+   * ASIO_ENABLE_CANCELIO is defined. However, the CancelIo function has
    * two issues that should be considered before enabling its use:
    *
    * @li It will only cancel asynchronous operations that were initiated in the
@@ -736,32 +735,32 @@ public:
    * CancelIoEx function is always used. This function does not have the
    * problems described above.
    */
-#if defined(BOOST_ASIO_MSVC) && (BOOST_ASIO_MSVC >= 1400) \
+#if defined(ASIO_MSVC) && (ASIO_MSVC >= 1400) \
   && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600) \
-  && !defined(BOOST_ASIO_ENABLE_CANCELIO)
+  && !defined(ASIO_ENABLE_CANCELIO)
   __declspec(deprecated("By default, this function always fails with "
         "operation_not_supported when used on Windows XP, Windows Server 2003, "
         "or earlier. Consult documentation for details."))
 #endif
   void cancel()
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().cancel(impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "cancel");
+    asio::detail::throw_error(ec, "cancel");
   }
 
   /// Cancel all asynchronous operations associated with the file.
   /**
    * This function causes all outstanding asynchronous read and write
    * operations to finish immediately, and the handlers for cancelled
-   * operations will be passed the boost::asio::error::operation_aborted error.
+   * operations will be passed the asio::error::operation_aborted error.
    *
    * @param ec Set to indicate what error occurred, if any.
    *
    * @note Calls to cancel() will always fail with
-   * boost::asio::error::operation_not_supported when run on Windows XP, Windows
+   * asio::error::operation_not_supported when run on Windows XP, Windows
    * Server 2003, and earlier versions of Windows, unless
-   * BOOST_ASIO_ENABLE_CANCELIO is defined. However, the CancelIo function has
+   * ASIO_ENABLE_CANCELIO is defined. However, the CancelIo function has
    * two issues that should be considered before enabling its use:
    *
    * @li It will only cancel asynchronous operations that were initiated in the
@@ -778,30 +777,30 @@ public:
    * CancelIoEx function is always used. This function does not have the
    * problems described above.
    */
-#if defined(BOOST_ASIO_MSVC) && (BOOST_ASIO_MSVC >= 1400) \
+#if defined(ASIO_MSVC) && (ASIO_MSVC >= 1400) \
   && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600) \
-  && !defined(BOOST_ASIO_ENABLE_CANCELIO)
+  && !defined(ASIO_ENABLE_CANCELIO)
   __declspec(deprecated("By default, this function always fails with "
         "operation_not_supported when used on Windows XP, Windows Server 2003, "
         "or earlier. Consult documentation for details."))
 #endif
-  BOOST_ASIO_SYNC_OP_VOID cancel(boost::system::error_code& ec)
+  ASIO_SYNC_OP_VOID cancel(asio::error_code& ec)
   {
     impl_.get_service().cancel(impl_.get_implementation(), ec);
-    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
+    ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Get the size of the file.
   /**
    * This function determines the size of the file, in bytes.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    */
   uint64_t size() const
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     uint64_t s = impl_.get_service().size(impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "size");
+    asio::detail::throw_error(ec, "size");
     return s;
   }
 
@@ -811,7 +810,7 @@ public:
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  uint64_t size(boost::system::error_code& ec) const
+  uint64_t size(asio::error_code& ec) const
   {
     return impl_.get_service().size(impl_.get_implementation(), ec);
   }
@@ -825,13 +824,13 @@ public:
    *
    * @param n The new size for the file.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    */
   void resize(uint64_t n)
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().resize(impl_.get_implementation(), n, ec);
-    boost::asio::detail::throw_error(ec, "resize");
+    asio::detail::throw_error(ec, "resize");
   }
 
   /// Alter the size of the file.
@@ -845,10 +844,10 @@ public:
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  BOOST_ASIO_SYNC_OP_VOID resize(uint64_t n, boost::system::error_code& ec)
+  ASIO_SYNC_OP_VOID resize(uint64_t n, asio::error_code& ec)
   {
     impl_.get_service().resize(impl_.get_implementation(), n, ec);
-    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
+    ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Synchronise the file to disk.
@@ -856,13 +855,13 @@ public:
    * This function synchronises the file data and metadata to disk. Note that
    * the semantics of this synchronisation vary between operation systems.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    */
   void sync_all()
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().sync_all(impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "sync_all");
+    asio::detail::throw_error(ec, "sync_all");
   }
 
   /// Synchronise the file to disk.
@@ -872,10 +871,10 @@ public:
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  BOOST_ASIO_SYNC_OP_VOID sync_all(boost::system::error_code& ec)
+  ASIO_SYNC_OP_VOID sync_all(asio::error_code& ec)
   {
     impl_.get_service().sync_all(impl_.get_implementation(), ec);
-    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
+    ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Synchronise the file data to disk.
@@ -883,13 +882,13 @@ public:
    * This function synchronises the file data to disk. Note that the semantics
    * of this synchronisation vary between operation systems.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws asio::system_error Thrown on failure.
    */
   void sync_data()
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     impl_.get_service().sync_data(impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "sync_data");
+    asio::detail::throw_error(ec, "sync_data");
   }
 
   /// Synchronise the file data to disk.
@@ -899,10 +898,10 @@ public:
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  BOOST_ASIO_SYNC_OP_VOID sync_data(boost::system::error_code& ec)
+  ASIO_SYNC_OP_VOID sync_data(asio::error_code& ec)
   {
     impl_.get_service().sync_data(impl_.get_implementation(), ec);
-    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
+    ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
 protected:
@@ -915,9 +914,9 @@ protected:
   {
   }
 
-#if defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
   detail::io_object_impl<detail::win_iocp_file_service, Executor> impl_;
-#elif defined(BOOST_ASIO_HAS_IO_URING)
+#elif defined(ASIO_HAS_IO_URING)
   detail::io_object_impl<detail::io_uring_file_service, Executor> impl_;
 #endif
 
@@ -928,11 +927,10 @@ private:
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // defined(BOOST_ASIO_HAS_FILE)
+#endif // defined(ASIO_HAS_FILE)
        //   || defined(GENERATING_DOCUMENTATION)
 
-#endif // BOOST_ASIO_BASIC_FILE_HPP
+#endif // ASIO_BASIC_FILE_HPP

@@ -8,20 +8,19 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IMPL_EXECUTION_CONTEXT_IPP
-#define BOOST_ASIO_IMPL_EXECUTION_CONTEXT_IPP
+#ifndef ASIO_IMPL_EXECUTION_CONTEXT_IPP
+#define ASIO_IMPL_EXECUTION_CONTEXT_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/execution_context.hpp>
-#include <boost/asio/detail/service_registry.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/execution_context.hpp"
+#include "asio/detail/service_registry.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 execution_context::execution_context()
@@ -76,7 +75,7 @@ void execution_context::destroy()
 }
 
 void execution_context::notify_fork(
-    boost::asio::execution_context::fork_event event)
+    asio::execution_context::fork_event event)
 {
   service_registry_->notify_fork(event);
 }
@@ -115,8 +114,7 @@ invalid_service_owner::invalid_service_owner()
 }
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_IMPL_EXECUTION_CONTEXT_IPP
+#endif // ASIO_IMPL_EXECUTION_CONTEXT_IPP

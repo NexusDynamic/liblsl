@@ -8,24 +8,23 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_BIND_ALLOCATOR_HPP
-#define BOOST_ASIO_BIND_ALLOCATOR_HPP
+#ifndef ASIO_BIND_ALLOCATOR_HPP
+#define ASIO_BIND_ALLOCATOR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/associated_allocator.hpp>
-#include <boost/asio/associated_executor.hpp>
-#include <boost/asio/associator.hpp>
-#include <boost/asio/async_result.hpp>
-#include <boost/asio/detail/initiation_base.hpp>
-#include <boost/asio/detail/type_traits.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/associated_allocator.hpp"
+#include "asio/associated_executor.hpp"
+#include "asio/associator.hpp"
+#include "asio/async_result.hpp"
+#include "asio/detail/initiation_base.hpp"
+#include "asio/detail/type_traits.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -375,7 +374,7 @@ private:
 /// allocator.
 /**
  * May also be used directly as a completion token, in which case it adapts the
- * asynchronous operation's default completion token (or boost::asio::deferred
+ * asynchronous operation's default completion token (or asio::deferred
  * if no default is available).
  */
 template <typename Allocator>
@@ -390,7 +389,7 @@ struct partial_allocator_binder
   /// Adapt a @ref completion_token to specify that the completion handler
   /// should have the allocator as its associated allocator.
   template <typename CompletionToken>
-  BOOST_ASIO_NODISCARD inline
+  ASIO_NODISCARD inline
   constexpr allocator_binder<decay_t<CompletionToken>, Allocator>
   operator()(CompletionToken&& completion_token) const
   {
@@ -404,7 +403,7 @@ struct partial_allocator_binder
 
 /// Create a partial completion token that associates an allocator.
 template <typename Allocator>
-BOOST_ASIO_NODISCARD inline partial_allocator_binder<Allocator>
+ASIO_NODISCARD inline partial_allocator_binder<Allocator>
 bind_allocator(const Allocator& ex)
 {
   return partial_allocator_binder<Allocator>(ex);
@@ -413,7 +412,7 @@ bind_allocator(const Allocator& ex)
 /// Associate an object of type @c T with an allocator of type
 /// @c Allocator.
 template <typename Allocator, typename T>
-BOOST_ASIO_NODISCARD inline allocator_binder<decay_t<T>, Allocator>
+ASIO_NODISCARD inline allocator_binder<decay_t<T>, Allocator>
 bind_allocator(const Allocator& s, T&& t)
 {
   return allocator_binder<decay_t<T>, Allocator>(s, static_cast<T&&>(t));
@@ -598,8 +597,7 @@ struct associated_allocator<allocator_binder<T, Allocator>, Allocator1>
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_BIND_ALLOCATOR_HPP
+#endif // ASIO_BIND_ALLOCATOR_HPP

@@ -8,25 +8,25 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_ASSERT_HPP
-#define BOOST_ASIO_DETAIL_ASSERT_HPP
+#ifndef ASIO_DETAIL_ASSERT_HPP
+#define ASIO_DETAIL_ASSERT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_BOOST_ASSERT)
+#if defined(ASIO_HAS_BOOST_ASSERT)
 # include <boost/assert.hpp>
-#else // defined(BOOST_ASIO_HAS_BOOST_ASSERT)
+#else // defined(ASIO_HAS_BOOST_ASSERT)
 # include <cassert>
-#endif // defined(BOOST_ASIO_HAS_BOOST_ASSERT)
+#endif // defined(ASIO_HAS_BOOST_ASSERT)
 
-#if defined(BOOST_ASIO_HAS_BOOST_ASSERT)
-# define BOOST_ASIO_ASSERT(expr) BOOST_ASSERT(expr)
-#else // defined(BOOST_ASIO_HAS_BOOST_ASSERT)
-# define BOOST_ASIO_ASSERT(expr) assert(expr)
-#endif // defined(BOOST_ASIO_HAS_BOOST_ASSERT)
+#if defined(ASIO_HAS_BOOST_ASSERT)
+# define ASIO_ASSERT(expr) BOOST_ASSERT(expr)
+#else // defined(ASIO_HAS_BOOST_ASSERT)
+# define ASIO_ASSERT(expr) assert(expr)
+#endif // defined(ASIO_HAS_BOOST_ASSERT)
 
-#endif // BOOST_ASIO_DETAIL_ASSERT_HPP
+#endif // ASIO_DETAIL_ASSERT_HPP

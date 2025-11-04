@@ -8,33 +8,32 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_THREAD_INFO_BASE_HPP
-#define BOOST_ASIO_DETAIL_THREAD_INFO_BASE_HPP
+#ifndef ASIO_DETAIL_THREAD_INFO_BASE_HPP
+#define ASIO_DETAIL_THREAD_INFO_BASE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <climits>
 #include <cstddef>
-#include <boost/asio/detail/memory.hpp>
-#include <boost/asio/detail/noncopyable.hpp>
+#include "asio/detail/memory.hpp"
+#include "asio/detail/noncopyable.hpp"
 
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
 # include <exception>
-# include <boost/asio/multiple_exceptions.hpp>
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+# include "asio/multiple_exceptions.hpp"
+#endif // !defined(ASIO_NO_EXCEPTIONS)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
-#ifndef BOOST_ASIO_RECYCLING_ALLOCATOR_CACHE_SIZE
-# define BOOST_ASIO_RECYCLING_ALLOCATOR_CACHE_SIZE 2
-#endif // BOOST_ASIO_RECYCLING_ALLOCATOR_CACHE_SIZE
+#ifndef ASIO_RECYCLING_ALLOCATOR_CACHE_SIZE
+# define ASIO_RECYCLING_ALLOCATOR_CACHE_SIZE 2
+#endif // ASIO_RECYCLING_ALLOCATOR_CACHE_SIZE
 
 class thread_info_base
   : private noncopyable
@@ -44,7 +43,7 @@ public:
   {
     enum
     {
-      cache_size = BOOST_ASIO_RECYCLING_ALLOCATOR_CACHE_SIZE,
+      cache_size = ASIO_RECYCLING_ALLOCATOR_CACHE_SIZE,
       begin_mem_index = 0,
       end_mem_index = cache_size
     };
@@ -54,7 +53,7 @@ public:
   {
     enum
     {
-      cache_size = BOOST_ASIO_RECYCLING_ALLOCATOR_CACHE_SIZE,
+      cache_size = ASIO_RECYCLING_ALLOCATOR_CACHE_SIZE,
       begin_mem_index = default_tag::end_mem_index,
       end_mem_index = begin_mem_index + cache_size
     };
@@ -64,7 +63,7 @@ public:
   {
     enum
     {
-      cache_size = BOOST_ASIO_RECYCLING_ALLOCATOR_CACHE_SIZE,
+      cache_size = ASIO_RECYCLING_ALLOCATOR_CACHE_SIZE,
       begin_mem_index = awaitable_frame_tag::end_mem_index,
       end_mem_index = begin_mem_index + cache_size
     };
@@ -74,7 +73,7 @@ public:
   {
     enum
     {
-      cache_size = BOOST_ASIO_RECYCLING_ALLOCATOR_CACHE_SIZE,
+      cache_size = ASIO_RECYCLING_ALLOCATOR_CACHE_SIZE,
       begin_mem_index = executor_function_tag::end_mem_index,
       end_mem_index = begin_mem_index + cache_size
     };
@@ -84,7 +83,7 @@ public:
   {
     enum
     {
-      cache_size = BOOST_ASIO_RECYCLING_ALLOCATOR_CACHE_SIZE,
+      cache_size = ASIO_RECYCLING_ALLOCATOR_CACHE_SIZE,
       begin_mem_index = cancellation_signal_tag::end_mem_index,
       end_mem_index = begin_mem_index + cache_size
     };
@@ -94,7 +93,7 @@ public:
   {
     enum
     {
-      cache_size = BOOST_ASIO_RECYCLING_ALLOCATOR_CACHE_SIZE,
+      cache_size = ASIO_RECYCLING_ALLOCATOR_CACHE_SIZE,
       begin_mem_index = parallel_group_tag::end_mem_index,
       end_mem_index = begin_mem_index + cache_size
     };
@@ -103,9 +102,9 @@ public:
   enum { max_mem_index = timed_cancel_tag::end_mem_index };
 
   thread_info_base()
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
     : has_pending_exception_(0)
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
   {
     for (int i = 0; i < max_mem_index; ++i)
       reusable_memory_[i] = 0;
@@ -124,7 +123,7 @@ public:
   }
 
   static void* allocate(thread_info_base* this_thread,
-      std::size_t size, std::size_t align = BOOST_ASIO_DEFAULT_ALIGN)
+      std::size_t size, std::size_t align = ASIO_DEFAULT_ALIGN)
   {
     return allocate(default_tag(), this_thread, size, align);
   }
@@ -137,7 +136,7 @@ public:
 
   template <typename Purpose>
   static void* allocate(Purpose, thread_info_base* this_thread,
-      std::size_t size, std::size_t align = BOOST_ASIO_DEFAULT_ALIGN)
+      std::size_t size, std::size_t align = ASIO_DEFAULT_ALIGN)
   {
     std::size_t chunks = (size + chunk_size - 1) / chunk_size;
 
@@ -206,7 +205,7 @@ public:
 
   void capture_current_exception()
   {
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
     switch (has_pending_exception_)
     {
     case 0:
@@ -222,12 +221,12 @@ public:
     default:
       break;
     }
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
   }
 
   void rethrow_pending_exception()
   {
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
     if (has_pending_exception_ > 0)
     {
       has_pending_exception_ = 0;
@@ -236,27 +235,26 @@ public:
             pending_exception_));
       std::rethrow_exception(ex);
     }
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
   }
 
 private:
-#if defined(BOOST_ASIO_HAS_IO_URING)
+#if defined(ASIO_HAS_IO_URING)
   enum { chunk_size = 8 };
-#else // defined(BOOST_ASIO_HAS_IO_URING)
+#else // defined(ASIO_HAS_IO_URING)
   enum { chunk_size = 4 };
-#endif // defined(BOOST_ASIO_HAS_IO_URING)
+#endif // defined(ASIO_HAS_IO_URING)
   void* reusable_memory_[max_mem_index];
 
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
   int has_pending_exception_;
   std::exception_ptr pending_exception_;
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
 };
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_THREAD_INFO_BASE_HPP
+#endif // ASIO_DETAIL_THREAD_INFO_BASE_HPP

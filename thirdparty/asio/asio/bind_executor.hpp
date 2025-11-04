@@ -8,27 +8,26 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_BIND_EXECUTOR_HPP
-#define BOOST_ASIO_BIND_EXECUTOR_HPP
+#ifndef ASIO_BIND_EXECUTOR_HPP
+#define ASIO_BIND_EXECUTOR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/associated_executor.hpp>
-#include <boost/asio/associator.hpp>
-#include <boost/asio/async_result.hpp>
-#include <boost/asio/detail/initiation_base.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/execution/executor.hpp>
-#include <boost/asio/execution_context.hpp>
-#include <boost/asio/is_executor.hpp>
-#include <boost/asio/uses_executor.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/associated_executor.hpp"
+#include "asio/associator.hpp"
+#include "asio/async_result.hpp"
+#include "asio/detail/initiation_base.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/execution/executor.hpp"
+#include "asio/execution_context.hpp"
+#include "asio/is_executor.hpp"
+#include "asio/uses_executor.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -408,7 +407,7 @@ private:
 /// executor.
 /**
  * May also be used directly as a completion token, in which case it adapts the
- * asynchronous operation's default completion token (or boost::asio::deferred
+ * asynchronous operation's default completion token (or asio::deferred
  * if no default is available).
  */
 template <typename Executor>
@@ -423,7 +422,7 @@ struct partial_executor_binder
   /// Adapt a @ref completion_token to specify that the completion handler
   /// should have the executor as its associated executor.
   template <typename CompletionToken>
-  BOOST_ASIO_NODISCARD inline
+  ASIO_NODISCARD inline
   constexpr executor_binder<decay_t<CompletionToken>, Executor>
   operator()(CompletionToken&& completion_token) const
   {
@@ -437,7 +436,7 @@ struct partial_executor_binder
 
 /// Create a partial completion token that associates an executor.
 template <typename Executor>
-BOOST_ASIO_NODISCARD inline partial_executor_binder<Executor>
+ASIO_NODISCARD inline partial_executor_binder<Executor>
 bind_executor(const Executor& ex,
     constraint_t<
       is_executor<Executor>::value || execution::is_executor<Executor>::value
@@ -448,7 +447,7 @@ bind_executor(const Executor& ex,
 
 /// Associate an object of type @c T with an executor of type @c Executor.
 template <typename Executor, typename T>
-BOOST_ASIO_NODISCARD inline executor_binder<decay_t<T>, Executor>
+ASIO_NODISCARD inline executor_binder<decay_t<T>, Executor>
 bind_executor(const Executor& ex, T&& t,
     constraint_t<
       is_executor<Executor>::value || execution::is_executor<Executor>::value
@@ -461,7 +460,7 @@ bind_executor(const Executor& ex, T&& t,
 /// Create a partial completion token that associates an execution context's
 /// executor.
 template <typename ExecutionContext>
-BOOST_ASIO_NODISCARD inline partial_executor_binder<
+ASIO_NODISCARD inline partial_executor_binder<
     typename ExecutionContext::executor_type>
 bind_executor(ExecutionContext& ctx,
     constraint_t<
@@ -474,7 +473,7 @@ bind_executor(ExecutionContext& ctx,
 
 /// Associate an object of type @c T with an execution context's executor.
 template <typename ExecutionContext, typename T>
-BOOST_ASIO_NODISCARD inline executor_binder<decay_t<T>,
+ASIO_NODISCARD inline executor_binder<decay_t<T>,
     typename ExecutionContext::executor_type>
 bind_executor(ExecutionContext& ctx, T&& t,
     constraint_t<
@@ -666,8 +665,7 @@ struct associated_executor<executor_binder<T, Executor>, Executor1>
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_BIND_EXECUTOR_HPP
+#endif // ASIO_BIND_EXECUTOR_HPP

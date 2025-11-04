@@ -8,15 +8,15 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IMPL_CONFIG_IPP
-#define BOOST_ASIO_IMPL_CONFIG_IPP
+#ifndef ASIO_IMPL_CONFIG_IPP
+#define ASIO_IMPL_CONFIG_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/config.hpp>
-#include <boost/asio/detail/concurrency_hint.hpp>
+#include "asio/config.hpp"
+#include "asio/detail/concurrency_hint.hpp"
 #include <cctype>
 #include <cstdio>
 #include <cstring>
@@ -24,9 +24,8 @@
 #include <vector>
 #include <utility>
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 config_service::config_service(execution_context& ctx)
@@ -63,12 +62,12 @@ public:
     {
       if (std::strcmp(key_name, "concurrency_hint") == 0)
       {
-        if (BOOST_ASIO_CONCURRENCY_HINT_IS_SPECIAL(concurrency_hint_))
+        if (ASIO_CONCURRENCY_HINT_IS_SPECIAL(concurrency_hint_))
         {
           return
-            !BOOST_ASIO_CONCURRENCY_HINT_IS_LOCKING(
+            !ASIO_CONCURRENCY_HINT_IS_LOCKING(
               SCHEDULER, concurrency_hint_) ||
-            !BOOST_ASIO_CONCURRENCY_HINT_IS_LOCKING(
+            !ASIO_CONCURRENCY_HINT_IS_LOCKING(
                 REACTOR_IO, concurrency_hint_) ? "1" : "-1";
         }
         else
@@ -79,7 +78,7 @@ public:
       }
       else if (std::strcmp(key_name, "locking") == 0)
       {
-        return BOOST_ASIO_CONCURRENCY_HINT_IS_LOCKING(
+        return ASIO_CONCURRENCY_HINT_IS_LOCKING(
             SCHEDULER, concurrency_hint_) ? "1" : "0";
       }
     }
@@ -87,12 +86,12 @@ public:
     {
       if (std::strcmp(key_name, "io_locking") == 0)
       {
-        return BOOST_ASIO_CONCURRENCY_HINT_IS_LOCKING(
+        return ASIO_CONCURRENCY_HINT_IS_LOCKING(
             REACTOR_IO, concurrency_hint_) ? "1" : "0";
       }
       else if (std::strcmp(key_name, "registration_locking") == 0)
       {
-        return BOOST_ASIO_CONCURRENCY_HINT_IS_LOCKING(
+        return ASIO_CONCURRENCY_HINT_IS_LOCKING(
             REACTOR_REGISTRATION, concurrency_hint_) ? "1" : "0";
       }
     }
@@ -106,7 +105,7 @@ private:
 } // namespace detail
 
 config_from_concurrency_hint::config_from_concurrency_hint()
-  : concurrency_hint_(BOOST_ASIO_CONCURRENCY_HINT_DEFAULT)
+  : concurrency_hint_(ASIO_CONCURRENCY_HINT_DEFAULT)
 {
 }
 
@@ -114,7 +113,7 @@ void config_from_concurrency_hint::make(execution_context& ctx) const
 {
   (void)make_service<detail::config_from_concurrency_hint_service>(ctx,
       concurrency_hint_ == 1
-        ? BOOST_ASIO_CONCURRENCY_HINT_1 : concurrency_hint_);
+        ? ASIO_CONCURRENCY_HINT_1 : concurrency_hint_);
 }
 
 namespace detail {
@@ -286,10 +285,10 @@ void config_from_string::make(execution_context& ctx) const
 
 namespace detail {
 
-#if defined(BOOST_ASIO_MSVC)
+#if defined(ASIO_MSVC)
 # pragma warning (push)
 # pragma warning (disable:4996) // suppress unsafe warning for std::getenv
-#endif // defined(BOOST_ASIO_MSVC)
+#endif // defined(ASIO_MSVC)
 
 class config_from_env_service : public config_service
 {
@@ -323,9 +322,9 @@ private:
   std::string prefix_;
 };
 
-#if defined(BOOST_ASIO_MSVC)
+#if defined(ASIO_MSVC)
 # pragma warning (pop)
-#endif // defined(BOOST_ASIO_MSVC)
+#endif // defined(ASIO_MSVC)
 
 } // namespace detail
 
@@ -340,8 +339,7 @@ void config_from_env::make(execution_context& ctx) const
 }
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_IMPL_CONFIG_IPP
+#endif // ASIO_IMPL_CONFIG_IPP

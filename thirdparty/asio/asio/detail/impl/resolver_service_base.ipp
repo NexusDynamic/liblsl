@@ -8,26 +8,25 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_IMPL_RESOLVER_SERVICE_BASE_IPP
-#define BOOST_ASIO_DETAIL_IMPL_RESOLVER_SERVICE_BASE_IPP
+#ifndef ASIO_DETAIL_IMPL_RESOLVER_SERVICE_BASE_IPP
+#define ASIO_DETAIL_IMPL_RESOLVER_SERVICE_BASE_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/config.hpp>
-#include <boost/asio/detail/memory.hpp>
-#include <boost/asio/detail/resolver_service_base.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/config.hpp"
+#include "asio/detail/memory.hpp"
+#include "asio/detail/resolver_service_base.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
 resolver_service_base::resolver_service_base(execution_context& context)
-  : thread_pool_(boost::asio::use_service<resolver_thread_pool>(context))
+  : thread_pool_(asio::use_service<resolver_thread_pool>(context))
 {
 }
 
@@ -44,7 +43,7 @@ void resolver_service_base::construct(
 void resolver_service_base::destroy(
     resolver_service_base::implementation_type& impl)
 {
-  BOOST_ASIO_HANDLER_OPERATION((thread_pool_.context(),
+  ASIO_HANDLER_OPERATION((thread_pool_.context(),
         "resolver", &impl, 0, "cancel"));
 
   impl.reset();
@@ -66,7 +65,7 @@ void resolver_service_base::move_assign(implementation_type& impl,
 void resolver_service_base::cancel(
     resolver_service_base::implementation_type& impl)
 {
-  BOOST_ASIO_HANDLER_OPERATION((thread_pool_.context(),
+  ASIO_HANDLER_OPERATION((thread_pool_.context(),
         "resolver", &impl, 0, "cancel"));
 
   impl.reset(static_cast<void*>(0), socket_ops::noop_deleter());
@@ -74,8 +73,7 @@ void resolver_service_base::cancel(
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_DETAIL_IMPL_RESOLVER_SERVICE_BASE_IPP
+#endif // ASIO_DETAIL_IMPL_RESOLVER_SERVICE_BASE_IPP

@@ -8,24 +8,23 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_IMPL_REACTIVE_SOCKET_SERVICE_BASE_IPP
-#define BOOST_ASIO_DETAIL_IMPL_REACTIVE_SOCKET_SERVICE_BASE_IPP
+#ifndef ASIO_DETAIL_IMPL_REACTIVE_SOCKET_SERVICE_BASE_IPP
+#define ASIO_DETAIL_IMPL_REACTIVE_SOCKET_SERVICE_BASE_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if !defined(BOOST_ASIO_HAS_IOCP) \
-  && !defined(BOOST_ASIO_WINDOWS_RUNTIME) \
-  && !defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+#if !defined(ASIO_HAS_IOCP) \
+  && !defined(ASIO_WINDOWS_RUNTIME) \
+  && !defined(ASIO_HAS_IO_URING_AS_DEFAULT)
 
-#include <boost/asio/detail/reactive_socket_service_base.hpp>
+#include "asio/detail/reactive_socket_service_base.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -85,26 +84,26 @@ void reactive_socket_service_base::destroy(
 {
   if (impl.socket_ != invalid_socket)
   {
-    BOOST_ASIO_HANDLER_OPERATION((reactor_.context(),
+    ASIO_HANDLER_OPERATION((reactor_.context(),
           "socket", &impl, impl.socket_, "close"));
 
     reactor_.deregister_descriptor(impl.socket_, impl.reactor_data_,
         (impl.state_ & socket_ops::possible_dup) == 0);
 
-    boost::system::error_code ignored_ec;
+    asio::error_code ignored_ec;
     socket_ops::close(impl.socket_, impl.state_, true, ignored_ec);
 
     reactor_.cleanup_descriptor_data(impl.reactor_data_);
   }
 }
 
-boost::system::error_code reactive_socket_service_base::close(
+asio::error_code reactive_socket_service_base::close(
     reactive_socket_service_base::base_implementation_type& impl,
-    boost::system::error_code& ec)
+    asio::error_code& ec)
 {
   if (is_open(impl))
   {
-    BOOST_ASIO_HANDLER_OPERATION((reactor_.context(),
+    ASIO_HANDLER_OPERATION((reactor_.context(),
           "socket", &impl, impl.socket_, "close"));
 
     reactor_.deregister_descriptor(impl.socket_, impl.reactor_data_,
@@ -116,7 +115,7 @@ boost::system::error_code reactive_socket_service_base::close(
   }
   else
   {
-    ec = boost::system::error_code();
+    ec = asio::error_code();
   }
 
   // The descriptor is closed by the OS even if close() returns an error.
@@ -134,50 +133,50 @@ boost::system::error_code reactive_socket_service_base::close(
 
 socket_type reactive_socket_service_base::release(
     reactive_socket_service_base::base_implementation_type& impl,
-    boost::system::error_code& ec)
+    asio::error_code& ec)
 {
   if (!is_open(impl))
   {
-    ec = boost::asio::error::bad_descriptor;
+    ec = asio::error::bad_descriptor;
     return invalid_socket;
   }
 
-  BOOST_ASIO_HANDLER_OPERATION((reactor_.context(),
+  ASIO_HANDLER_OPERATION((reactor_.context(),
         "socket", &impl, impl.socket_, "release"));
 
   reactor_.deregister_descriptor(impl.socket_, impl.reactor_data_, false);
   reactor_.cleanup_descriptor_data(impl.reactor_data_);
   socket_type sock = impl.socket_;
   construct(impl);
-  ec = boost::system::error_code();
+  ec = asio::error_code();
   return sock;
 }
 
-boost::system::error_code reactive_socket_service_base::cancel(
+asio::error_code reactive_socket_service_base::cancel(
     reactive_socket_service_base::base_implementation_type& impl,
-    boost::system::error_code& ec)
+    asio::error_code& ec)
 {
   if (!is_open(impl))
   {
-    ec = boost::asio::error::bad_descriptor;
+    ec = asio::error::bad_descriptor;
     return ec;
   }
 
-  BOOST_ASIO_HANDLER_OPERATION((reactor_.context(),
+  ASIO_HANDLER_OPERATION((reactor_.context(),
         "socket", &impl, impl.socket_, "cancel"));
 
   reactor_.cancel_ops(impl.socket_, impl.reactor_data_);
-  ec = boost::system::error_code();
+  ec = asio::error_code();
   return ec;
 }
 
-boost::system::error_code reactive_socket_service_base::do_open(
+asio::error_code reactive_socket_service_base::do_open(
     reactive_socket_service_base::base_implementation_type& impl,
-    int af, int type, int protocol, boost::system::error_code& ec)
+    int af, int type, int protocol, asio::error_code& ec)
 {
   if (is_open(impl))
   {
-    ec = boost::asio::error::already_open;
+    ec = asio::error::already_open;
     return ec;
   }
 
@@ -187,8 +186,8 @@ boost::system::error_code reactive_socket_service_base::do_open(
 
   if (int err = reactor_.register_descriptor(sock.get(), impl.reactor_data_))
   {
-    ec = boost::system::error_code(err,
-        boost::asio::error::get_system_category());
+    ec = asio::error_code(err,
+        asio::error::get_system_category());
     return ec;
   }
 
@@ -199,26 +198,26 @@ boost::system::error_code reactive_socket_service_base::do_open(
   case SOCK_DGRAM: impl.state_ = socket_ops::datagram_oriented; break;
   default: impl.state_ = 0; break;
   }
-  ec = boost::system::error_code();
+  ec = asio::error_code();
   return ec;
 }
 
-boost::system::error_code reactive_socket_service_base::do_assign(
+asio::error_code reactive_socket_service_base::do_assign(
     reactive_socket_service_base::base_implementation_type& impl, int type,
     const reactive_socket_service_base::native_handle_type& native_socket,
-    boost::system::error_code& ec)
+    asio::error_code& ec)
 {
   if (is_open(impl))
   {
-    ec = boost::asio::error::already_open;
+    ec = asio::error::already_open;
     return ec;
   }
 
   if (int err = reactor_.register_descriptor(
         native_socket, impl.reactor_data_))
   {
-    ec = boost::system::error_code(err,
-        boost::asio::error::get_system_category());
+    ec = asio::error_code(err,
+        asio::error::get_system_category());
     return ec;
   }
 
@@ -230,7 +229,7 @@ boost::system::error_code reactive_socket_service_base::do_assign(
   default: impl.state_ = 0; break;
   }
   impl.state_ |= socket_ops::possible_dup;
-  ec = boost::system::error_code();
+  ec = asio::error_code();
   return ec;
 }
 
@@ -270,7 +269,7 @@ void reactive_socket_service_base::do_start_accept_op(
   }
   else
   {
-    op->ec_ = boost::asio::error::already_open;
+    op->ec_ = asio::error::already_open;
     on_immediate(op, is_continuation, immediate_arg);
   }
 }
@@ -287,10 +286,10 @@ void reactive_socket_service_base::do_start_connect_op(
   {
     if (socket_ops::connect(impl.socket_, addr, addrlen, op->ec_) != 0)
     {
-      if (op->ec_ == boost::asio::error::in_progress
-          || op->ec_ == boost::asio::error::would_block)
+      if (op->ec_ == asio::error::in_progress
+          || op->ec_ == asio::error::would_block)
       {
-        op->ec_ = boost::system::error_code();
+        op->ec_ = asio::error_code();
         reactor_.start_op(reactor::connect_op, impl.socket_, impl.reactor_data_,
             op, is_continuation, false, on_immediate, immediate_arg);
         return;
@@ -303,12 +302,11 @@ void reactive_socket_service_base::do_start_connect_op(
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // !defined(BOOST_ASIO_HAS_IOCP)
-       //   && !defined(BOOST_ASIO_WINDOWS_RUNTIME)
-       //   && !defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+#endif // !defined(ASIO_HAS_IOCP)
+       //   && !defined(ASIO_WINDOWS_RUNTIME)
+       //   && !defined(ASIO_HAS_IO_URING_AS_DEFAULT)
 
-#endif // BOOST_ASIO_DETAIL_IMPL_REACTIVE_SOCKET_SERVICE_BASE_IPP
+#endif // ASIO_DETAIL_IMPL_REACTIVE_SOCKET_SERVICE_BASE_IPP

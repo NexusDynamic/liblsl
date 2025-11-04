@@ -8,29 +8,28 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_IMPL_WIN_IOCP_IO_CONTEXT_IPP
-#define BOOST_ASIO_DETAIL_IMPL_WIN_IOCP_IO_CONTEXT_IPP
+#ifndef ASIO_DETAIL_IMPL_WIN_IOCP_IO_CONTEXT_IPP
+#define ASIO_DETAIL_IMPL_WIN_IOCP_IO_CONTEXT_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_IOCP)
+#if defined(ASIO_HAS_IOCP)
 
-#include <boost/asio/config.hpp>
-#include <boost/asio/error.hpp>
-#include <boost/asio/detail/cstdint.hpp>
-#include <boost/asio/detail/handler_alloc_helpers.hpp>
-#include <boost/asio/detail/limits.hpp>
-#include <boost/asio/detail/thread.hpp>
-#include <boost/asio/detail/throw_error.hpp>
-#include <boost/asio/detail/win_iocp_io_context.hpp>
+#include "asio/config.hpp"
+#include "asio/error.hpp"
+#include "asio/detail/cstdint.hpp"
+#include "asio/detail/handler_alloc_helpers.hpp"
+#include "asio/detail/limits.hpp"
+#include "asio/detail/thread.hpp"
+#include "asio/detail/throw_error.hpp"
+#include "asio/detail/win_iocp_io_context.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -43,7 +42,7 @@ struct win_iocp_io_context::thread_function
 
   void operator()()
   {
-    boost::system::error_code ec;
+    asio::error_code ec;
     this_->run(ec);
   }
 
@@ -80,7 +79,7 @@ struct win_iocp_io_context::timer_thread_function
 };
 
 win_iocp_io_context::win_iocp_io_context(
-    boost::asio::execution_context& ctx, bool own_thread)
+    asio::execution_context& ctx, bool own_thread)
   : execution_context_service_base<win_iocp_io_context>(ctx),
     iocp_(),
     outstanding_work_(0),
@@ -91,7 +90,7 @@ win_iocp_io_context::win_iocp_io_context(
     dispatch_required_(0),
     concurrency_hint_(config(ctx).get("scheduler", "concurrency_hint", -1))
 {
-  BOOST_ASIO_HANDLER_TRACKING_INIT;
+  ASIO_HANDLER_TRACKING_INIT;
 
   iocp_.handle = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0,
       static_cast<DWORD>(concurrency_hint_ >= 0
@@ -99,9 +98,9 @@ win_iocp_io_context::win_iocp_io_context(
   if (!iocp_.handle)
   {
     DWORD last_error = ::GetLastError();
-    boost::system::error_code ec(last_error,
-        boost::asio::error::get_system_category());
-    boost::asio::detail::throw_error(ec, "iocp");
+    asio::error_code ec(last_error,
+        asio::error::get_system_category());
+    asio::detail::throw_error(ec, "iocp");
   }
 
   if (own_thread)
@@ -112,7 +111,7 @@ win_iocp_io_context::win_iocp_io_context(
 }
 
 win_iocp_io_context::win_iocp_io_context(
-    win_iocp_io_context::internal, boost::asio::execution_context& ctx)
+    win_iocp_io_context::internal, asio::execution_context& ctx)
   : execution_context_service_base<win_iocp_io_context>(ctx),
     iocp_(),
     outstanding_work_(0),
@@ -123,7 +122,7 @@ win_iocp_io_context::win_iocp_io_context(
     dispatch_required_(0),
     concurrency_hint_(-1)
 {
-  BOOST_ASIO_HANDLER_TRACKING_INIT;
+  ASIO_HANDLER_TRACKING_INIT;
 
   iocp_.handle = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0,
       static_cast<DWORD>(concurrency_hint_ >= 0
@@ -131,9 +130,9 @@ win_iocp_io_context::win_iocp_io_context(
   if (!iocp_.handle)
   {
     DWORD last_error = ::GetLastError();
-    boost::system::error_code ec(last_error,
-        boost::asio::error::get_system_category());
-    boost::asio::detail::throw_error(ec, "iocp");
+    asio::error_code ec(last_error,
+        asio::error::get_system_category());
+    asio::detail::throw_error(ec, "iocp");
   }
 }
 
@@ -196,28 +195,28 @@ void win_iocp_io_context::shutdown()
   timer_thread_.join();
 }
 
-boost::system::error_code win_iocp_io_context::register_handle(
-    HANDLE handle, boost::system::error_code& ec)
+asio::error_code win_iocp_io_context::register_handle(
+    HANDLE handle, asio::error_code& ec)
 {
   if (::CreateIoCompletionPort(handle, iocp_.handle, 0, 0) == 0)
   {
     DWORD last_error = ::GetLastError();
-    ec = boost::system::error_code(last_error,
-        boost::asio::error::get_system_category());
+    ec = asio::error_code(last_error,
+        asio::error::get_system_category());
   }
   else
   {
-    ec = boost::system::error_code();
+    ec = asio::error_code();
   }
   return ec;
 }
 
-size_t win_iocp_io_context::run(boost::system::error_code& ec)
+size_t win_iocp_io_context::run(asio::error_code& ec)
 {
   if (::InterlockedExchangeAdd(&outstanding_work_, 0) == 0)
   {
     stop();
-    ec = boost::system::error_code();
+    ec = asio::error_code();
     return 0;
   }
 
@@ -231,12 +230,12 @@ size_t win_iocp_io_context::run(boost::system::error_code& ec)
   return n;
 }
 
-size_t win_iocp_io_context::run_one(boost::system::error_code& ec)
+size_t win_iocp_io_context::run_one(asio::error_code& ec)
 {
   if (::InterlockedExchangeAdd(&outstanding_work_, 0) == 0)
   {
     stop();
-    ec = boost::system::error_code();
+    ec = asio::error_code();
     return 0;
   }
 
@@ -246,12 +245,12 @@ size_t win_iocp_io_context::run_one(boost::system::error_code& ec)
   return do_one(INFINITE, this_thread, ec);
 }
 
-size_t win_iocp_io_context::wait_one(long usec, boost::system::error_code& ec)
+size_t win_iocp_io_context::wait_one(long usec, asio::error_code& ec)
 {
   if (::InterlockedExchangeAdd(&outstanding_work_, 0) == 0)
   {
     stop();
-    ec = boost::system::error_code();
+    ec = asio::error_code();
     return 0;
   }
 
@@ -261,12 +260,12 @@ size_t win_iocp_io_context::wait_one(long usec, boost::system::error_code& ec)
   return do_one(usec < 0 ? INFINITE : ((usec - 1) / 1000 + 1), this_thread, ec);
 }
 
-size_t win_iocp_io_context::poll(boost::system::error_code& ec)
+size_t win_iocp_io_context::poll(asio::error_code& ec)
 {
   if (::InterlockedExchangeAdd(&outstanding_work_, 0) == 0)
   {
     stop();
-    ec = boost::system::error_code();
+    ec = asio::error_code();
     return 0;
   }
 
@@ -280,12 +279,12 @@ size_t win_iocp_io_context::poll(boost::system::error_code& ec)
   return n;
 }
 
-size_t win_iocp_io_context::poll_one(boost::system::error_code& ec)
+size_t win_iocp_io_context::poll_one(asio::error_code& ec)
 {
   if (::InterlockedExchangeAdd(&outstanding_work_, 0) == 0)
   {
     stop();
-    ec = boost::system::error_code();
+    ec = asio::error_code();
     return 0;
   }
 
@@ -304,9 +303,9 @@ void win_iocp_io_context::stop()
       if (!::PostQueuedCompletionStatus(iocp_.handle, 0, 0, 0))
       {
         DWORD last_error = ::GetLastError();
-        boost::system::error_code ec(last_error,
-            boost::asio::error::get_system_category());
-        boost::asio::detail::throw_error(ec, "pqcs");
+        asio::error_code ec(last_error,
+            asio::error::get_system_category());
+        asio::detail::throw_error(ec, "pqcs");
       }
     }
   }
@@ -395,7 +394,7 @@ void win_iocp_io_context::on_completion(win_iocp_operation* op,
 
   // Store results in the OVERLAPPED structure.
   op->Internal = reinterpret_cast<ulong_ptr_t>(
-      &boost::asio::error::get_system_category());
+      &asio::error::get_system_category());
   op->Offset = last_error;
   op->OffsetHigh = bytes_transferred;
 
@@ -411,7 +410,7 @@ void win_iocp_io_context::on_completion(win_iocp_operation* op,
 }
 
 void win_iocp_io_context::on_completion(win_iocp_operation* op,
-    const boost::system::error_code& ec, DWORD bytes_transferred)
+    const asio::error_code& ec, DWORD bytes_transferred)
 {
   // Flag that the operation is ready for invocation.
   op->ready_ = 1;
@@ -433,7 +432,7 @@ void win_iocp_io_context::on_completion(win_iocp_operation* op,
 }
 
 size_t win_iocp_io_context::do_one(DWORD msec,
-    win_iocp_thread_info& this_thread, boost::system::error_code& ec)
+    win_iocp_thread_info& this_thread, asio::error_code& ec)
 {
   for (;;)
   {
@@ -463,15 +462,15 @@ size_t win_iocp_io_context::do_one(DWORD msec,
     if (overlapped)
     {
       win_iocp_operation* op = static_cast<win_iocp_operation*>(overlapped);
-      boost::system::error_code result_ec(last_error,
-          boost::asio::error::get_system_category());
+      asio::error_code result_ec(last_error,
+          asio::error::get_system_category());
 
       // We may have been passed the last_error and bytes_transferred in the
       // OVERLAPPED structure itself.
       if (completion_key == overlapped_contains_result)
       {
-        result_ec = boost::system::error_code(static_cast<int>(op->Offset),
-            *reinterpret_cast<boost::system::error_category*>(op->Internal));
+        result_ec = asio::error_code(static_cast<int>(op->Offset),
+            *reinterpret_cast<asio::error_category*>(op->Internal));
         bytes_transferred = op->OffsetHigh;
       }
 
@@ -496,7 +495,7 @@ size_t win_iocp_io_context::do_one(DWORD msec,
 
         op->complete(this, result_ec, bytes_transferred);
         this_thread.rethrow_pending_exception();
-        ec = boost::system::error_code();
+        ec = asio::error_code();
         return 1;
       }
     }
@@ -504,8 +503,8 @@ size_t win_iocp_io_context::do_one(DWORD msec,
     {
       if (last_error != WAIT_TIMEOUT)
       {
-        ec = boost::system::error_code(last_error,
-            boost::asio::error::get_system_category());
+        ec = asio::error_code(last_error,
+            asio::error::get_system_category());
         return 0;
       }
 
@@ -514,7 +513,7 @@ size_t win_iocp_io_context::do_one(DWORD msec,
       if (msec == INFINITE)
         continue;
 
-      ec = boost::system::error_code();
+      ec = asio::error_code();
       return 0;
     }
     else if (completion_key == wake_for_dispatch)
@@ -537,13 +536,13 @@ size_t win_iocp_io_context::do_one(DWORD msec,
           if (!::PostQueuedCompletionStatus(iocp_.handle, 0, 0, 0))
           {
             last_error = ::GetLastError();
-            ec = boost::system::error_code(last_error,
-                boost::asio::error::get_system_category());
+            ec = asio::error_code(last_error,
+                asio::error::get_system_category());
             return 0;
           }
         }
 
-        ec = boost::system::error_code();
+        ec = asio::error_code();
         return 0;
       }
     }
@@ -582,9 +581,9 @@ void win_iocp_io_context::do_add_timer_queue(timer_queue_base& queue)
     if (waitable_timer_.handle == 0)
     {
       DWORD last_error = ::GetLastError();
-      boost::system::error_code ec(last_error,
-          boost::asio::error::get_system_category());
-      boost::asio::detail::throw_error(ec, "timer");
+      asio::error_code ec(last_error,
+          asio::error::get_system_category());
+      asio::detail::throw_error(ec, "timer");
     }
 
     LARGE_INTEGER timeout;
@@ -629,10 +628,9 @@ void win_iocp_io_context::update_timeout()
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // defined(BOOST_ASIO_HAS_IOCP)
+#endif // defined(ASIO_HAS_IOCP)
 
-#endif // BOOST_ASIO_DETAIL_IMPL_WIN_IOCP_IO_CONTEXT_IPP
+#endif // ASIO_DETAIL_IMPL_WIN_IOCP_IO_CONTEXT_IPP

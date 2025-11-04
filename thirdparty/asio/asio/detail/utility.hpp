@@ -8,27 +8,26 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_UTILITY_HPP
-#define BOOST_ASIO_DETAIL_UTILITY_HPP
+#ifndef ASIO_DETAIL_UTILITY_HPP
+#define ASIO_DETAIL_UTILITY_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <utility>
 
-namespace boost {
 namespace asio {
 namespace detail {
 
-#if defined(BOOST_ASIO_HAS_STD_INDEX_SEQUENCE)
+#if defined(ASIO_HAS_STD_INDEX_SEQUENCE)
 
 using std::index_sequence;
 using std::index_sequence_for;
 using std::make_index_sequence;
 
-#else // defined(BOOST_ASIO_HAS_STD_INDEX_SEQUENCE)
+#else // defined(ASIO_HAS_STD_INDEX_SEQUENCE)
 
 template <std::size_t...>
 struct index_sequence
@@ -76,10 +75,9 @@ using index_sequence_for = typename index_range<0, sizeof...(T)>::type;
 template <std::size_t N>
 using make_index_sequence = typename index_range<0, N>::type;
 
-#endif // defined(BOOST_ASIO_HAS_STD_INDEX_SEQUENCE)
+#endif // defined(ASIO_HAS_STD_INDEX_SEQUENCE)
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#endif // BOOST_ASIO_DETAIL_UTILITY_HPP
+#endif // ASIO_DETAIL_UTILITY_HPP

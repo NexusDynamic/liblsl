@@ -8,22 +8,21 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_ASSOCIATED_ALLOCATOR_HPP
-#define BOOST_ASIO_ASSOCIATED_ALLOCATOR_HPP
+#ifndef ASIO_ASSOCIATED_ALLOCATOR_HPP
+#define ASIO_ASSOCIATED_ALLOCATOR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 #include <memory>
-#include <boost/asio/associator.hpp>
-#include <boost/asio/detail/functional.hpp>
-#include <boost/asio/detail/type_traits.hpp>
+#include "asio/associator.hpp"
+#include "asio/detail/functional.hpp"
+#include "asio/detail/type_traits.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 template <typename T, typename Allocator>
@@ -137,7 +136,7 @@ struct associated_allocator
  * @returns <tt>associated_allocator<T>::get(t)</tt>
  */
 template <typename T>
-BOOST_ASIO_NODISCARD inline typename associated_allocator<T>::type
+ASIO_NODISCARD inline typename associated_allocator<T>::type
 get_associated_allocator(const T& t) noexcept
 {
   return associated_allocator<T>::get(t);
@@ -148,7 +147,7 @@ get_associated_allocator(const T& t) noexcept
  * @returns <tt>associated_allocator<T, Allocator>::get(t, a)</tt>
  */
 template <typename T, typename Allocator>
-BOOST_ASIO_NODISCARD inline auto get_associated_allocator(
+ASIO_NODISCARD inline auto get_associated_allocator(
     const T& t, const Allocator& a) noexcept
   -> decltype(associated_allocator<T, Allocator>::get(t, a))
 {
@@ -209,8 +208,7 @@ struct associated_allocator<reference_wrapper<T>, Allocator>
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_ASSOCIATED_ALLOCATOR_HPP
+#endif // ASIO_ASSOCIATED_ALLOCATOR_HPP

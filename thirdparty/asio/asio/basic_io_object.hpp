@@ -8,23 +8,22 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_BASIC_IO_OBJECT_HPP
-#define BOOST_ASIO_BASIC_IO_OBJECT_HPP
+#ifndef ASIO_BASIC_IO_OBJECT_HPP
+#define ASIO_BASIC_IO_OBJECT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if !defined(BOOST_ASIO_NO_DEPRECATED) \
+#if !defined(ASIO_NO_DEPRECATED) \
   || defined(GENERATING_DOCUMENTATION)
 
-#include <boost/asio/io_context.hpp>
+#include "asio/io_context.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 namespace detail
@@ -78,7 +77,7 @@ public:
    * @return A reference to the io_context object that the I/O object will use
    * to dispatch handlers. Ownership is not transferred to the caller.
    */
-  boost::asio::io_context& get_io_context()
+  asio::io_context& get_io_context()
   {
     return service_.get_io_context();
   }
@@ -91,13 +90,13 @@ public:
    * @return A reference to the io_context object that the I/O object will use
    * to dispatch handlers. Ownership is not transferred to the caller.
    */
-  boost::asio::io_context& get_io_service()
+  asio::io_context& get_io_service()
   {
     return service_.get_io_context();
   }
 
   /// The type of the executor associated with the object.
-  typedef boost::asio::io_context::executor_type executor_type;
+  typedef asio::io_context::executor_type executor_type;
 
   /// Get the executor associated with the object.
   executor_type get_executor() noexcept
@@ -111,8 +110,8 @@ protected:
    * Performs:
    * @code get_service().construct(get_implementation()); @endcode
    */
-  explicit basic_io_object(boost::asio::io_context& io_context)
-    : service_(boost::asio::use_service<IoObjectService>(io_context))
+  explicit basic_io_object(asio::io_context& io_context)
+    : service_(asio::use_service<IoObjectService>(io_context))
   {
     service_.construct(implementation_);
   }
@@ -197,17 +196,17 @@ public:
   typedef IoObjectService service_type;
   typedef typename service_type::implementation_type implementation_type;
 
-  boost::asio::io_context& get_io_context()
+  asio::io_context& get_io_context()
   {
     return service_->get_io_context();
   }
 
-  boost::asio::io_context& get_io_service()
+  asio::io_context& get_io_service()
   {
     return service_->get_io_context();
   }
 
-  typedef boost::asio::io_context::executor_type executor_type;
+  typedef asio::io_context::executor_type executor_type;
 
   executor_type get_executor() noexcept
   {
@@ -215,8 +214,8 @@ public:
   }
 
 protected:
-  explicit basic_io_object(boost::asio::io_context& io_context)
-    : service_(&boost::asio::use_service<IoObjectService>(io_context))
+  explicit basic_io_object(asio::io_context& io_context)
+    : service_(&asio::use_service<IoObjectService>(io_context))
   {
     service_->construct(implementation_);
   }
@@ -230,7 +229,7 @@ protected:
   template <typename IoObjectService1>
   basic_io_object(IoObjectService1& other_service,
       typename IoObjectService1::implementation_type& other_implementation)
-    : service_(&boost::asio::use_service<IoObjectService>(
+    : service_(&asio::use_service<IoObjectService>(
           other_service.get_io_context()))
   {
     service_->converting_move_construct(implementation_,
@@ -279,11 +278,10 @@ private:
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // !defined(BOOST_ASIO_NO_DEPRECATED)
+#endif // !defined(ASIO_NO_DEPRECATED)
        //   || defined(GENERATING_DOCUMENTATION)
 
-#endif // BOOST_ASIO_BASIC_IO_OBJECT_HPP
+#endif // ASIO_BASIC_IO_OBJECT_HPP

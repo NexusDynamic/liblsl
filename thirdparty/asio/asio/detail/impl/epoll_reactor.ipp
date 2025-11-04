@@ -8,36 +8,35 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_IMPL_EPOLL_REACTOR_IPP
-#define BOOST_ASIO_DETAIL_IMPL_EPOLL_REACTOR_IPP
+#ifndef ASIO_DETAIL_IMPL_EPOLL_REACTOR_IPP
+#define ASIO_DETAIL_IMPL_EPOLL_REACTOR_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_EPOLL)
+#if defined(ASIO_HAS_EPOLL)
 
 #include <cstddef>
 #include <sys/epoll.h>
-#include <boost/asio/config.hpp>
-#include <boost/asio/detail/epoll_reactor.hpp>
-#include <boost/asio/detail/scheduler.hpp>
-#include <boost/asio/detail/throw_error.hpp>
-#include <boost/asio/error.hpp>
+#include "asio/config.hpp"
+#include "asio/detail/epoll_reactor.hpp"
+#include "asio/detail/scheduler.hpp"
+#include "asio/detail/throw_error.hpp"
+#include "asio/error.hpp"
 
-#if defined(BOOST_ASIO_HAS_TIMERFD)
+#if defined(ASIO_HAS_TIMERFD)
 # include <sys/timerfd.h>
-#endif // defined(BOOST_ASIO_HAS_TIMERFD)
+#endif // defined(ASIO_HAS_TIMERFD)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
-epoll_reactor::epoll_reactor(boost::asio::execution_context& ctx)
+epoll_reactor::epoll_reactor(asio::execution_context& ctx)
   : execution_context_service_base<epoll_reactor>(ctx),
     scheduler_(use_service<scheduler>(ctx)),
     mutex_(config(ctx).get("reactor", "registration_locking", true),
@@ -100,9 +99,9 @@ void epoll_reactor::shutdown()
 }
 
 void epoll_reactor::notify_fork(
-    boost::asio::execution_context::fork_event fork_ev)
+    asio::execution_context::fork_event fork_ev)
 {
-  if (fork_ev == boost::asio::execution_context::fork_child)
+  if (fork_ev == asio::execution_context::fork_child)
   {
     if (epoll_fd_ != -1)
       ::close(epoll_fd_);
@@ -146,9 +145,9 @@ void epoll_reactor::notify_fork(
             EPOLL_CTL_ADD, state->descriptor_, &ev);
         if (result != 0)
         {
-          boost::system::error_code ec(errno,
-              boost::asio::error::get_system_category());
-          boost::asio::detail::throw_error(ec, "epoll re-registration");
+          asio::error_code ec(errno,
+              asio::error::get_system_category());
+          asio::detail::throw_error(ec, "epoll re-registration");
         }
       }
     }
@@ -165,7 +164,7 @@ int epoll_reactor::register_descriptor(socket_type descriptor,
 {
   descriptor_data = allocate_descriptor_state();
 
-  BOOST_ASIO_HANDLER_REACTOR_REGISTRATION((
+  ASIO_HANDLER_REACTOR_REGISTRATION((
         context(), static_cast<uintmax_t>(descriptor),
         reinterpret_cast<uintmax_t>(descriptor_data)));
 
@@ -207,7 +206,7 @@ int epoll_reactor::register_internal_descriptor(
 {
   descriptor_data = allocate_descriptor_state();
 
-  BOOST_ASIO_HANDLER_REACTOR_REGISTRATION((
+  ASIO_HANDLER_REACTOR_REGISTRATION((
         context(), static_cast<uintmax_t>(descriptor),
         reinterpret_cast<uintmax_t>(descriptor_data)));
 
@@ -260,7 +259,7 @@ void epoll_reactor::start_op(int op_type, socket_type descriptor,
 {
   if (!descriptor_data)
   {
-    op->ec_ = boost::asio::error::bad_descriptor;
+    op->ec_ = asio::error::bad_descriptor;
     on_immediate(op, is_continuation, immediate_arg);
     return;
   }
@@ -294,7 +293,7 @@ void epoll_reactor::start_op(int op_type, socket_type descriptor,
 
       if (descriptor_data->registered_events_ == 0)
       {
-        op->ec_ = boost::asio::error::operation_not_supported;
+        op->ec_ = asio::error::operation_not_supported;
         on_immediate(op, is_continuation, immediate_arg);
         return;
       }
@@ -312,8 +311,8 @@ void epoll_reactor::start_op(int op_type, socket_type descriptor,
           }
           else
           {
-            op->ec_ = boost::system::error_code(errno,
-                boost::asio::error::get_system_category());
+            op->ec_ = asio::error_code(errno,
+                asio::error::get_system_category());
             on_immediate(op, is_continuation, immediate_arg);
             return;
           }
@@ -322,7 +321,7 @@ void epoll_reactor::start_op(int op_type, socket_type descriptor,
     }
     else if (descriptor_data->registered_events_ == 0)
     {
-      op->ec_ = boost::asio::error::operation_not_supported;
+      op->ec_ = asio::error::operation_not_supported;
       on_immediate(op, is_continuation, immediate_arg);
       return;
     }
@@ -357,7 +356,7 @@ void epoll_reactor::cancel_ops(socket_type,
   {
     while (reactor_op* op = descriptor_data->op_queue_[i].front())
     {
-      op->ec_ = boost::asio::error::operation_aborted;
+      op->ec_ = asio::error::operation_aborted;
       descriptor_data->op_queue_[i].pop();
       ops.push(op);
     }
@@ -384,7 +383,7 @@ void epoll_reactor::cancel_ops_by_key(socket_type,
     descriptor_data->op_queue_[op_type].pop();
     if (op->cancellation_key_ == cancellation_key)
     {
-      op->ec_ = boost::asio::error::operation_aborted;
+      op->ec_ = asio::error::operation_aborted;
       ops.push(op);
     }
     else
@@ -423,7 +422,7 @@ void epoll_reactor::deregister_descriptor(socket_type descriptor,
     {
       while (reactor_op* op = descriptor_data->op_queue_[i].front())
       {
-        op->ec_ = boost::asio::error::operation_aborted;
+        op->ec_ = asio::error::operation_aborted;
         descriptor_data->op_queue_[i].pop();
         ops.push(op);
       }
@@ -434,7 +433,7 @@ void epoll_reactor::deregister_descriptor(socket_type descriptor,
 
     descriptor_lock.unlock();
 
-    BOOST_ASIO_HANDLER_REACTOR_DEREGISTRATION((
+    ASIO_HANDLER_REACTOR_DEREGISTRATION((
           context(), static_cast<uintmax_t>(descriptor),
           reinterpret_cast<uintmax_t>(descriptor_data)));
 
@@ -473,7 +472,7 @@ void epoll_reactor::deregister_internal_descriptor(socket_type descriptor,
 
     descriptor_lock.unlock();
 
-    BOOST_ASIO_HANDLER_REACTOR_DEREGISTRATION((
+    ASIO_HANDLER_REACTOR_DEREGISTRATION((
           context(), static_cast<uintmax_t>(descriptor),
           reinterpret_cast<uintmax_t>(descriptor_data)));
 
@@ -524,7 +523,7 @@ void epoll_reactor::run(long usec, op_queue<operation>& ops)
   epoll_event events[128];
   int num_events = epoll_wait(epoll_fd_, events, 128, timeout);
 
-#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#if defined(ASIO_ENABLE_HANDLER_TRACKING)
   // Trace the waiting events.
   for (int i = 0; i < num_events; ++i)
   {
@@ -533,32 +532,32 @@ void epoll_reactor::run(long usec, op_queue<operation>& ops)
     {
       // Ignore.
     }
-# if defined(BOOST_ASIO_HAS_TIMERFD)
+# if defined(ASIO_HAS_TIMERFD)
     else if (ptr == &timer_fd_)
     {
       // Ignore.
     }
-# endif // defined(BOOST_ASIO_HAS_TIMERFD)
+# endif // defined(ASIO_HAS_TIMERFD)
     else
     {
       unsigned event_mask = 0;
       if ((events[i].events & EPOLLIN) != 0)
-        event_mask |= BOOST_ASIO_HANDLER_REACTOR_READ_EVENT;
+        event_mask |= ASIO_HANDLER_REACTOR_READ_EVENT;
       if ((events[i].events & EPOLLOUT))
-        event_mask |= BOOST_ASIO_HANDLER_REACTOR_WRITE_EVENT;
+        event_mask |= ASIO_HANDLER_REACTOR_WRITE_EVENT;
       if ((events[i].events & (EPOLLERR | EPOLLHUP)) != 0)
-        event_mask |= BOOST_ASIO_HANDLER_REACTOR_ERROR_EVENT;
-      BOOST_ASIO_HANDLER_REACTOR_EVENTS((context(),
+        event_mask |= ASIO_HANDLER_REACTOR_ERROR_EVENT;
+      ASIO_HANDLER_REACTOR_EVENTS((context(),
             reinterpret_cast<uintmax_t>(ptr), event_mask));
     }
   }
-#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
+#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
 
-#if defined(BOOST_ASIO_HAS_TIMERFD)
+#if defined(ASIO_HAS_TIMERFD)
   bool check_timers = (timer_fd_ == -1);
-#else // defined(BOOST_ASIO_HAS_TIMERFD)
+#else // defined(ASIO_HAS_TIMERFD)
   bool check_timers = true;
-#endif // defined(BOOST_ASIO_HAS_TIMERFD)
+#endif // defined(ASIO_HAS_TIMERFD)
 
   // Dispatch the waiting events.
   for (int i = 0; i < num_events; ++i)
@@ -571,19 +570,19 @@ void epoll_reactor::run(long usec, op_queue<operation>& ops)
       // to make it so that we only get woken up when the descriptor's epoll
       // registration is updated.
 
-#if defined(BOOST_ASIO_HAS_TIMERFD)
+#if defined(ASIO_HAS_TIMERFD)
       if (timer_fd_ == -1)
         check_timers = true;
-#else // defined(BOOST_ASIO_HAS_TIMERFD)
+#else // defined(ASIO_HAS_TIMERFD)
       check_timers = true;
-#endif // defined(BOOST_ASIO_HAS_TIMERFD)
+#endif // defined(ASIO_HAS_TIMERFD)
     }
-#if defined(BOOST_ASIO_HAS_TIMERFD)
+#if defined(ASIO_HAS_TIMERFD)
     else if (ptr == &timer_fd_)
     {
       check_timers = true;
     }
-#endif // defined(BOOST_ASIO_HAS_TIMERFD)
+#endif // defined(ASIO_HAS_TIMERFD)
     else
     {
       // The descriptor operation doesn't count as work in and of itself, so we
@@ -607,7 +606,7 @@ void epoll_reactor::run(long usec, op_queue<operation>& ops)
     mutex::scoped_lock common_lock(mutex_);
     timer_queues_.get_ready_timers(ops);
 
-#if defined(BOOST_ASIO_HAS_TIMERFD)
+#if defined(ASIO_HAS_TIMERFD)
     if (timer_fd_ != -1)
     {
       itimerspec new_timeout;
@@ -615,7 +614,7 @@ void epoll_reactor::run(long usec, op_queue<operation>& ops)
       int flags = get_timeout(new_timeout);
       timerfd_settime(timer_fd_, flags, &new_timeout, &old_timeout);
     }
-#endif // defined(BOOST_ASIO_HAS_TIMERFD)
+#endif // defined(ASIO_HAS_TIMERFD)
   }
 }
 
@@ -645,9 +644,9 @@ int epoll_reactor::do_epoll_create()
 
   if (fd == -1)
   {
-    boost::system::error_code ec(errno,
-        boost::asio::error::get_system_category());
-    boost::asio::detail::throw_error(ec, "epoll");
+    asio::error_code ec(errno,
+        asio::error::get_system_category());
+    asio::detail::throw_error(ec, "epoll");
   }
 
   return fd;
@@ -655,7 +654,7 @@ int epoll_reactor::do_epoll_create()
 
 int epoll_reactor::do_timerfd_create()
 {
-#if defined(BOOST_ASIO_HAS_TIMERFD)
+#if defined(ASIO_HAS_TIMERFD)
 # if defined(TFD_CLOEXEC)
   int fd = timerfd_create(CLOCK_MONOTONIC, TFD_CLOEXEC);
 # else // defined(TFD_CLOEXEC)
@@ -671,9 +670,9 @@ int epoll_reactor::do_timerfd_create()
   }
 
   return fd;
-#else // defined(BOOST_ASIO_HAS_TIMERFD)
+#else // defined(ASIO_HAS_TIMERFD)
   return -1;
-#endif // defined(BOOST_ASIO_HAS_TIMERFD)
+#endif // defined(ASIO_HAS_TIMERFD)
 }
 
 epoll_reactor::descriptor_state* epoll_reactor::allocate_descriptor_state()
@@ -702,7 +701,7 @@ void epoll_reactor::do_remove_timer_queue(timer_queue_base& queue)
 
 void epoll_reactor::update_timeout()
 {
-#if defined(BOOST_ASIO_HAS_TIMERFD)
+#if defined(ASIO_HAS_TIMERFD)
   if (timer_fd_ != -1)
   {
     itimerspec new_timeout;
@@ -711,7 +710,7 @@ void epoll_reactor::update_timeout()
     timerfd_settime(timer_fd_, flags, &new_timeout, &old_timeout);
     return;
   }
-#endif // defined(BOOST_ASIO_HAS_TIMERFD)
+#endif // defined(ASIO_HAS_TIMERFD)
   interrupt();
 }
 
@@ -724,7 +723,7 @@ int epoll_reactor::get_timeout(int msec)
       (msec < 0 || max_msec < msec) ? max_msec : msec);
 }
 
-#if defined(BOOST_ASIO_HAS_TIMERFD)
+#if defined(ASIO_HAS_TIMERFD)
 int epoll_reactor::get_timeout(itimerspec& ts)
 {
   ts.it_interval.tv_sec = 0;
@@ -736,7 +735,7 @@ int epoll_reactor::get_timeout(itimerspec& ts)
 
   return usec ? 0 : TFD_TIMER_ABSTIME;
 }
-#endif // defined(BOOST_ASIO_HAS_TIMERFD)
+#endif // defined(ASIO_HAS_TIMERFD)
 
 struct epoll_reactor::perform_io_cleanup_on_block_exit
 {
@@ -818,7 +817,7 @@ operation* epoll_reactor::descriptor_state::perform_io(uint32_t events)
 
 void epoll_reactor::descriptor_state::do_complete(
     void* owner, operation* base,
-    const boost::system::error_code& ec, std::size_t bytes_transferred)
+    const asio::error_code& ec, std::size_t bytes_transferred)
 {
   if (owner)
   {
@@ -833,10 +832,9 @@ void epoll_reactor::descriptor_state::do_complete(
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // defined(BOOST_ASIO_HAS_EPOLL)
+#endif // defined(ASIO_HAS_EPOLL)
 
-#endif // BOOST_ASIO_DETAIL_IMPL_EPOLL_REACTOR_IPP
+#endif // ASIO_DETAIL_IMPL_EPOLL_REACTOR_IPP

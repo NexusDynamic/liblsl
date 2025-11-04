@@ -8,27 +8,26 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXECUTION_RELATIONSHIP_HPP
-#define BOOST_ASIO_EXECUTION_RELATIONSHIP_HPP
+#ifndef ASIO_EXECUTION_RELATIONSHIP_HPP
+#define ASIO_EXECUTION_RELATIONSHIP_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/execution/executor.hpp>
-#include <boost/asio/is_applicable_property.hpp>
-#include <boost/asio/query.hpp>
-#include <boost/asio/traits/query_free.hpp>
-#include <boost/asio/traits/query_member.hpp>
-#include <boost/asio/traits/query_static_constexpr_member.hpp>
-#include <boost/asio/traits/static_query.hpp>
-#include <boost/asio/traits/static_require.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/execution/executor.hpp"
+#include "asio/is_applicable_property.hpp"
+#include "asio/query.hpp"
+#include "asio/traits/query_free.hpp"
+#include "asio/traits/query_member.hpp"
+#include "asio/traits/query_static_constexpr_member.hpp"
+#include "asio/traits/static_query.hpp"
+#include "asio/traits/static_require.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 #if defined(GENERATING_DOCUMENTATION)
@@ -150,10 +149,10 @@ template <int I> struct continuation_t;
 template <int I = 0>
 struct relationship_t
 {
-#if defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr bool is_applicable_property_v = is_executor<T>::value;
-#endif // defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
   static constexpr bool is_requirable = false;
   static constexpr bool is_preferable = false;
@@ -180,7 +179,7 @@ struct relationship_t
   template <typename T>
   struct proxy
   {
-#if defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#if defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
     struct type
     {
       template <typename P>
@@ -194,15 +193,15 @@ struct relationship_t
           declval<conditional_t<true, T, P>>().query(static_cast<P&&>(p))
         );
     };
-#else // defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#else // defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
     typedef T type;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#endif // defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
   };
 
   template <typename T>
   struct static_proxy
   {
-#if defined(BOOST_ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
+#if defined(ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
     struct type
     {
       template <typename P>
@@ -219,9 +218,9 @@ struct relationship_t
         return T::query(static_cast<P&&>(p));
       }
     };
-#else // defined(BOOST_ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
+#else // defined(ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
     typedef T type;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
+#endif // defined(ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
   };
 
   template <typename T>
@@ -233,8 +232,8 @@ struct relationship_t
     traits::query_static_constexpr_member<
       typename static_proxy<T>::type, relationship_t> {};
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr
   typename query_static_constexpr_member<T>::result_type
@@ -285,8 +284,8 @@ struct relationship_t
       typename T = decltype(relationship_t::static_query<E>())>
   static constexpr const T static_query_v
     = relationship_t::static_query<E>();
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
   friend constexpr bool operator==(
       const relationship_t& a, const relationship_t& b)
@@ -314,14 +313,14 @@ struct relationship_t
         can_query<const Executor&, fork_t>::value
       >* = 0)
 #if !defined(__clang__) // Clang crashes if noexcept is used here.
-#if defined(BOOST_ASIO_MSVC) // Visual C++ wants the type to be qualified.
+#if defined(ASIO_MSVC) // Visual C++ wants the type to be qualified.
     noexcept(is_nothrow_query<const Executor&, relationship_t<>::fork_t>::value)
-#else // defined(BOOST_ASIO_MSVC)
+#else // defined(ASIO_MSVC)
     noexcept(is_nothrow_query<const Executor&, fork_t>::value)
-#endif // defined(BOOST_ASIO_MSVC)
+#endif // defined(ASIO_MSVC)
 #endif // !defined(__clang__)
   {
-    return boost::asio::query(ex, fork_t());
+    return asio::query(ex, fork_t());
   }
 
   template <typename Executor>
@@ -334,30 +333,30 @@ struct relationship_t
         can_query<const Executor&, continuation_t>::value
       >* = 0)
 #if !defined(__clang__) // Clang crashes if noexcept is used here.
-#if defined(BOOST_ASIO_MSVC) // Visual C++ wants the type to be qualified.
+#if defined(ASIO_MSVC) // Visual C++ wants the type to be qualified.
     noexcept(is_nothrow_query<const Executor&,
         relationship_t<>::continuation_t>::value)
-#else // defined(BOOST_ASIO_MSVC)
+#else // defined(ASIO_MSVC)
     noexcept(is_nothrow_query<const Executor&, continuation_t>::value)
-#endif // defined(BOOST_ASIO_MSVC)
+#endif // defined(ASIO_MSVC)
 #endif // !defined(__clang__)
   {
-    return boost::asio::query(ex, continuation_t());
+    return asio::query(ex, continuation_t());
   }
 
-  BOOST_ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(fork_t, fork);
-  BOOST_ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(continuation_t, continuation);
+  ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(fork_t, fork);
+  ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(continuation_t, continuation);
 
 private:
   int value_;
 };
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 template <int I> template <typename E, typename T>
 const T relationship_t<I>::static_query_v;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 template <int I>
 const typename relationship_t<I>::fork_t relationship_t<I>::fork;
@@ -371,10 +370,10 @@ namespace relationship {
 template <int I = 0>
 struct fork_t
 {
-#if defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr bool is_applicable_property_v = is_executor<T>::value;
-#endif // defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
   static constexpr bool is_requirable = true;
   static constexpr bool is_preferable = true;
@@ -394,8 +393,8 @@ struct fork_t
     traits::query_static_constexpr_member<
       typename relationship_t<I>::template static_proxy<T>::type, fork_t> {};
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr typename query_static_constexpr_member<T>::result_type
   static_query()
@@ -425,8 +424,8 @@ struct fork_t
   template <typename E, typename T = decltype(fork_t::static_query<E>())>
   static constexpr const T static_query_v
     = fork_t::static_query<E>();
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
   static constexpr relationship_t<I> value()
   {
@@ -454,20 +453,20 @@ struct fork_t
   }
 };
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 template <int I> template <typename E, typename T>
 const T fork_t<I>::static_query_v;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 template <int I = 0>
 struct continuation_t
 {
-#if defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr bool is_applicable_property_v = is_executor<T>::value;
-#endif // defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
   static constexpr bool is_requirable = true;
   static constexpr bool is_preferable = true;
@@ -488,8 +487,8 @@ struct continuation_t
       typename relationship_t<I>::template static_proxy<T>::type,
         continuation_t> {};
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
   template <typename T>
   static constexpr typename query_static_constexpr_member<T>::result_type
   static_query()
@@ -502,8 +501,8 @@ struct continuation_t
       typename T = decltype(continuation_t::static_query<E>())>
   static constexpr const T static_query_v
     = continuation_t::static_query<E>();
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
   static constexpr relationship_t<I> value()
   {
@@ -531,23 +530,23 @@ struct continuation_t
   }
 };
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 template <int I> template <typename E, typename T>
 const T continuation_t<I>::static_query_v;
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   && defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   && defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 } // namespace relationship
 } // namespace detail
 
 typedef detail::relationship_t<> relationship_t;
 
-BOOST_ASIO_INLINE_VARIABLE constexpr relationship_t relationship;
+ASIO_INLINE_VARIABLE constexpr relationship_t relationship;
 
 } // namespace execution
 
-#if !defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#if !defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
 template <typename T>
 struct is_applicable_property<T, execution::relationship_t>
@@ -567,11 +566,11 @@ struct is_applicable_property<T, execution::relationship_t::continuation_t>
 {
 };
 
-#endif // !defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // !defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
 namespace traits {
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_FREE_TRAIT)
+#if !defined(ASIO_HAS_DEDUCED_QUERY_FREE_TRAIT)
 
 template <typename T>
 struct query_free_default<T, execution::relationship_t,
@@ -600,10 +599,10 @@ struct query_free_default<T, execution::relationship_t,
   typedef execution::relationship_t result_type;
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_FREE_TRAIT)
+#endif // !defined(ASIO_HAS_DEDUCED_QUERY_FREE_TRAIT)
 
-#if !defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
-  || !defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#if !defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT) \
+  || !defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 template <typename T>
 struct static_query<T, execution::relationship_t,
@@ -738,16 +737,15 @@ struct static_query<T, execution::relationship_t::continuation_t,
   }
 };
 
-#endif // !defined(BOOST_ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
-       //   || !defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+#endif // !defined(ASIO_HAS_DEDUCED_STATIC_QUERY_TRAIT)
+       //   || !defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
 
 } // namespace traits
 
 #endif // defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_EXECUTION_RELATIONSHIP_HPP
+#endif // ASIO_EXECUTION_RELATIONSHIP_HPP

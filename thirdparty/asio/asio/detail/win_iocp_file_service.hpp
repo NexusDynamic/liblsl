@@ -8,27 +8,26 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_WIN_IOCP_FILE_SERVICE_HPP
-#define BOOST_ASIO_DETAIL_WIN_IOCP_FILE_SERVICE_HPP
+#ifndef ASIO_DETAIL_WIN_IOCP_FILE_SERVICE_HPP
+#define ASIO_DETAIL_WIN_IOCP_FILE_SERVICE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_IOCP) && defined(BOOST_ASIO_HAS_FILE)
+#if defined(ASIO_HAS_IOCP) && defined(ASIO_HAS_FILE)
 
 #include <string>
-#include <boost/asio/detail/cstdint.hpp>
-#include <boost/asio/detail/win_iocp_handle_service.hpp>
-#include <boost/asio/error.hpp>
-#include <boost/asio/execution_context.hpp>
-#include <boost/asio/file_base.hpp>
+#include "asio/detail/cstdint.hpp"
+#include "asio/detail/win_iocp_handle_service.hpp"
+#include "asio/error.hpp"
+#include "asio/execution_context.hpp"
+#include "asio/file_base.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -52,10 +51,10 @@ public:
   };
 
   // Constructor.
-  BOOST_ASIO_DECL win_iocp_file_service(execution_context& context);
+  ASIO_DECL win_iocp_file_service(execution_context& context);
 
   // Destroy all user-defined handler objects owned by the service.
-  BOOST_ASIO_DECL void shutdown();
+  ASIO_DECL void shutdown();
 
   // Construct a new file implementation.
   void construct(implementation_type& impl)
@@ -100,14 +99,14 @@ public:
   }
 
   // Open the file using the specified path name.
-  BOOST_ASIO_DECL boost::system::error_code open(implementation_type& impl,
+  ASIO_DECL asio::error_code open(implementation_type& impl,
       const char* path, file_base::flags open_flags,
-      boost::system::error_code& ec);
+      asio::error_code& ec);
 
   // Assign a native handle to a file implementation.
-  boost::system::error_code assign(implementation_type& impl,
+  asio::error_code assign(implementation_type& impl,
       const native_handle_type& native_handle,
-      boost::system::error_code& ec)
+      asio::error_code& ec)
   {
     return handle_service_.assign(impl, native_handle, ec);
   }
@@ -119,8 +118,8 @@ public:
   }
 
   // Destroy a file implementation.
-  boost::system::error_code close(implementation_type& impl,
-      boost::system::error_code& ec)
+  asio::error_code close(implementation_type& impl,
+      asio::error_code& ec)
   {
     return handle_service_.close(impl, ec);
   }
@@ -133,45 +132,45 @@ public:
 
   // Release ownership of a file.
   native_handle_type release(implementation_type& impl,
-      boost::system::error_code& ec)
+      asio::error_code& ec)
   {
     return handle_service_.release(impl, ec);
   }
 
   // Cancel all operations associated with the file.
-  boost::system::error_code cancel(implementation_type& impl,
-      boost::system::error_code& ec)
+  asio::error_code cancel(implementation_type& impl,
+      asio::error_code& ec)
   {
     return handle_service_.cancel(impl, ec);
   }
 
   // Get the size of the file.
-  BOOST_ASIO_DECL uint64_t size(const implementation_type& impl,
-      boost::system::error_code& ec) const;
+  ASIO_DECL uint64_t size(const implementation_type& impl,
+      asio::error_code& ec) const;
 
   // Alter the size of the file.
-  BOOST_ASIO_DECL boost::system::error_code resize(implementation_type& impl,
-      uint64_t n, boost::system::error_code& ec);
+  ASIO_DECL asio::error_code resize(implementation_type& impl,
+      uint64_t n, asio::error_code& ec);
 
   // Synchronise the file to disk.
-  BOOST_ASIO_DECL boost::system::error_code sync_all(implementation_type& impl,
-      boost::system::error_code& ec);
+  ASIO_DECL asio::error_code sync_all(implementation_type& impl,
+      asio::error_code& ec);
 
   // Synchronise the file data to disk.
-  BOOST_ASIO_DECL boost::system::error_code sync_data(implementation_type& impl,
-      boost::system::error_code& ec);
+  ASIO_DECL asio::error_code sync_data(implementation_type& impl,
+      asio::error_code& ec);
 
   // Seek to a position in the file.
-  BOOST_ASIO_DECL uint64_t seek(implementation_type& impl, int64_t offset,
-      file_base::seek_basis whence, boost::system::error_code& ec);
+  ASIO_DECL uint64_t seek(implementation_type& impl, int64_t offset,
+      file_base::seek_basis whence, asio::error_code& ec);
 
   // Write the given data. Returns the number of bytes written.
   template <typename ConstBufferSequence>
   size_t write_some(implementation_type& impl,
-      const ConstBufferSequence& buffers, boost::system::error_code& ec)
+      const ConstBufferSequence& buffers, asio::error_code& ec)
   {
     uint64_t offset = impl.offset_;
-    impl.offset_ += boost::asio::buffer_size(buffers);
+    impl.offset_ += asio::buffer_size(buffers);
     return handle_service_.write_some_at(impl, offset, buffers, ec);
   }
 
@@ -183,7 +182,7 @@ public:
       Handler& handler, const IoExecutor& io_ex)
   {
     uint64_t offset = impl.offset_;
-    impl.offset_ += boost::asio::buffer_size(buffers);
+    impl.offset_ += asio::buffer_size(buffers);
     handle_service_.async_write_some_at(impl, offset, buffers, handler, io_ex);
   }
 
@@ -191,7 +190,7 @@ public:
   // bytes written.
   template <typename ConstBufferSequence>
   size_t write_some_at(implementation_type& impl, uint64_t offset,
-      const ConstBufferSequence& buffers, boost::system::error_code& ec)
+      const ConstBufferSequence& buffers, asio::error_code& ec)
   {
     return handle_service_.write_some_at(impl, offset, buffers, ec);
   }
@@ -209,10 +208,10 @@ public:
   // Read some data. Returns the number of bytes read.
   template <typename MutableBufferSequence>
   size_t read_some(implementation_type& impl,
-      const MutableBufferSequence& buffers, boost::system::error_code& ec)
+      const MutableBufferSequence& buffers, asio::error_code& ec)
   {
     uint64_t offset = impl.offset_;
-    impl.offset_ += boost::asio::buffer_size(buffers);
+    impl.offset_ += asio::buffer_size(buffers);
     return handle_service_.read_some_at(impl, offset, buffers, ec);
   }
 
@@ -225,14 +224,14 @@ public:
       Handler& handler, const IoExecutor& io_ex)
   {
     uint64_t offset = impl.offset_;
-    impl.offset_ += boost::asio::buffer_size(buffers);
+    impl.offset_ += asio::buffer_size(buffers);
     handle_service_.async_read_some_at(impl, offset, buffers, handler, io_ex);
   }
 
   // Read some data. Returns the number of bytes read.
   template <typename MutableBufferSequence>
   size_t read_some_at(implementation_type& impl, uint64_t offset,
-      const MutableBufferSequence& buffers, boost::system::error_code& ec)
+      const MutableBufferSequence& buffers, asio::error_code& ec)
   {
     return handle_service_.read_some_at(impl, offset, buffers, ec);
   }
@@ -276,14 +275,13 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#if defined(BOOST_ASIO_HEADER_ONLY)
-# include <boost/asio/detail/impl/win_iocp_file_service.ipp>
-#endif // defined(BOOST_ASIO_HEADER_ONLY)
+#if defined(ASIO_HEADER_ONLY)
+# include "asio/detail/impl/win_iocp_file_service.ipp"
+#endif // defined(ASIO_HEADER_ONLY)
 
-#endif // defined(BOOST_ASIO_HAS_IOCP) && defined(BOOST_ASIO_HAS_FILE)
+#endif // defined(ASIO_HAS_IOCP) && defined(ASIO_HAS_FILE)
 
-#endif // BOOST_ASIO_DETAIL_WIN_IOCP_FILE_SERVICE_HPP
+#endif // ASIO_DETAIL_WIN_IOCP_FILE_SERVICE_HPP

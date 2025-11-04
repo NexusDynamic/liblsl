@@ -8,24 +8,23 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_SSL_IMPL_HOST_NAME_VERIFICATION_IPP
-#define BOOST_ASIO_SSL_IMPL_HOST_NAME_VERIFICATION_IPP
+#ifndef ASIO_SSL_IMPL_HOST_NAME_VERIFICATION_IPP
+#define ASIO_SSL_IMPL_HOST_NAME_VERIFICATION_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
 #include <cctype>
 #include <cstring>
-#include <boost/asio/ip/address.hpp>
-#include <boost/asio/ssl/host_name_verification.hpp>
-#include <boost/asio/ssl/detail/openssl_types.hpp>
+#include "asio/ip/address.hpp"
+#include "asio/ssl/host_name_verification.hpp"
+#include "asio/ssl/detail/openssl_types.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace ssl {
 
@@ -45,7 +44,7 @@ bool host_name_verification::operator()(
 
   // Try converting the host name to an address. If it is an address then we
   // need to look for an IP address in the certificate rather than a host name.
-  boost::system::error_code ec;
+  asio::error_code ec;
   ip::address address = ip::make_address(host_, ec);
   const bool is_address = !ec;
   (void)address;
@@ -68,8 +67,7 @@ bool host_name_verification::operator()(
 
 } // namespace ssl
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_SSL_IMPL_HOST_NAME_VERIFICATION_IPP
+#endif // ASIO_SSL_IMPL_HOST_NAME_VERIFICATION_IPP

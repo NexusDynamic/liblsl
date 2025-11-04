@@ -8,19 +8,18 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IP_RESOLVER_BASE_HPP
-#define BOOST_ASIO_IP_RESOLVER_BASE_HPP
+#ifndef ASIO_IP_RESOLVER_BASE_HPP
+#define ASIO_IP_RESOLVER_BASE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/socket_types.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/socket_types.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace ip {
 
@@ -62,13 +61,13 @@ public:
 #else
   enum flags
   {
-    canonical_name = BOOST_ASIO_OS_DEF(AI_CANONNAME),
-    passive = BOOST_ASIO_OS_DEF(AI_PASSIVE),
-    numeric_host = BOOST_ASIO_OS_DEF(AI_NUMERICHOST),
-    numeric_service = BOOST_ASIO_OS_DEF(AI_NUMERICSERV),
-    v4_mapped = BOOST_ASIO_OS_DEF(AI_V4MAPPED),
-    all_matching = BOOST_ASIO_OS_DEF(AI_ALL),
-    address_configured = BOOST_ASIO_OS_DEF(AI_ADDRCONFIG)
+    canonical_name = ASIO_OS_DEF(AI_CANONNAME),
+    passive = ASIO_OS_DEF(AI_PASSIVE),
+    numeric_host = ASIO_OS_DEF(AI_NUMERICHOST),
+    numeric_service = ASIO_OS_DEF(AI_NUMERICSERV),
+    v4_mapped = ASIO_OS_DEF(AI_V4MAPPED),
+    all_matching = ASIO_OS_DEF(AI_ALL),
+    address_configured = ASIO_OS_DEF(AI_ADDRCONFIG)
   };
 
   // Implement bitmask operations as shown in C++ Std [lib.bitmask.types].
@@ -124,8 +123,7 @@ protected:
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_IP_RESOLVER_BASE_HPP
+#endif // ASIO_IP_RESOLVER_BASE_HPP

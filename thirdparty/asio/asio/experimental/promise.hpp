@@ -9,29 +9,28 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXPERIMENTAL_PROMISE_HPP
-#define BOOST_ASIO_EXPERIMENTAL_PROMISE_HPP
+#ifndef ASIO_EXPERIMENTAL_PROMISE_HPP
+#define ASIO_EXPERIMENTAL_PROMISE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/any_io_executor.hpp>
-#include <boost/asio/associated_cancellation_slot.hpp>
-#include <boost/asio/associated_executor.hpp>
-#include <boost/asio/bind_executor.hpp>
-#include <boost/asio/cancellation_signal.hpp>
-#include <boost/asio/dispatch.hpp>
-#include <boost/asio/experimental/impl/promise.hpp>
-#include <boost/asio/post.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/any_io_executor.hpp"
+#include "asio/associated_cancellation_slot.hpp"
+#include "asio/associated_executor.hpp"
+#include "asio/bind_executor.hpp"
+#include "asio/cancellation_signal.hpp"
+#include "asio/dispatch.hpp"
+#include "asio/experimental/impl/promise.hpp"
+#include "asio/post.hpp"
 
 #include <algorithm>
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace experimental {
 
@@ -82,18 +81,18 @@ struct promise_value_type<>
  * @par Examples
  * Reading and writing from one coroutine.
  * @code
- * awaitable<void> read_write_some(boost::asio::ip::tcp::socket & sock,
- *     boost::asio::mutable_buffer read_buf, boost::asio::const_buffer to_write)
+ * awaitable<void> read_write_some(asio::ip::tcp::socket & sock,
+ *     asio::mutable_buffer read_buf, asio::const_buffer to_write)
  * {
- *   auto p = boost::asio::async_read(read_buf,
- *       boost::asio::experimental::use_promise);
- *   co_await boost::asio::async_write_some(to_write);
+ *   auto p = asio::async_read(read_buf,
+ *       asio::experimental::use_promise);
+ *   co_await asio::async_write_some(to_write);
  *   co_await p;
  * }
  * @endcode
  */
 template<typename Signature = void(),
-    typename Executor = boost::asio::any_io_executor,
+    typename Executor = asio::any_io_executor,
     typename Allocator = std::allocator<void>>
 struct promise
 #else
@@ -109,7 +108,7 @@ struct promise<void(Ts...), Executor,  Allocator>
   {
     if (impl_ && !impl_->done)
     {
-      boost::asio::dispatch(impl_->executor,
+      asio::dispatch(impl_->executor,
           [level, impl = impl_]{ impl->cancel.emit(level); });
     }
   }
@@ -121,8 +120,8 @@ struct promise<void(Ts...), Executor,  Allocator>
   }
 
   /// Wait for the promise to become ready.
-  template <BOOST_ASIO_COMPLETION_TOKEN_FOR(void(Ts...)) CompletionToken>
-  inline BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(CompletionToken, void(Ts...))
+  template <ASIO_COMPLETION_TOKEN_FOR(void(Ts...)) CompletionToken>
+  inline ASIO_INITFN_AUTO_RESULT_TYPE(CompletionToken, void(Ts...))
   operator()(CompletionToken&& token)
   {
     assert(impl_);
@@ -172,10 +171,10 @@ private:
 
       if (self_->done)
       {
-        auto exec = boost::asio::get_associated_executor(
+        auto exec = asio::get_associated_executor(
             handler, self_->get_executor());
 
-        boost::asio::post(exec,
+        asio::post(exec,
             [self = std::move(self_),
               handler = std::forward<WaitHandler>(handler)]() mutable
             {
@@ -219,8 +218,7 @@ private:
 } // namespace experimental
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_EXPERIMENTAL_PROMISE_HPP
+#endif // ASIO_EXPERIMENTAL_PROMISE_HPP

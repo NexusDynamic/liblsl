@@ -8,23 +8,22 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_CONFIG_HPP
-#define BOOST_ASIO_CONFIG_HPP
+#ifndef ASIO_CONFIG_HPP
+#define ASIO_CONFIG_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/throw_exception.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/execution_context.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/throw_exception.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/execution_context.hpp"
 #include <cstddef>
 #include <string>
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 /// Base class for configuration implementations.
@@ -41,13 +40,13 @@ public:
 #endif // defined(GENERATING_DOCUMENTATION)
 
   /// Constructor.
-  BOOST_ASIO_DECL explicit config_service(execution_context& ctx);
+  ASIO_DECL explicit config_service(execution_context& ctx);
 
   /// Shutdown the service.
-  BOOST_ASIO_DECL void shutdown() override;
+  ASIO_DECL void shutdown() override;
 
   /// Retrieve a configuration value.
-  BOOST_ASIO_DECL virtual const char* get_value(const char* section,
+  ASIO_DECL virtual const char* get_value(const char* section,
       const char* key_name, char* value, std::size_t value_len) const;
 };
 
@@ -87,14 +86,14 @@ private:
  * the existing concurrency hint mechanism.
  *
  * @par Example
- * @code boost::asio::io_context my_io_context{
- *     boost::asio::config_from_concurrency_hint{1}}; @endcode
+ * @code asio::io_context my_io_context{
+ *     asio::config_from_concurrency_hint{1}}; @endcode
  */
 class config_from_concurrency_hint : public execution_context::service_maker
 {
 public:
   /// Construct with a default concurrency hint.
-  BOOST_ASIO_DECL config_from_concurrency_hint();
+  ASIO_DECL config_from_concurrency_hint();
 
   /// Construct with a specified concurrency hint.
   explicit config_from_concurrency_hint(int concurrency_hint)
@@ -103,7 +102,7 @@ public:
   }
 
   /// Add a concrete service to the specified execution context.
-  BOOST_ASIO_DECL void make(execution_context& ctx) const override;
+  ASIO_DECL void make(execution_context& ctx) const override;
 
 private:
   int concurrency_hint_;
@@ -123,8 +122,8 @@ private:
  * permitted to include a comment starting with <tt>#</tt> after the value.
  *
  * @par Example
- * @code boost::asio::io_context my_io_context{
- *     boost::asio::config_from_string{
+ * @code asio::io_context my_io_context{
+ *     asio::config_from_string{
  *       "scheduler.concurrency_hint=10\n"
  *       "scheduler.locking=1"}}; @endcode
  */
@@ -146,7 +145,7 @@ public:
   }
 
   /// Add a concrete service to the specified execution context.
-  BOOST_ASIO_DECL void make(execution_context& ctx) const override;
+  ASIO_DECL void make(execution_context& ctx) const override;
 
 private:
   std::string string_;
@@ -160,14 +159,14 @@ private:
  * resulting string to upper case.
  *
  * @par Example
- * @code boost::asio::io_context my_io_context{
- *     boost::asio::config_from_env{"my_app"}}; @endcode
+ * @code asio::io_context my_io_context{
+ *     asio::config_from_env{"my_app"}}; @endcode
  */
 class config_from_env : public execution_context::service_maker
 {
 public:
   /// Construct with the default prefix "asio".
-  BOOST_ASIO_DECL config_from_env();
+  ASIO_DECL config_from_env();
 
   /// Construct with a specified prefix.
   explicit config_from_env(std::string prefix)
@@ -176,20 +175,19 @@ public:
   }
 
   /// Add a concrete service to the specified execution context.
-  BOOST_ASIO_DECL void make(execution_context& ctx) const override;
+  ASIO_DECL void make(execution_context& ctx) const override;
 
 private:
   std::string prefix_;
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#include <boost/asio/impl/config.hpp>
-#if defined(BOOST_ASIO_HEADER_ONLY)
-# include <boost/asio/impl/config.ipp>
-#endif // defined(BOOST_ASIO_HEADER_ONLY)
+#include "asio/impl/config.hpp"
+#if defined(ASIO_HEADER_ONLY)
+# include "asio/impl/config.ipp"
+#endif // defined(ASIO_HEADER_ONLY)
 
-#endif // BOOST_ASIO_CONFIG_HPP
+#endif // ASIO_CONFIG_HPP

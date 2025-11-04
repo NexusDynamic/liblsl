@@ -8,24 +8,23 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_BIND_CANCELLATION_SLOT_HPP
-#define BOOST_ASIO_BIND_CANCELLATION_SLOT_HPP
+#ifndef ASIO_BIND_CANCELLATION_SLOT_HPP
+#define ASIO_BIND_CANCELLATION_SLOT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/associated_cancellation_slot.hpp>
-#include <boost/asio/associated_executor.hpp>
-#include <boost/asio/associator.hpp>
-#include <boost/asio/async_result.hpp>
-#include <boost/asio/detail/initiation_base.hpp>
-#include <boost/asio/detail/type_traits.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/associated_cancellation_slot.hpp"
+#include "asio/associated_executor.hpp"
+#include "asio/associator.hpp"
+#include "asio/async_result.hpp"
+#include "asio/detail/initiation_base.hpp"
+#include "asio/detail/type_traits.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -381,7 +380,7 @@ private:
 /// associated cancellation slot.
 /**
  * May also be used directly as a completion token, in which case it adapts the
- * asynchronous operation's default completion token (or boost::asio::deferred
+ * asynchronous operation's default completion token (or asio::deferred
  * if no default is available).
  */
 template <typename CancellationSlot>
@@ -396,7 +395,7 @@ struct partial_cancellation_slot_binder
   /// Adapt a @ref completion_token to specify that the completion handler
   /// should have the cancellation slot as its associated cancellation slot.
   template <typename CompletionToken>
-  BOOST_ASIO_NODISCARD inline
+  ASIO_NODISCARD inline
   constexpr cancellation_slot_binder<decay_t<CompletionToken>, CancellationSlot>
   operator()(CompletionToken&& completion_token) const
   {
@@ -410,7 +409,7 @@ struct partial_cancellation_slot_binder
 
 /// Create a partial completion token that associates a cancellation slot.
 template <typename CancellationSlot>
-BOOST_ASIO_NODISCARD inline partial_cancellation_slot_binder<CancellationSlot>
+ASIO_NODISCARD inline partial_cancellation_slot_binder<CancellationSlot>
 bind_cancellation_slot(const CancellationSlot& ex)
 {
   return partial_cancellation_slot_binder<CancellationSlot>(ex);
@@ -419,7 +418,7 @@ bind_cancellation_slot(const CancellationSlot& ex)
 /// Associate an object of type @c T with a cancellation slot of type
 /// @c CancellationSlot.
 template <typename CancellationSlot, typename T>
-BOOST_ASIO_NODISCARD inline
+ASIO_NODISCARD inline
 cancellation_slot_binder<decay_t<T>, CancellationSlot>
 bind_cancellation_slot(const CancellationSlot& s, T&& t)
 {
@@ -615,8 +614,7 @@ struct associated_cancellation_slot<
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_BIND_CANCELLATION_SLOT_HPP
+#endif // ASIO_BIND_CANCELLATION_SLOT_HPP

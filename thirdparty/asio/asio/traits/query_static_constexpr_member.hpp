@@ -8,25 +8,24 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_TRAITS_QUERY_STATIC_CONSTEXPR_MEMBER_HPP
-#define BOOST_ASIO_TRAITS_QUERY_STATIC_CONSTEXPR_MEMBER_HPP
+#ifndef ASIO_TRAITS_QUERY_STATIC_CONSTEXPR_MEMBER_HPP
+#define ASIO_TRAITS_QUERY_STATIC_CONSTEXPR_MEMBER_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/detail/type_traits.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/detail/type_traits.hpp"
 
-#if defined(BOOST_ASIO_HAS_CONSTANT_EXPRESSION_SFINAE) \
-  && defined(BOOST_ASIO_HAS_WORKING_EXPRESSION_SFINAE)
-# define BOOST_ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT 1
-#endif // defined(BOOST_ASIO_HAS_CONSTANT_EXPRESSION_SFINAE)
-       //   && defined(BOOST_ASIO_HAS_WORKING_EXPRESSION_SFINAE)
+#if defined(ASIO_HAS_CONSTANT_EXPRESSION_SFINAE) \
+  && defined(ASIO_HAS_WORKING_EXPRESSION_SFINAE)
+# define ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT 1
+#endif // defined(ASIO_HAS_CONSTANT_EXPRESSION_SFINAE)
+       //   && defined(ASIO_HAS_WORKING_EXPRESSION_SFINAE)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace traits {
 
@@ -57,7 +56,7 @@ struct query_static_constexpr_member_trait :
 {
 };
 
-#if defined(BOOST_ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
+#if defined(ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
 
 template <typename T, typename Property>
 struct query_static_constexpr_member_trait<T, Property,
@@ -77,7 +76,7 @@ struct query_static_constexpr_member_trait<T, Property,
   }
 };
 
-#endif // defined(BOOST_ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
+#endif // defined(ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
 
 } // namespace detail
 namespace traits {
@@ -96,8 +95,7 @@ struct query_static_constexpr_member :
 
 } // namespace traits
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_TRAITS_QUERY_STATIC_CONSTEXPR_MEMBER_HPP
+#endif // ASIO_TRAITS_QUERY_STATIC_CONSTEXPR_MEMBER_HPP

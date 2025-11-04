@@ -8,27 +8,26 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IO_CONTEXT_STRAND_HPP
-#define BOOST_ASIO_IO_CONTEXT_STRAND_HPP
+#ifndef ASIO_IO_CONTEXT_STRAND_HPP
+#define ASIO_IO_CONTEXT_STRAND_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if !defined(BOOST_ASIO_NO_EXTENSIONS) \
-  && !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#if !defined(ASIO_NO_EXTENSIONS) \
+  && !defined(ASIO_NO_TS_EXECUTORS)
 
-#include <boost/asio/async_result.hpp>
-#include <boost/asio/detail/handler_type_requirements.hpp>
-#include <boost/asio/detail/strand_service.hpp>
-#include <boost/asio/detail/wrapped_handler.hpp>
-#include <boost/asio/io_context.hpp>
+#include "asio/async_result.hpp"
+#include "asio/detail/handler_type_requirements.hpp"
+#include "asio/detail/strand_service.hpp"
+#include "asio/detail/wrapped_handler.hpp"
+#include "asio/io_context.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 /// Provides serialised handler execution.
@@ -96,9 +95,9 @@ public:
    * @param io_context The io_context object that the strand will use to
    * dispatch handlers that are ready to be run.
    */
-  explicit strand(boost::asio::io_context& io_context)
-    : service_(boost::asio::use_service<
-        boost::asio::detail::strand_service>(io_context))
+  explicit strand(asio::io_context& io_context)
+    : service_(asio::use_service<
+        asio::detail::strand_service>(io_context))
   {
     service_.construct(impl_);
   }
@@ -126,7 +125,7 @@ public:
   }
 
   /// Obtain the underlying execution context.
-  boost::asio::io_context& context() const noexcept
+  asio::io_context& context() const noexcept
   {
     return service_.get_io_context();
   }
@@ -214,8 +213,8 @@ public:
     (void)a;
   }
 
-#if !defined(BOOST_ASIO_NO_DEPRECATED)
-  /// (Deprecated: Use boost::asio::bind_executor().) Create a new handler that
+#if !defined(ASIO_NO_DEPRECATED)
+  /// (Deprecated: Use asio::bind_executor().) Create a new handler that
   /// automatically dispatches the wrapped handler on the strand.
   /**
    * This function is used to create a new handler function object that, when
@@ -234,7 +233,7 @@ public:
    * then the return value is a function object with the signature
    * @code void g(A1 a1, ... An an); @endcode
    * that, when invoked, executes code equivalent to:
-   * @code boost::asio::dispatch(strand, boost::bind(f, a1, ... an)); @endcode
+   * @code asio::dispatch(strand, boost::bind(f, a1, ... an)); @endcode
    */
   template <typename Handler>
 #if defined(GENERATING_DOCUMENTATION)
@@ -247,7 +246,7 @@ public:
     return detail::wrapped_handler<io_context::strand, Handler,
         detail::is_continuation_if_running>(*this, handler);
   }
-#endif // !defined(BOOST_ASIO_NO_DEPRECATED)
+#endif // !defined(ASIO_NO_DEPRECATED)
 
   /// Determine whether the strand is running in the current thread.
   /**
@@ -281,16 +280,15 @@ public:
   }
 
 private:
-  boost::asio::detail::strand_service& service_;
-  mutable boost::asio::detail::strand_service::implementation_type impl_;
+  asio::detail::strand_service& service_;
+  mutable asio::detail::strand_service::implementation_type impl_;
 };
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // !defined(BOOST_ASIO_NO_EXTENSIONS)
-       //   && !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#endif // !defined(ASIO_NO_EXTENSIONS)
+       //   && !defined(ASIO_NO_TS_EXECUTORS)
 
-#endif // BOOST_ASIO_IO_CONTEXT_STRAND_HPP
+#endif // ASIO_IO_CONTEXT_STRAND_HPP

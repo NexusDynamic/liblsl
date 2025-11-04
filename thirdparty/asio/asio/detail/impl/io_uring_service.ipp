@@ -8,32 +8,31 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_DETAIL_IMPL_IO_URING_SERVICE_IPP
-#define BOOST_ASIO_DETAIL_IMPL_IO_URING_SERVICE_IPP
+#ifndef ASIO_DETAIL_IMPL_IO_URING_SERVICE_IPP
+#define ASIO_DETAIL_IMPL_IO_URING_SERVICE_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
+#include "asio/detail/config.hpp"
 
-#if defined(BOOST_ASIO_HAS_IO_URING)
+#if defined(ASIO_HAS_IO_URING)
 
 #include <cstddef>
 #include <sys/eventfd.h>
-#include <boost/asio/detail/io_uring_service.hpp>
-#include <boost/asio/detail/reactor_op.hpp>
-#include <boost/asio/detail/scheduler.hpp>
-#include <boost/asio/detail/throw_error.hpp>
-#include <boost/asio/error.hpp>
+#include "asio/detail/io_uring_service.hpp"
+#include "asio/detail/reactor_op.hpp"
+#include "asio/detail/scheduler.hpp"
+#include "asio/detail/throw_error.hpp"
+#include "asio/error.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
-io_uring_service::io_uring_service(boost::asio::execution_context& ctx)
+io_uring_service::io_uring_service(asio::execution_context& ctx)
   : execution_context_service_base<io_uring_service>(ctx),
     scheduler_(use_service<scheduler>(ctx)),
     mutex_(config(ctx).get("reactor", "registration_locking", true),
@@ -111,11 +110,11 @@ void io_uring_service::shutdown()
 }
 
 void io_uring_service::notify_fork(
-    boost::asio::execution_context::fork_event fork_ev)
+    asio::execution_context::fork_event fork_ev)
 {
   switch (fork_ev)
   {
-  case boost::asio::execution_context::fork_prepare:
+  case asio::execution_context::fork_prepare:
     {
       // Cancel all outstanding operations. They will be restarted
       // after the fork completes.
@@ -171,13 +170,13 @@ void io_uring_service::notify_fork(
     }
     break;
 
-  case boost::asio::execution_context::fork_parent:
+  case asio::execution_context::fork_parent:
     // Restart the timeout and eventfd operations.
     update_timeout();
     register_with_reactor();
     break;
 
-  case boost::asio::execution_context::fork_child:
+  case asio::execution_context::fork_child:
     {
       // The child process gets a new io_uring instance.
       ::io_uring_queue_exit(&ring_);
@@ -238,9 +237,9 @@ void io_uring_service::register_internal_io_object(
   }
   else
   {
-    boost::system::error_code ec(ENOBUFS,
-        boost::asio::error::get_system_category());
-    boost::asio::detail::throw_error(ec, "io_uring_get_sqe");
+    asio::error_code ec(ENOBUFS,
+        asio::error::get_system_category());
+    asio::detail::throw_error(ec, "io_uring_get_sqe");
   }
 }
 
@@ -249,9 +248,9 @@ void io_uring_service::register_buffers(const ::iovec* v, unsigned n)
   int result = ::io_uring_register_buffers(&ring_, v, n);
   if (result < 0)
   {
-    boost::system::error_code ec(-result,
-        boost::asio::error::get_system_category());
-    boost::asio::detail::throw_error(ec, "io_uring_register_buffers");
+    asio::error_code ec(-result,
+        asio::error::get_system_category());
+    asio::detail::throw_error(ec, "io_uring_register_buffers");
   }
 }
 
@@ -266,7 +265,7 @@ void io_uring_service::start_op(int op_type,
 {
   if (!io_obj)
   {
-    op->ec_ = boost::asio::error::bad_descriptor;
+    op->ec_ = asio::error::bad_descriptor;
     post_immediate_completion(op, is_continuation);
     return;
   }
@@ -359,7 +358,7 @@ void io_uring_service::cancel_ops_by_key(
       }
       else
       {
-        op->ec_ = boost::asio::error::operation_aborted;
+        op->ec_ = asio::error::operation_aborted;
         ops.push(op);
       }
     }
@@ -533,19 +532,19 @@ void io_uring_service::init_ring()
   if (result < 0)
   {
     ring_.ring_fd = -1;
-    boost::system::error_code ec(-result,
-        boost::asio::error::get_system_category());
-    boost::asio::detail::throw_error(ec, "io_uring_queue_init");
+    asio::error_code ec(-result,
+        asio::error::get_system_category());
+    asio::detail::throw_error(ec, "io_uring_queue_init");
   }
 
-#if !defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+#if !defined(ASIO_HAS_IO_URING_AS_DEFAULT)
   event_fd_ = ::eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK);
   if (event_fd_ < 0)
   {
-    boost::system::error_code ec(-result,
-        boost::asio::error::get_system_category());
+    asio::error_code ec(-result,
+        asio::error::get_system_category());
     ::io_uring_queue_exit(&ring_);
-    boost::asio::detail::throw_error(ec, "eventfd");
+    asio::detail::throw_error(ec, "eventfd");
   }
 
   result = ::io_uring_register_eventfd(&ring_, event_fd_);
@@ -553,20 +552,20 @@ void io_uring_service::init_ring()
   {
     ::close(event_fd_);
     ::io_uring_queue_exit(&ring_);
-    boost::system::error_code ec(-result,
-        boost::asio::error::get_system_category());
-    boost::asio::detail::throw_error(ec, "io_uring_queue_init");
+    asio::error_code ec(-result,
+        asio::error::get_system_category());
+    asio::detail::throw_error(ec, "io_uring_queue_init");
   }
-#endif // !defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+#endif // !defined(ASIO_HAS_IO_URING_AS_DEFAULT)
 }
 
-#if !defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+#if !defined(ASIO_HAS_IO_URING_AS_DEFAULT)
 class io_uring_service::event_fd_read_op :
   public reactor_op
 {
 public:
   event_fd_read_op(io_uring_service* s)
-    : reactor_op(boost::system::error_code(),
+    : reactor_op(asio::error_code(),
         &event_fd_read_op::do_perform, event_fd_read_op::do_complete),
       service_(s)
   {
@@ -596,7 +595,7 @@ public:
   }
 
   static void do_complete(void* /*owner*/, operation* base,
-      const boost::system::error_code& /*ec*/,
+      const asio::error_code& /*ec*/,
       std::size_t /*bytes_transferred*/)
   {
     event_fd_read_op* o(static_cast<event_fd_read_op*>(base));
@@ -606,14 +605,14 @@ public:
 private:
   io_uring_service* service_;
 };
-#endif // !defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+#endif // !defined(ASIO_HAS_IO_URING_AS_DEFAULT)
 
 void io_uring_service::register_with_reactor()
 {
-#if !defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+#if !defined(ASIO_HAS_IO_URING_AS_DEFAULT)
   reactor_.register_internal_descriptor(reactor::read_op,
       event_fd_, reactor_data_, new event_fd_read_op(this));
-#endif // !defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+#endif // !defined(ASIO_HAS_IO_URING_AS_DEFAULT)
 }
 
 io_uring_service::io_object* io_uring_service::allocate_io_object()
@@ -641,7 +640,7 @@ bool io_uring_service::do_cancel_ops(
       io_obj->queues_[i].op_queue_.pop();
       while (io_uring_operation* op = io_obj->queues_[i].op_queue_.front())
       {
-        op->ec_ = boost::asio::error::operation_aborted;
+        op->ec_ = asio::error::operation_aborted;
         io_obj->queues_[i].op_queue_.pop();
         ops.push(op);
       }
@@ -758,7 +757,7 @@ io_uring_service::submit_sqes_op::submit_sqes_op(io_uring_service* s)
 }
 
 void io_uring_service::submit_sqes_op::do_complete(void* owner, operation* base,
-    const boost::system::error_code& /*ec*/, std::size_t /*bytes_transferred*/)
+    const asio::error_code& /*ec*/, std::size_t /*bytes_transferred*/)
 {
   if (owner)
   {
@@ -828,7 +827,7 @@ operation* io_uring_service::io_queue::perform_io(int result)
     {
       if (result < 0)
       {
-        op->ec_.assign(-result, boost::asio::error::get_system_category());
+        op->ec_.assign(-result, asio::error::get_system_category());
         op->bytes_transferred_ = 0;
       }
       else
@@ -867,7 +866,7 @@ operation* io_uring_service::io_queue::perform_io(int result)
       lock.unlock();
       while (io_uring_operation* op = op_queue_.front())
       {
-        op->ec_ = boost::asio::error::no_buffer_space;
+        op->ec_ = asio::error::no_buffer_space;
         op_queue_.pop();
         io_cleanup.ops_.push(op);
       }
@@ -891,7 +890,7 @@ operation* io_uring_service::io_queue::perform_io(int result)
 }
 
 void io_uring_service::io_queue::do_complete(void* owner, operation* base,
-    const boost::system::error_code& ec, std::size_t bytes_transferred)
+    const asio::error_code& ec, std::size_t bytes_transferred)
 {
   if (owner)
   {
@@ -911,10 +910,9 @@ io_uring_service::io_object::io_object(bool locking, int spin_count)
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // defined(BOOST_ASIO_HAS_IO_URING)
+#endif // defined(ASIO_HAS_IO_URING)
 
-#endif // BOOST_ASIO_DETAIL_IMPL_IO_URING_SERVICE_IPP
+#endif // ASIO_DETAIL_IMPL_IO_URING_SERVICE_IPP

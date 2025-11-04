@@ -8,27 +8,26 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IMPL_CO_SPAWN_HPP
-#define BOOST_ASIO_IMPL_CO_SPAWN_HPP
+#ifndef ASIO_IMPL_CO_SPAWN_HPP
+#define ASIO_IMPL_CO_SPAWN_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/associated_cancellation_slot.hpp>
-#include <boost/asio/awaitable.hpp>
-#include <boost/asio/detail/memory.hpp>
-#include <boost/asio/detail/recycling_allocator.hpp>
-#include <boost/asio/dispatch.hpp>
-#include <boost/asio/execution/outstanding_work.hpp>
-#include <boost/asio/post.hpp>
-#include <boost/asio/prefer.hpp>
-#include <boost/asio/use_awaitable.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/associated_cancellation_slot.hpp"
+#include "asio/awaitable.hpp"
+#include "asio/detail/memory.hpp"
+#include "asio/detail/recycling_allocator.hpp"
+#include "asio/dispatch.hpp"
+#include "asio/execution/outstanding_work.hpp"
+#include "asio/post.hpp"
+#include "asio/prefer.hpp"
+#include "asio/use_awaitable.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -43,7 +42,7 @@ public:
     > executor_type;
 
   co_spawn_work_guard(const Executor& ex)
-    : executor_(boost::asio::prefer(ex, execution::outstanding_work.tracked))
+    : executor_(asio::prefer(ex, execution::outstanding_work.tracked))
   {
   }
 
@@ -56,7 +55,7 @@ private:
   executor_type executor_;
 };
 
-#if !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#if !defined(ASIO_NO_TS_EXECUTORS)
 
 template <typename Executor>
 struct co_spawn_work_guard<Executor,
@@ -70,7 +69,7 @@ struct co_spawn_work_guard<Executor,
   }
 };
 
-#endif // !defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#endif // !defined(ASIO_NO_TS_EXECUTORS)
 
 template <typename Handler, typename Executor,
     typename Function, typename = void>
@@ -80,7 +79,7 @@ struct co_spawn_state
   co_spawn_state(H&& h, const Executor& ex, F&& f)
     : handler(std::forward<H>(h)),
       spawn_work(ex),
-      handler_work(boost::asio::get_associated_executor(handler, ex)),
+      handler_work(asio::get_associated_executor(handler, ex)),
       function(std::forward<F>(f))
   {
   }
@@ -118,9 +117,9 @@ struct co_spawn_dispatch
 {
   template <typename CompletionToken>
   auto operator()(CompletionToken&& token) const
-    -> decltype(boost::asio::dispatch(std::forward<CompletionToken>(token)))
+    -> decltype(asio::dispatch(std::forward<CompletionToken>(token)))
   {
-    return boost::asio::dispatch(std::forward<CompletionToken>(token));
+    return asio::dispatch(std::forward<CompletionToken>(token));
   }
 };
 
@@ -128,9 +127,9 @@ struct co_spawn_post
 {
   template <typename CompletionToken>
   auto operator()(CompletionToken&& token) const
-    -> decltype(boost::asio::post(std::forward<CompletionToken>(token)))
+    -> decltype(asio::post(std::forward<CompletionToken>(token)))
   {
-    return boost::asio::post(std::forward<CompletionToken>(token));
+    return asio::post(std::forward<CompletionToken>(token));
   }
 };
 
@@ -142,9 +141,9 @@ awaitable<awaitable_thread_entry_point, Executor> co_spawn_entry_point(
 
   std::exception_ptr e = nullptr;
   bool done = false;
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
   try
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
   {
     T t = co_await s.function();
 
@@ -165,7 +164,7 @@ awaitable<awaitable_thread_entry_point, Executor> co_spawn_entry_point(
 
     co_return;
   }
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
   catch (...)
   {
     if (done)
@@ -173,7 +172,7 @@ awaitable<awaitable_thread_entry_point, Executor> co_spawn_entry_point(
 
     e = std::current_exception();
   }
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
 
   bool is_launching = (co_await awaitable_thread_is_launching{});
   if (is_launching)
@@ -196,18 +195,18 @@ awaitable<awaitable_thread_entry_point, Executor> co_spawn_entry_point(
   (void) co_await co_spawn_dispatch{};
 
   std::exception_ptr e = nullptr;
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
   try
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
   {
     co_await s.function();
   }
-#if !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#if !defined(ASIO_NO_EXCEPTIONS)
   catch (...)
   {
     e = std::current_exception();
   }
-#endif // !defined(BOOST_ASIO_NO_EXCEPTIONS)
+#endif // !defined(ASIO_NO_EXCEPTIONS)
 
   bool is_launching = (co_await awaitable_thread_is_launching{});
   if (is_launching)
@@ -261,7 +260,7 @@ public:
   void operator()(cancellation_type_t type)
   {
     shared_ptr<cancellation_signal> sig = signal_;
-    boost::asio::dispatch(ex_, [sig, type]{ sig->emit(type); });
+    asio::dispatch(ex_, [sig, type]{ sig->emit(type); });
   }
 
 private:
@@ -324,7 +323,7 @@ public:
     typedef co_spawn_cancellation_handler<
       handler_type, Executor> cancel_handler_type;
 
-    auto slot = boost::asio::get_associated_cancellation_slot(handler);
+    auto slot = asio::get_associated_cancellation_slot(handler);
     cancel_handler_type* cancel_handler = slot.is_connected()
       ? &slot.template emplace<cancel_handler_type>(handler, ex_)
       : nullptr;
@@ -350,9 +349,9 @@ private:
 } // namespace detail
 
 template <typename Executor, typename T, typename AwaitableExecutor,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(
+    ASIO_COMPLETION_TOKEN_FOR(
       void(std::exception_ptr, T)) CompletionToken>
-inline BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(
+inline ASIO_INITFN_AUTO_RESULT_TYPE(
     CompletionToken, void(std::exception_ptr, T))
 co_spawn(const Executor& ex,
     awaitable<T, AwaitableExecutor> a, CompletionToken&& token,
@@ -367,9 +366,9 @@ co_spawn(const Executor& ex,
 }
 
 template <typename Executor, typename AwaitableExecutor,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(
+    ASIO_COMPLETION_TOKEN_FOR(
       void(std::exception_ptr)) CompletionToken>
-inline BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(
+inline ASIO_INITFN_AUTO_RESULT_TYPE(
     CompletionToken, void(std::exception_ptr))
 co_spawn(const Executor& ex,
     awaitable<void, AwaitableExecutor> a, CompletionToken&& token,
@@ -385,9 +384,9 @@ co_spawn(const Executor& ex,
 }
 
 template <typename ExecutionContext, typename T, typename AwaitableExecutor,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(
+    ASIO_COMPLETION_TOKEN_FOR(
       void(std::exception_ptr, T)) CompletionToken>
-inline BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(
+inline ASIO_INITFN_AUTO_RESULT_TYPE(
     CompletionToken, void(std::exception_ptr, T))
 co_spawn(ExecutionContext& ctx,
     awaitable<T, AwaitableExecutor> a, CompletionToken&& token,
@@ -402,9 +401,9 @@ co_spawn(ExecutionContext& ctx,
 }
 
 template <typename ExecutionContext, typename AwaitableExecutor,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(
+    ASIO_COMPLETION_TOKEN_FOR(
       void(std::exception_ptr)) CompletionToken>
-inline BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(
+inline ASIO_INITFN_AUTO_RESULT_TYPE(
     CompletionToken, void(std::exception_ptr))
 co_spawn(ExecutionContext& ctx,
     awaitable<void, AwaitableExecutor> a, CompletionToken&& token,
@@ -419,9 +418,9 @@ co_spawn(ExecutionContext& ctx,
 }
 
 template <typename Executor, typename F,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::awaitable_signature<
+    ASIO_COMPLETION_TOKEN_FOR(typename detail::awaitable_signature<
       result_of_t<F()>>::type) CompletionToken>
-inline BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(CompletionToken,
+inline ASIO_INITFN_AUTO_RESULT_TYPE(CompletionToken,
     typename detail::awaitable_signature<result_of_t<F()>>::type)
 co_spawn(const Executor& ex, F&& f, CompletionToken&& token,
     constraint_t<
@@ -436,9 +435,9 @@ co_spawn(const Executor& ex, F&& f, CompletionToken&& token,
 }
 
 template <typename ExecutionContext, typename F,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::awaitable_signature<
+    ASIO_COMPLETION_TOKEN_FOR(typename detail::awaitable_signature<
       result_of_t<F()>>::type) CompletionToken>
-inline BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(CompletionToken,
+inline ASIO_INITFN_AUTO_RESULT_TYPE(CompletionToken,
     typename detail::awaitable_signature<result_of_t<F()>>::type)
 co_spawn(ExecutionContext& ctx, F&& f, CompletionToken&& token,
     constraint_t<
@@ -450,8 +449,7 @@ co_spawn(ExecutionContext& ctx, F&& f, CompletionToken&& token,
 }
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_IMPL_CO_SPAWN_HPP
+#endif // ASIO_IMPL_CO_SPAWN_HPP

@@ -8,28 +8,27 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-#ifndef BOOST_ASIO_EXPERIMENTAL_IMPL_PROMISE_HPP
-#define BOOST_ASIO_EXPERIMENTAL_IMPL_PROMISE_HPP
+#ifndef ASIO_EXPERIMENTAL_IMPL_PROMISE_HPP
+#define ASIO_EXPERIMENTAL_IMPL_PROMISE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/cancellation_signal.hpp>
-#include <boost/asio/detail/utility.hpp>
-#include <boost/asio/error.hpp>
-#include <boost/system/system_error.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/cancellation_signal.hpp"
+#include "asio/detail/utility.hpp"
+#include "asio/error.hpp"
+#include "asio/system_error.hpp"
 #include <tuple>
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace experimental {
 
 template<typename Signature = void(),
-    typename Executor = boost::asio::any_io_executor,
+    typename Executor = asio::any_io_executor,
     typename Allocator = std::allocator<void>>
 struct promise;
 
@@ -66,7 +65,7 @@ struct promise_impl<void(Ts...), Executor, Allocator>
   Executor executor;
 
   template<typename Func, std::size_t... Idx>
-  void apply_impl(Func f, boost::asio::detail::index_sequence<Idx...>)
+  void apply_impl(Func f, asio::detail::index_sequence<Idx...>)
   {
     auto& result_type = *reinterpret_cast<promise_impl::result_type*>(&result);
     f(std::get<Idx>(std::move(result_type))...);
@@ -82,7 +81,7 @@ struct promise_impl<void(Ts...), Executor, Allocator>
   void apply(Func f)
   {
     apply_impl(std::forward<Func>(f),
-        boost::asio::detail::make_index_sequence<sizeof...(Ts)>{});
+        asio::detail::make_index_sequence<sizeof...(Ts)>{});
   }
 
   struct completion_base
@@ -100,7 +99,7 @@ struct promise_impl<void(Ts...), Executor, Allocator>
       auto h = std::move(handler);
 
       using alloc_t = typename std::allocator_traits<
-        typename boost::asio::decay<Alloc>::type>::template
+        typename asio::decay<Alloc>::type>::template
           rebind_alloc<completion_impl>;
 
       alloc_t alloc_{allocator};
@@ -118,7 +117,7 @@ struct promise_impl<void(Ts...), Executor, Allocator>
   };
 
   completion_base* completion = nullptr;
-  typename boost::asio::aligned_storage<sizeof(void*) * 4,
+  typename asio::aligned_storage<sizeof(void*) * 4,
     alignof(completion_base)>::type completion_opt;
 
   template<typename Alloc, typename Handler>
@@ -128,9 +127,9 @@ struct promise_impl<void(Ts...), Executor, Allocator>
       cancel_();
 
     using impl_t = completion_impl<
-      typename boost::asio::decay<Alloc>::type, Handler>;
+      typename asio::decay<Alloc>::type, Handler>;
     using alloc_t = typename std::allocator_traits<
-      typename boost::asio::decay<Alloc>::type>::template rebind_alloc<impl_t>;
+      typename asio::decay<Alloc>::type>::template rebind_alloc<impl_t>;
 
     alloc_t alloc_{alloc};
     auto p = std::allocator_traits<alloc_t>::allocate(alloc_, 1u);
@@ -146,7 +145,7 @@ struct promise_impl<void(Ts...), Executor, Allocator>
   }
 
   template<std::size_t... Idx>
-  void complete_with_result_impl(boost::asio::detail::index_sequence<Idx...>)
+  void complete_with_result_impl(asio::detail::index_sequence<Idx...>)
   {
     auto& result_type = *reinterpret_cast<promise_impl::result_type*>(&result);
     this->complete(std::get<Idx>(std::move(result_type))...);
@@ -155,7 +154,7 @@ struct promise_impl<void(Ts...), Executor, Allocator>
   void complete_with_result()
   {
     complete_with_result_impl(
-        boost::asio::detail::make_index_sequence<sizeof...(Ts)>{});
+        asio::detail::make_index_sequence<sizeof...(Ts)>{});
   }
 
   template<typename... T_>
@@ -163,15 +162,15 @@ struct promise_impl<void(Ts...), Executor, Allocator>
   {
     complete(
         std::make_exception_ptr(
-          boost::system::system_error(
-            boost::asio::error::operation_aborted)),
+          asio::system_error(
+            asio::error::operation_aborted)),
         T_{}...);
   }
 
   template<typename... T_>
-  void cancel_impl_(boost::system::error_code*, T_*...)
+  void cancel_impl_(asio::error_code*, T_*...)
   {
-    complete(boost::asio::error::operation_aborted, T_{}...);
+    complete(asio::error::operation_aborted, T_{}...);
   }
 
   template<typename... T_>
@@ -187,7 +186,7 @@ struct promise_impl<void(Ts...), Executor, Allocator>
 };
 
 template<typename Signature = void(),
-    typename Executor = boost::asio::any_io_executor,
+    typename Executor = asio::any_io_executor,
     typename Allocator = std::allocator<void>>
 struct promise_handler;
 
@@ -250,8 +249,7 @@ struct promise_handler<void(Ts...), Executor, Allocator>
 } // namespace detail
 } // namespace experimental
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_EXPERIMENTAL_IMPL_PROMISE_HPP
+#endif // ASIO_EXPERIMENTAL_IMPL_PROMISE_HPP

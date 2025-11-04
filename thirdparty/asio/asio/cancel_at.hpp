@@ -8,23 +8,22 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_CANCEL_AT_HPP
-#define BOOST_ASIO_CANCEL_AT_HPP
+#ifndef ASIO_CANCEL_AT_HPP
+#define ASIO_CANCEL_AT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/basic_waitable_timer.hpp>
-#include <boost/asio/cancellation_type.hpp>
-#include <boost/asio/detail/chrono.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/wait_traits.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/basic_waitable_timer.hpp"
+#include "asio/cancellation_type.hpp"
+#include "asio/detail/chrono.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/wait_traits.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 
 /// A @ref completion_token adapter that cancels an operation at a given time.
@@ -33,7 +32,7 @@ namespace asio {
  * should be cancelled if not complete at the specified absolute time.
  */
 template <typename CompletionToken, typename Clock,
-    typename WaitTraits = boost::asio::wait_traits<Clock>>
+    typename WaitTraits = asio::wait_traits<Clock>>
 class cancel_at_t
 {
 public:
@@ -59,7 +58,7 @@ public:
  * should be cancelled if not complete at the specified absolute time.
  */
 template <typename CompletionToken, typename Clock,
-    typename WaitTraits = boost::asio::wait_traits<Clock>,
+    typename WaitTraits = asio::wait_traits<Clock>,
     typename Executor = any_io_executor>
 class cancel_at_timer
 {
@@ -88,10 +87,10 @@ public:
 /// operation at a given time.
 /**
  * May also be used directly as a completion token, in which case it adapts the
- * asynchronous operation's default completion token (or boost::asio::deferred
+ * asynchronous operation's default completion token (or asio::deferred
  * if no default is available).
  */
-template <typename Clock, typename WaitTraits = boost::asio::wait_traits<Clock>>
+template <typename Clock, typename WaitTraits = asio::wait_traits<Clock>>
 class partial_cancel_at
 {
 public:
@@ -106,7 +105,7 @@ public:
   /// Adapt a @ref completion_token to specify that the completion handler
   /// arguments should be combined into a single tuple argument.
   template <typename CompletionToken>
-  BOOST_ASIO_NODISCARD inline
+  ASIO_NODISCARD inline
   constexpr cancel_at_t<decay_t<CompletionToken>, Clock, WaitTraits>
   operator()(CompletionToken&& completion_token) const
   {
@@ -124,10 +123,10 @@ public:
 /// operation at a given time.
 /**
  * May also be used directly as a completion token, in which case it adapts the
- * asynchronous operation's default completion token (or boost::asio::deferred
+ * asynchronous operation's default completion token (or asio::deferred
  * if no default is available).
  */
-template <typename Clock, typename WaitTraits = boost::asio::wait_traits<Clock>,
+template <typename Clock, typename WaitTraits = asio::wait_traits<Clock>,
     typename Executor = any_io_executor>
 class partial_cancel_at_timer
 {
@@ -146,7 +145,7 @@ public:
   /// Adapt a @ref completion_token to specify that the completion handler
   /// arguments should be combined into a single tuple argument.
   template <typename CompletionToken>
-  BOOST_ASIO_NODISCARD inline
+  ASIO_NODISCARD inline
   cancel_at_timer<decay_t<CompletionToken>, Clock, WaitTraits, Executor>
   operator()(CompletionToken&& completion_token) const
   {
@@ -173,7 +172,7 @@ public:
  * asynchronous operation is performed within an implicit or explicit strand.
  */
 template <typename Clock, typename Duration>
-BOOST_ASIO_NODISCARD inline partial_cancel_at<Clock>
+ASIO_NODISCARD inline partial_cancel_at<Clock>
 cancel_at(const chrono::time_point<Clock, Duration>& expiry,
     cancellation_type_t cancel_type = cancellation_type::terminal)
 {
@@ -192,7 +191,7 @@ cancel_at(const chrono::time_point<Clock, Duration>& expiry,
  */
 template <typename Clock, typename WaitTraits,
     typename Executor, typename Duration>
-BOOST_ASIO_NODISCARD inline partial_cancel_at_timer<Clock, WaitTraits, Executor>
+ASIO_NODISCARD inline partial_cancel_at_timer<Clock, WaitTraits, Executor>
 cancel_at(basic_waitable_timer<Clock, WaitTraits, Executor>& timer,
     const chrono::time_point<Clock, Duration>& expiry,
     cancellation_type_t cancel_type = cancellation_type::terminal)
@@ -212,7 +211,7 @@ cancel_at(basic_waitable_timer<Clock, WaitTraits, Executor>& timer,
  * asynchronous operation is performed within an implicit or explicit strand.
  */
 template <typename CompletionToken, typename Clock, typename Duration>
-BOOST_ASIO_NODISCARD inline cancel_at_t<decay_t<CompletionToken>, Clock>
+ASIO_NODISCARD inline cancel_at_t<decay_t<CompletionToken>, Clock>
 cancel_at(const chrono::time_point<Clock, Duration>& expiry,
     CompletionToken&& completion_token)
 {
@@ -232,7 +231,7 @@ cancel_at(const chrono::time_point<Clock, Duration>& expiry,
  * asynchronous operation is performed within an implicit or explicit strand.
  */
 template <typename CompletionToken, typename Clock, typename Duration>
-BOOST_ASIO_NODISCARD inline cancel_at_t<decay_t<CompletionToken>, Clock>
+ASIO_NODISCARD inline cancel_at_t<decay_t<CompletionToken>, Clock>
 cancel_at(const chrono::time_point<Clock, Duration>& expiry,
     cancellation_type_t cancel_type, CompletionToken&& completion_token)
 {
@@ -252,7 +251,7 @@ cancel_at(const chrono::time_point<Clock, Duration>& expiry,
  */
 template <typename CompletionToken, typename Clock,
     typename WaitTraits, typename Executor, typename Duration>
-BOOST_ASIO_NODISCARD inline
+ASIO_NODISCARD inline
 cancel_at_timer<decay_t<CompletionToken>, Clock, WaitTraits, Executor>
 cancel_at(basic_waitable_timer<Clock, WaitTraits, Executor>& timer,
     const chrono::time_point<Clock, Duration>& expiry,
@@ -275,7 +274,7 @@ cancel_at(basic_waitable_timer<Clock, WaitTraits, Executor>& timer,
  */
 template <typename CompletionToken, typename Clock,
     typename WaitTraits, typename Executor, typename Duration>
-BOOST_ASIO_NODISCARD inline
+ASIO_NODISCARD inline
 cancel_at_timer<decay_t<CompletionToken>, Clock, WaitTraits, Executor>
 cancel_at(basic_waitable_timer<Clock, WaitTraits, Executor>& timer,
     const chrono::time_point<Clock, Duration>& expiry,
@@ -287,10 +286,9 @@ cancel_at(basic_waitable_timer<Clock, WaitTraits, Executor>& timer,
 }
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#include <boost/asio/impl/cancel_at.hpp>
+#include "asio/impl/cancel_at.hpp"
 
-#endif // BOOST_ASIO_CANCEL_AT_HPP
+#endif // ASIO_CANCEL_AT_HPP

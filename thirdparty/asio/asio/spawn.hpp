@@ -8,27 +8,26 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_SPAWN_HPP
-#define BOOST_ASIO_SPAWN_HPP
+#ifndef ASIO_SPAWN_HPP
+#define ASIO_SPAWN_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/any_io_executor.hpp>
-#include <boost/asio/cancellation_signal.hpp>
-#include <boost/asio/cancellation_state.hpp>
-#include <boost/asio/detail/exception.hpp>
-#include <boost/asio/detail/memory.hpp>
-#include <boost/asio/detail/type_traits.hpp>
-#include <boost/asio/io_context.hpp>
-#include <boost/asio/is_executor.hpp>
-#include <boost/asio/strand.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/any_io_executor.hpp"
+#include "asio/cancellation_signal.hpp"
+#include "asio/cancellation_state.hpp"
+#include "asio/detail/exception.hpp"
+#include "asio/detail/memory.hpp"
+#include "asio/detail/type_traits.hpp"
+#include "asio/io_context.hpp"
+#include "asio/is_executor.hpp"
+#include "asio/strand.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -124,8 +123,8 @@ public:
 
 protected:
   spawned_thread_base** owner_; // Points to data member in active handler.
-  boost::asio::cancellation_slot parent_cancellation_slot_;
-  boost::asio::cancellation_state cancellation_state_;
+  asio::cancellation_slot parent_cancellation_slot_;
+  asio::cancellation_state cancellation_state_;
   bool has_context_switched_;
   bool throw_if_cancelled_;
   bool terminal_;
@@ -225,7 +224,7 @@ public:
   /**
    * Let <tt>P</tt> be the cancellation slot associated with the current
    * coroutine's @ref spawn completion handler. Assigns a new
-   * boost::asio::cancellation_state object <tt>S</tt>, constructed as
+   * asio::cancellation_state object <tt>S</tt>, constructed as
    * <tt>S(P)</tt>, into the current coroutine's cancellation state object.
    */
   void reset_cancellation_state() const
@@ -237,7 +236,7 @@ public:
   /**
    * Let <tt>P</tt> be the cancellation slot associated with the current
    * coroutine's @ref spawn completion handler. Assigns a new
-   * boost::asio::cancellation_state object <tt>S</tt>, constructed as <tt>S(P,
+   * asio::cancellation_state object <tt>S</tt>, constructed as <tt>S(P,
    * std::forward<Filter>(filter))</tt>, into the current coroutine's
    * cancellation state object.
    */
@@ -252,7 +251,7 @@ public:
   /**
    * Let <tt>P</tt> be the cancellation slot associated with the current
    * coroutine's @ref spawn completion handler. Assigns a new
-   * boost::asio::cancellation_state object <tt>S</tt>, constructed as <tt>S(P,
+   * asio::cancellation_state object <tt>S</tt>, constructed as <tt>S(P,
    * std::forward<InFilter>(in_filter),
    * std::forward<OutFilter>(out_filter))</tt>, into the current coroutine's
    * cancellation state object.
@@ -305,7 +304,7 @@ public:
    *   ...
    * } @endcode
    */
-  basic_yield_context operator[](boost::system::error_code& ec) const
+  basic_yield_context operator[](asio::error_code& ec) const
   {
     basic_yield_context tmp(*this);
     tmp.ec_ = &ec;
@@ -324,7 +323,7 @@ public:
 
   detail::spawned_thread_base* spawned_thread_;
   Executor executor_;
-  boost::system::error_code* ec_;
+  asio::error_code* ec_;
 #endif // !defined(GENERATING_DOCUMENTATION)
 };
 
@@ -333,7 +332,7 @@ public:
 typedef basic_yield_context<any_io_executor> yield_context;
 
 /**
- * @defgroup spawn boost::asio::spawn
+ * @defgroup spawn asio::spawn
  *
  * @brief Start a new stackful coroutine.
  *
@@ -341,11 +340,11 @@ typedef basic_yield_context<any_io_executor> yield_context;
  * library. This function enables programs to implement asynchronous logic in a
  * synchronous manner, as illustrated by the following example:
  *
- * @code boost::asio::spawn(my_strand, do_echo, boost::asio::detached);
+ * @code asio::spawn(my_strand, do_echo, asio::detached);
  *
  * // ...
  *
- * void do_echo(boost::asio::yield_context yield)
+ * void do_echo(asio::yield_context yield)
  * {
  *   try
  *   {
@@ -354,10 +353,10 @@ typedef basic_yield_context<any_io_executor> yield_context;
  *     {
  *       std::size_t length =
  *         my_socket.async_read_some(
- *           boost::asio::buffer(data), yield);
+ *           asio::buffer(data), yield);
  *
- *       boost::asio::async_write(my_socket,
- *           boost::asio::buffer(data, length), yield);
+ *       asio::async_write(my_socket,
+ *           asio::buffer(data, length), yield);
  *     }
  *   }
  *   catch (std::exception& e)
@@ -397,7 +396,7 @@ typedef basic_yield_context<any_io_executor> yield_context;
  * @c reset_cancellation_state.
  */
 template <typename Executor, typename F,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
+    ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
       result_of_t<F(basic_yield_context<Executor>)>>::type)
         CompletionToken = default_completion_token_t<Executor>>
 auto spawn(const Executor& ex, F&& function,
@@ -442,7 +441,7 @@ auto spawn(const Executor& ex, F&& function,
  * @c reset_cancellation_state.
  */
 template <typename ExecutionContext, typename F,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
+    ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
       result_of_t<F(basic_yield_context<
         typename ExecutionContext::executor_type>)>>::type)
           CompletionToken = default_completion_token_t<
@@ -494,7 +493,7 @@ auto spawn(ExecutionContext& ctx, F&& function,
  * @c reset_cancellation_state.
  */
 template <typename Executor, typename F,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
+    ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
       result_of_t<F(basic_yield_context<Executor>)>>::type)
         CompletionToken = default_completion_token_t<Executor>>
 auto spawn(const basic_yield_context<Executor>& ctx, F&& function,
@@ -509,7 +508,7 @@ auto spawn(const basic_yield_context<Executor>& ctx, F&& function,
           declval<detail::initiate_spawn<Executor>>(),
           token, static_cast<F&&>(function)));
 
-#if defined(BOOST_ASIO_HAS_BOOST_CONTEXT_FIBER) \
+#if defined(ASIO_HAS_BOOST_CONTEXT_FIBER) \
   || defined(GENERATING_DOCUMENTATION)
 
 /// Start a new stackful coroutine that executes on a given executor.
@@ -546,7 +545,7 @@ auto spawn(const basic_yield_context<Executor>& ctx, F&& function,
  * @c reset_cancellation_state.
  */
 template <typename Executor, typename StackAllocator, typename F,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
+    ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
       result_of_t<F(basic_yield_context<Executor>)>>::type)
         CompletionToken = default_completion_token_t<Executor>>
 auto spawn(const Executor& ex, allocator_arg_t,
@@ -598,7 +597,7 @@ auto spawn(const Executor& ex, allocator_arg_t,
  * @c reset_cancellation_state.
  */
 template <typename ExecutionContext, typename StackAllocator, typename F,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
+    ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
       result_of_t<F(basic_yield_context<
         typename ExecutionContext::executor_type>)>>::type)
           CompletionToken = default_completion_token_t<
@@ -659,7 +658,7 @@ auto spawn(ExecutionContext& ctx, allocator_arg_t,
  * @c reset_cancellation_state.
  */
 template <typename Executor, typename StackAllocator, typename F,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
+    ASIO_COMPLETION_TOKEN_FOR(typename detail::spawn_signature<
       result_of_t<F(basic_yield_context<Executor>)>>::type)
         CompletionToken = default_completion_token_t<Executor>>
 auto spawn(const basic_yield_context<Executor>& ctx, allocator_arg_t,
@@ -677,16 +676,15 @@ auto spawn(const basic_yield_context<Executor>& ctx, allocator_arg_t,
           static_cast<StackAllocator&&>(stack_allocator),
           static_cast<F&&>(function)));
 
-#endif // defined(BOOST_ASIO_HAS_BOOST_CONTEXT_FIBER)
+#endif // defined(ASIO_HAS_BOOST_CONTEXT_FIBER)
        //   || defined(GENERATING_DOCUMENTATION)
 
 /*@}*/
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#include <boost/asio/impl/spawn.hpp>
+#include "asio/impl/spawn.hpp"
 
-#endif // BOOST_ASIO_SPAWN_HPP
+#endif // ASIO_SPAWN_HPP

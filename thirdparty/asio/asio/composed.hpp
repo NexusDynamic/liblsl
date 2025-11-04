@@ -8,24 +8,23 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_COMPOSED_HPP
-#define BOOST_ASIO_COMPOSED_HPP
+#ifndef ASIO_COMPOSED_HPP
+#define ASIO_COMPOSED_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/config.hpp>
-#include <boost/asio/associated_executor.hpp>
-#include <boost/asio/async_result.hpp>
-#include <boost/asio/detail/base_from_cancellation_state.hpp>
-#include <boost/asio/detail/composed_work.hpp>
-#include <boost/asio/detail/handler_cont_helpers.hpp>
-#include <boost/asio/detail/type_traits.hpp>
+#include "asio/detail/config.hpp"
+#include "asio/associated_executor.hpp"
+#include "asio/async_result.hpp"
+#include "asio/detail/base_from_cancellation_state.hpp"
+#include "asio/detail/composed_work.hpp"
+#include "asio/detail/handler_cont_helpers.hpp"
+#include "asio/detail/type_traits.hpp"
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace detail {
 
@@ -187,7 +186,7 @@ inline bool asio_handler_is_continuation(
     composed_op<Impl, Work, Handler, Signature>* this_handler)
 {
   return this_handler->invocations_ > 1 ? true
-    : boost_asio_handler_cont_helpers::is_continuation(
+    : asio_handler_cont_helpers::is_continuation(
         this_handler->handler_);
 }
 
@@ -332,12 +331,12 @@ struct associator<Associator,
  * @code struct async_echo_implementation
  * {
  *   tcp::socket& socket_;
- *   boost::asio::mutable_buffer buffer_;
+ *   asio::mutable_buffer buffer_;
  *   enum { starting, reading, writing } state_;
  *
  *   template <typename Self>
  *   void operator()(Self& self,
- *       boost::system::error_code error,
+ *       asio::error_code error,
  *       std::size_t n)
  *   {
  *     switch (state_)
@@ -355,8 +354,8 @@ struct associator<Associator,
  *       else
  *       {
  *         state_ = writing;
- *         boost::asio::async_write(socket_, buffer_,
- *             boost::asio::transfer_exactly(n),
+ *         asio::async_write(socket_, buffer_,
+ *             asio::transfer_exactly(n),
  *             std::move(self));
  *       }
  *       break;
@@ -369,25 +368,25 @@ struct associator<Associator,
  *
  * template <typename CompletionToken>
  * auto async_echo(tcp::socket& socket,
- *     boost::asio::mutable_buffer buffer,
+ *     asio::mutable_buffer buffer,
  *     CompletionToken&& token)
  *   -> decltype(
- *     boost::asio::async_initiate<CompletionToken,
- *       void(boost::system::error_code, std::size_t)>(
- *         boost::asio::composed(
+ *     asio::async_initiate<CompletionToken,
+ *       void(asio::error_code, std::size_t)>(
+ *         asio::composed(
  *           async_echo_implementation{socket, buffer,
  *             async_echo_implementation::starting}, socket),
  *         token))
  * {
- *   return boost::asio::async_initiate<CompletionToken,
- *     void(boost::system::error_code, std::size_t)>(
- *       boost::asio::composed(
+ *   return asio::async_initiate<CompletionToken,
+ *     void(asio::error_code, std::size_t)>(
+ *       asio::composed(
  *         async_echo_implementation{socket, buffer,
  *           async_echo_implementation::starting}, socket),
- *       token, boost::system::error_code{}, 0);
+ *       token, asio::error_code{}, 0);
  * } @endcode
  */
-template <BOOST_ASIO_COMPLETION_SIGNATURE... Signatures,
+template <ASIO_COMPLETION_SIGNATURE... Signatures,
     typename Implementation, typename... IoObjectsOrExecutors>
 inline auto composed(Implementation&& implementation,
     IoObjectsOrExecutors&&... io_objects_or_executors)
@@ -408,8 +407,7 @@ inline auto composed(Implementation&& implementation,
 }
 
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_COMPOSE_HPP
+#endif // ASIO_COMPOSE_HPP

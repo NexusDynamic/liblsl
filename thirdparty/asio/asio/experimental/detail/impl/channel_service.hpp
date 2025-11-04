@@ -8,24 +8,23 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_EXPERIMENTAL_DETAIL_IMPL_CHANNEL_SERVICE_HPP
-#define BOOST_ASIO_EXPERIMENTAL_DETAIL_IMPL_CHANNEL_SERVICE_HPP
+#ifndef ASIO_EXPERIMENTAL_DETAIL_IMPL_CHANNEL_SERVICE_HPP
+#define ASIO_EXPERIMENTAL_DETAIL_IMPL_CHANNEL_SERVICE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <boost/asio/detail/push_options.hpp>
+#include "asio/detail/push_options.hpp"
 
-namespace boost {
 namespace asio {
 namespace experimental {
 namespace detail {
 
 template <typename Mutex>
 inline channel_service<Mutex>::channel_service(
-    boost::asio::execution_context& ctx)
-  : boost::asio::detail::execution_context_service_base<channel_service>(ctx),
+    asio::execution_context& ctx)
+  : asio::detail::execution_context_service_base<channel_service>(ctx),
     mutex_(),
     impl_list_(0)
 {
@@ -35,8 +34,8 @@ template <typename Mutex>
 inline void channel_service<Mutex>::shutdown()
 {
   // Abandon all pending operations.
-  boost::asio::detail::op_queue<channel_operation> ops;
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  asio::detail::op_queue<channel_operation> ops;
+  asio::detail::mutex::scoped_lock lock(mutex_);
   base_implementation_type* impl = impl_list_;
   while (impl)
   {
@@ -55,7 +54,7 @@ inline void channel_service<Mutex>::construct(
   impl.send_state_ = max_buffer_size ? buffer : block;
 
   // Insert implementation into linked list of all implementations.
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  asio::detail::mutex::scoped_lock lock(mutex_);
   impl.next_ = impl_list_;
   impl.prev_ = 0;
   if (impl_list_)
@@ -87,7 +86,7 @@ void channel_service<Mutex>::move_construct(
   impl.buffer_move_from(other_impl);
 
   // Insert implementation into linked list of all implementations.
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  asio::detail::mutex::scoped_lock lock(mutex_);
   impl.next_ = impl_list_;
   impl.prev_ = 0;
   if (impl_list_)
@@ -108,7 +107,7 @@ void channel_service<Mutex>::move_assign(
   if (this != &other_service)
   {
     // Remove implementation from linked list of all implementations.
-    boost::asio::detail::mutex::scoped_lock lock(mutex_);
+    asio::detail::mutex::scoped_lock lock(mutex_);
     if (impl_list_ == &impl)
       impl_list_ = impl.next_;
     if (impl.prev_)
@@ -129,7 +128,7 @@ void channel_service<Mutex>::move_assign(
   if (this != &other_service)
   {
     // Insert implementation into linked list of all implementations.
-    boost::asio::detail::mutex::scoped_lock lock(other_service.mutex_);
+    asio::detail::mutex::scoped_lock lock(other_service.mutex_);
     impl.next_ = other_service.impl_list_;
     impl.prev_ = 0;
     if (other_service.impl_list_)
@@ -143,7 +142,7 @@ inline void channel_service<Mutex>::base_destroy(
     channel_service<Mutex>::base_implementation_type& impl)
 {
   // Remove implementation from linked list of all implementations.
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  asio::detail::mutex::scoped_lock lock(mutex_);
   if (impl_list_ == &impl)
     impl_list_ = impl.next_;
   if (impl.prev_)
@@ -265,7 +264,7 @@ void channel_service<Mutex>::cancel_by_key(
 
   typename Mutex::scoped_lock lock(impl.mutex_);
 
-  boost::asio::detail::op_queue<channel_operation> other_ops;
+  asio::detail::op_queue<channel_operation> other_ops;
   while (channel_operation* op = impl.waiters_.front())
   {
     if (op->cancellation_key_ == cancellation_key)
@@ -517,8 +516,8 @@ bool channel_service<Mutex>::try_receive(
         impl.send_state_ = (impl.send_state_ == closed) ? closed : buffer;
       }
       lock.unlock();
-      boost::asio::detail::non_const_lvalue<Handler> handler2(handler);
-      boost::asio::detail::completion_payload_handler<
+      asio::detail::non_const_lvalue<Handler> handler2(handler);
+      asio::detail::completion_payload_handler<
         payload_type, decay_t<Handler>>(
           static_cast<payload_type&&>(payload), handler2.value)();
       return true;
@@ -533,8 +532,8 @@ bool channel_service<Mutex>::try_receive(
         impl.receive_state_ = (impl.send_state_ == closed) ? closed : block;
       send_op->post();
       lock.unlock();
-      boost::asio::detail::non_const_lvalue<Handler> handler2(handler);
-      boost::asio::detail::completion_payload_handler<
+      asio::detail::non_const_lvalue<Handler> handler2(handler);
+      asio::detail::completion_payload_handler<
         payload_type, decay_t<Handler>>(
           static_cast<payload_type&&>(payload), handler2.value)();
       return true;
@@ -618,8 +617,7 @@ void channel_service<Mutex>::start_receive_op(
 } // namespace detail
 } // namespace experimental
 } // namespace asio
-} // namespace boost
 
-#include <boost/asio/detail/pop_options.hpp>
+#include "asio/detail/pop_options.hpp"
 
-#endif // BOOST_ASIO_EXPERIMENTAL_DETAIL_IMPL_CHANNEL_SERVICE_HPP
+#endif // ASIO_EXPERIMENTAL_DETAIL_IMPL_CHANNEL_SERVICE_HPP
