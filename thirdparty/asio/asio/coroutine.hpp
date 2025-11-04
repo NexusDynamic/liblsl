@@ -2,15 +2,16 @@
 // coroutine.hpp
 // ~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_COROUTINE_HPP
-#define ASIO_COROUTINE_HPP
+#ifndef BOOST_ASIO_COROUTINE_HPP
+#define BOOST_ASIO_COROUTINE_HPP
 
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -48,11 +49,11 @@ class coroutine_ref;
  * A coroutine is used in conjunction with certain "pseudo-keywords", which
  * are implemented as macros. These macros are defined by a header file:
  *
- * @code #include <asio/yield.hpp>@endcode
+ * @code #include <boost/asio/yield.hpp>@endcode
  *
  * and may conversely be undefined as follows:
  *
- * @code #include <asio/unyield.hpp>@endcode
+ * @code #include <boost/asio/unyield.hpp>@endcode
  *
  * <b>reenter</b>
  *
@@ -111,7 +112,7 @@ class coroutine_ref;
  *
  * @code yield
  * {
- *   mutable_buffers_1 b = buffer(*buffer_);
+ *   mutable_buffer b = buffer(*buffer_);
  *   socket_->async_read_some(b, *this);
  * } @endcode
  *
@@ -200,7 +201,7 @@ class coroutine_ref;
  * The @c fork pseudo-keyword is used when "forking" a coroutine, i.e. splitting
  * it into two (or more) copies. One use of @c fork is in a server, where a new
  * coroutine is created to handle each client connection:
- * 
+ *
  * @code reenter (this)
  * {
  *   do
@@ -211,9 +212,9 @@ class coroutine_ref;
  *   } while (is_parent());
  *   ... client-specific handling follows ...
  * } @endcode
- * 
+ *
  * The logical steps involved in a @c fork are:
- * 
+ *
  * @li @c fork saves the current state of the coroutine.
  * @li The statement creates a copy of the coroutine and either executes it
  *     immediately or schedules it for later execution.
@@ -227,16 +228,16 @@ class coroutine_ref;
  * Note that @c fork doesn't do the actual forking by itself. It is the
  * application's responsibility to create a clone of the coroutine and call it.
  * The clone can be called immediately, as above, or scheduled for delayed
- * execution using something like asio::post().
+ * execution using something like boost::asio::post().
  *
  * @par Alternate macro names
  *
  * If preferred, an application can use macro names that follow a more typical
  * naming convention, rather than the pseudo-keywords. These are:
  *
- * @li @c ASIO_CORO_REENTER instead of @c reenter
- * @li @c ASIO_CORO_YIELD instead of @c yield
- * @li @c ASIO_CORO_FORK instead of @c fork
+ * @li @c BOOST_ASIO_CORO_REENTER instead of @c reenter
+ * @li @c BOOST_ASIO_CORO_YIELD instead of @c yield
+ * @li @c BOOST_ASIO_CORO_FORK instead of @c fork
  */
 class coroutine
 {
@@ -258,7 +259,6 @@ private:
   int value_;
 };
 
-
 namespace detail {
 
 class coroutine_ref
@@ -266,6 +266,7 @@ class coroutine_ref
 public:
   coroutine_ref(coroutine& c) : value_(c.value_), modified_(false) {}
   coroutine_ref(coroutine* c) : value_(c->value_), modified_(false) {}
+  coroutine_ref(const coroutine_ref&) = default;
   ~coroutine_ref() { if (!modified_) value_ = -1; }
   operator int() const { return value_; }
   int& operator=(int v) { modified_ = true; return value_ = v; }
@@ -277,9 +278,10 @@ private:
 
 } // namespace detail
 } // namespace asio
+} // namespace boost
 
-#define ASIO_CORO_REENTER(c) \
-  switch (::asio::detail::coroutine_ref _coro_value = c) \
+#define BOOST_ASIO_CORO_REENTER(c) \
+  switch (::boost::asio::detail::coroutine_ref _coro_value = c) \
     case -1: if (_coro_value) \
     { \
       goto terminate_coroutine; \
@@ -291,7 +293,7 @@ private:
     } \
     else /* fall-through */ case 0:
 
-#define ASIO_CORO_YIELD_IMPL(n) \
+#define BOOST_ASIO_CORO_YIELD_IMPL(n) \
   for (_coro_value = (n);;) \
     if (_coro_value == 0) \
     { \
@@ -308,7 +310,7 @@ private:
               goto bail_out_of_coroutine; \
             else /* fall-through */ case 0:
 
-#define ASIO_CORO_FORK_IMPL(n) \
+#define BOOST_ASIO_CORO_FORK_IMPL(n) \
   for (_coro_value = -(n);; _coro_value = (n)) \
     if (_coro_value == (n)) \
     { \
@@ -318,11 +320,11 @@ private:
     else
 
 #if defined(_MSC_VER)
-# define ASIO_CORO_YIELD ASIO_CORO_YIELD_IMPL(__COUNTER__ + 1)
-# define ASIO_CORO_FORK ASIO_CORO_FORK_IMPL(__COUNTER__ + 1)
+# define BOOST_ASIO_CORO_YIELD BOOST_ASIO_CORO_YIELD_IMPL(__COUNTER__ + 1)
+# define BOOST_ASIO_CORO_FORK BOOST_ASIO_CORO_FORK_IMPL(__COUNTER__ + 1)
 #else // defined(_MSC_VER)
-# define ASIO_CORO_YIELD ASIO_CORO_YIELD_IMPL(__LINE__)
-# define ASIO_CORO_FORK ASIO_CORO_FORK_IMPL(__LINE__)
+# define BOOST_ASIO_CORO_YIELD BOOST_ASIO_CORO_YIELD_IMPL(__LINE__)
+# define BOOST_ASIO_CORO_FORK BOOST_ASIO_CORO_FORK_IMPL(__LINE__)
 #endif // defined(_MSC_VER)
 
-#endif // ASIO_COROUTINE_HPP
+#endif // BOOST_ASIO_COROUTINE_HPP

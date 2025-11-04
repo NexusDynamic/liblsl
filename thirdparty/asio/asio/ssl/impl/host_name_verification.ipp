@@ -2,29 +2,30 @@
 // ssl/impl/host_name_verification.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_SSL_IMPL_HOST_NAME_VERIFICATION_IPP
-#define ASIO_SSL_IMPL_HOST_NAME_VERIFICATION_IPP
+#ifndef BOOST_ASIO_SSL_IMPL_HOST_NAME_VERIFICATION_IPP
+#define BOOST_ASIO_SSL_IMPL_HOST_NAME_VERIFICATION_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 
 #include <cctype>
 #include <cstring>
-#include "asio/ip/address.hpp"
-#include "asio/ssl/host_name_verification.hpp"
-#include "asio/ssl/detail/openssl_types.hpp"
+#include <boost/asio/ip/address.hpp>
+#include <boost/asio/ssl/host_name_verification.hpp>
+#include <boost/asio/ssl/detail/openssl_types.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace ssl {
 
@@ -44,7 +45,7 @@ bool host_name_verification::operator()(
 
   // Try converting the host name to an address. If it is an address then we
   // need to look for an IP address in the certificate rather than a host name.
-  asio::error_code ec;
+  boost::system::error_code ec;
   ip::address address = ip::make_address(host_, ec);
   const bool is_address = !ec;
   (void)address;
@@ -67,7 +68,8 @@ bool host_name_verification::operator()(
 
 } // namespace ssl
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_SSL_IMPL_HOST_NAME_VERIFICATION_IPP
+#endif // BOOST_ASIO_SSL_IMPL_HOST_NAME_VERIFICATION_IPP

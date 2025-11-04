@@ -2,50 +2,50 @@
 // detail/win_iocp_socket_service_base.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_DETAIL_WIN_IOCP_SOCKET_SERVICE_BASE_HPP
-#define ASIO_DETAIL_WIN_IOCP_SOCKET_SERVICE_BASE_HPP
+#ifndef BOOST_ASIO_DETAIL_WIN_IOCP_SOCKET_SERVICE_BASE_HPP
+#define BOOST_ASIO_DETAIL_WIN_IOCP_SOCKET_SERVICE_BASE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 
-#if defined(ASIO_HAS_IOCP)
+#if defined(BOOST_ASIO_HAS_IOCP)
 
-#include "asio/associated_cancellation_slot.hpp"
-#include "asio/error.hpp"
-#include "asio/execution_context.hpp"
-#include "asio/socket_base.hpp"
-#include "asio/detail/bind_handler.hpp"
-#include "asio/detail/buffer_sequence_adapter.hpp"
-#include "asio/detail/fenced_block.hpp"
-#include "asio/detail/handler_alloc_helpers.hpp"
-#include "asio/detail/handler_invoke_helpers.hpp"
-#include "asio/detail/memory.hpp"
-#include "asio/detail/mutex.hpp"
-#include "asio/detail/operation.hpp"
-#include "asio/detail/reactor_op.hpp"
-#include "asio/detail/select_reactor.hpp"
-#include "asio/detail/socket_holder.hpp"
-#include "asio/detail/socket_ops.hpp"
-#include "asio/detail/socket_types.hpp"
-#include "asio/detail/win_iocp_io_context.hpp"
-#include "asio/detail/win_iocp_null_buffers_op.hpp"
-#include "asio/detail/win_iocp_socket_connect_op.hpp"
-#include "asio/detail/win_iocp_socket_send_op.hpp"
-#include "asio/detail/win_iocp_socket_recv_op.hpp"
-#include "asio/detail/win_iocp_socket_recvmsg_op.hpp"
-#include "asio/detail/win_iocp_wait_op.hpp"
+#include <boost/asio/associated_cancellation_slot.hpp>
+#include <boost/asio/error.hpp>
+#include <boost/asio/execution_context.hpp>
+#include <boost/asio/socket_base.hpp>
+#include <boost/asio/detail/bind_handler.hpp>
+#include <boost/asio/detail/buffer_sequence_adapter.hpp>
+#include <boost/asio/detail/fenced_block.hpp>
+#include <boost/asio/detail/handler_alloc_helpers.hpp>
+#include <boost/asio/detail/memory.hpp>
+#include <boost/asio/detail/mutex.hpp>
+#include <boost/asio/detail/operation.hpp>
+#include <boost/asio/detail/reactor_op.hpp>
+#include <boost/asio/detail/select_reactor.hpp>
+#include <boost/asio/detail/socket_holder.hpp>
+#include <boost/asio/detail/socket_ops.hpp>
+#include <boost/asio/detail/socket_types.hpp>
+#include <boost/asio/detail/win_iocp_io_context.hpp>
+#include <boost/asio/detail/win_iocp_null_buffers_op.hpp>
+#include <boost/asio/detail/win_iocp_socket_connect_op.hpp>
+#include <boost/asio/detail/win_iocp_socket_send_op.hpp>
+#include <boost/asio/detail/win_iocp_socket_recv_op.hpp>
+#include <boost/asio/detail/win_iocp_socket_recvmsg_op.hpp>
+#include <boost/asio/detail/win_iocp_wait_op.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -72,13 +72,13 @@ public:
     // Per-descriptor data used by the reactor.
     select_reactor::per_descriptor_data reactor_data_;
 
-#if defined(ASIO_ENABLE_CANCELIO)
+#if defined(BOOST_ASIO_ENABLE_CANCELIO)
     // The ID of the thread from which it is safe to cancel asynchronous
     // operations. 0 means no asynchronous operations have been started yet.
     // ~0 means asynchronous operations have been started from more than one
     // thread, and cancellation is not supported for the socket.
     DWORD safe_cancellation_thread_id_;
-#endif // defined(ASIO_ENABLE_CANCELIO)
+#endif // defined(BOOST_ASIO_ENABLE_CANCELIO)
 
     // Pointers to adjacent socket implementations in linked list.
     base_implementation_type* next_;
@@ -86,25 +86,25 @@ public:
   };
 
   // Constructor.
-  ASIO_DECL win_iocp_socket_service_base(execution_context& context);
+  BOOST_ASIO_DECL win_iocp_socket_service_base(execution_context& context);
 
   // Destroy all user-defined handler objects owned by the service.
-  ASIO_DECL void base_shutdown();
+  BOOST_ASIO_DECL void base_shutdown();
 
   // Construct a new socket implementation.
-  ASIO_DECL void construct(base_implementation_type& impl);
+  BOOST_ASIO_DECL void construct(base_implementation_type& impl);
 
   // Move-construct a new socket implementation.
-  ASIO_DECL void base_move_construct(base_implementation_type& impl,
-      base_implementation_type& other_impl) ASIO_NOEXCEPT;
+  BOOST_ASIO_DECL void base_move_construct(base_implementation_type& impl,
+      base_implementation_type& other_impl) noexcept;
 
   // Move-assign from another socket implementation.
-  ASIO_DECL void base_move_assign(base_implementation_type& impl,
+  BOOST_ASIO_DECL void base_move_assign(base_implementation_type& impl,
       win_iocp_socket_service_base& other_service,
       base_implementation_type& other_impl);
 
   // Destroy a socket implementation.
-  ASIO_DECL void destroy(base_implementation_type& impl);
+  BOOST_ASIO_DECL void destroy(base_implementation_type& impl);
 
   // Determine whether the socket is open.
   bool is_open(const base_implementation_type& impl) const
@@ -113,34 +113,34 @@ public:
   }
 
   // Destroy a socket implementation.
-  ASIO_DECL asio::error_code close(
-      base_implementation_type& impl, asio::error_code& ec);
+  BOOST_ASIO_DECL boost::system::error_code close(
+      base_implementation_type& impl, boost::system::error_code& ec);
 
   // Release ownership of the socket.
-  ASIO_DECL socket_type release(
-      base_implementation_type& impl, asio::error_code& ec);
+  BOOST_ASIO_DECL socket_type release(
+      base_implementation_type& impl, boost::system::error_code& ec);
 
   // Cancel all operations associated with the socket.
-  ASIO_DECL asio::error_code cancel(
-      base_implementation_type& impl, asio::error_code& ec);
+  BOOST_ASIO_DECL boost::system::error_code cancel(
+      base_implementation_type& impl, boost::system::error_code& ec);
 
   // Determine whether the socket is at the out-of-band data mark.
   bool at_mark(const base_implementation_type& impl,
-      asio::error_code& ec) const
+      boost::system::error_code& ec) const
   {
     return socket_ops::sockatmark(impl.socket_, ec);
   }
 
   // Determine the number of bytes available for reading.
   std::size_t available(const base_implementation_type& impl,
-      asio::error_code& ec) const
+      boost::system::error_code& ec) const
   {
     return socket_ops::available(impl.socket_, ec);
   }
 
   // Place the socket into the state where it will listen for new connections.
-  asio::error_code listen(base_implementation_type& impl,
-      int backlog, asio::error_code& ec)
+  boost::system::error_code listen(base_implementation_type& impl,
+      int backlog, boost::system::error_code& ec)
   {
     socket_ops::listen(impl.socket_, backlog, ec);
     return ec;
@@ -148,8 +148,8 @@ public:
 
   // Perform an IO control command on the socket.
   template <typename IO_Control_Command>
-  asio::error_code io_control(base_implementation_type& impl,
-      IO_Control_Command& command, asio::error_code& ec)
+  boost::system::error_code io_control(base_implementation_type& impl,
+      IO_Control_Command& command, boost::system::error_code& ec)
   {
     socket_ops::ioctl(impl.socket_, impl.state_, command.name(),
         static_cast<ioctl_arg_type*>(command.data()), ec);
@@ -163,8 +163,8 @@ public:
   }
 
   // Sets the non-blocking mode of the socket.
-  asio::error_code non_blocking(base_implementation_type& impl,
-      bool mode, asio::error_code& ec)
+  boost::system::error_code non_blocking(base_implementation_type& impl,
+      bool mode, boost::system::error_code& ec)
   {
     socket_ops::set_user_non_blocking(impl.socket_, impl.state_, mode, ec);
     return ec;
@@ -177,8 +177,8 @@ public:
   }
 
   // Sets the non-blocking mode of the native socket implementation.
-  asio::error_code native_non_blocking(base_implementation_type& impl,
-      bool mode, asio::error_code& ec)
+  boost::system::error_code native_non_blocking(base_implementation_type& impl,
+      bool mode, boost::system::error_code& ec)
   {
     socket_ops::set_internal_non_blocking(impl.socket_, impl.state_, mode, ec);
     return ec;
@@ -186,8 +186,8 @@ public:
 
   // Wait for the socket to become ready to read, ready to write, or to have
   // pending error conditions.
-  asio::error_code wait(base_implementation_type& impl,
-      socket_base::wait_type w, asio::error_code& ec)
+  boost::system::error_code wait(base_implementation_type& impl,
+      socket_base::wait_type w, boost::system::error_code& ec)
   {
     switch (w)
     {
@@ -201,7 +201,7 @@ public:
       socket_ops::poll_error(impl.socket_, impl.state_, -1, ec);
       break;
     default:
-      ec = asio::error::invalid_argument;
+      ec = boost::asio::error::invalid_argument;
       break;
     }
 
@@ -214,19 +214,19 @@ public:
   void async_wait(base_implementation_type& impl,
       socket_base::wait_type w, Handler& handler, const IoExecutor& io_ex)
   {
-    typename associated_cancellation_slot<Handler>::type slot
-      = asio::get_associated_cancellation_slot(handler);
+    associated_cancellation_slot_t<Handler> slot
+      = boost::asio::get_associated_cancellation_slot(handler);
 
     bool is_continuation =
-      asio_handler_cont_helpers::is_continuation(handler);
+      boost_asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_wait_op<Handler, IoExecutor> op;
-    typename op::ptr p = { asio::detail::addressof(handler),
+    typename op::ptr p = { boost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl.cancel_token_, handler, io_ex);
 
-    ASIO_HANDLER_CREATION((context_, *p.p, "socket",
+    BOOST_ASIO_HANDLER_CREATION((context_, *p.p, "socket",
           &impl, impl.socket_, "async_wait"));
 
     // Optionally register for per-operation cancellation.
@@ -253,7 +253,7 @@ public:
         start_reactor_op(impl, select_reactor::except_op, p.p);
         break;
       default:
-        p.p->ec_ = asio::error::invalid_argument;
+        p.p->ec_ = boost::asio::error::invalid_argument;
         iocp_service_.post_immediate_completion(p.p, is_continuation);
         break;
     }
@@ -272,9 +272,9 @@ public:
   template <typename ConstBufferSequence>
   size_t send(base_implementation_type& impl,
       const ConstBufferSequence& buffers,
-      socket_base::message_flags flags, asio::error_code& ec)
+      socket_base::message_flags flags, boost::system::error_code& ec)
   {
-    buffer_sequence_adapter<asio::const_buffer,
+    buffer_sequence_adapter<boost::asio::const_buffer,
         ConstBufferSequence> bufs(buffers);
 
     return socket_ops::sync_send(impl.socket_, impl.state_,
@@ -283,7 +283,7 @@ public:
 
   // Wait until data can be sent without blocking.
   size_t send(base_implementation_type& impl, const null_buffers&,
-      socket_base::message_flags, asio::error_code& ec)
+      socket_base::message_flags, boost::system::error_code& ec)
   {
     // Wait for socket to become ready.
     socket_ops::poll_write(impl.socket_, impl.state_, -1, ec);
@@ -298,21 +298,21 @@ public:
       const ConstBufferSequence& buffers, socket_base::message_flags flags,
       Handler& handler, const IoExecutor& io_ex)
   {
-    typename associated_cancellation_slot<Handler>::type slot
-      = asio::get_associated_cancellation_slot(handler);
+    associated_cancellation_slot_t<Handler> slot
+      = boost::asio::get_associated_cancellation_slot(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_socket_send_op<
         ConstBufferSequence, Handler, IoExecutor> op;
-    typename op::ptr p = { asio::detail::addressof(handler),
+    typename op::ptr p = { boost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     operation* o = p.p = new (p.v) op(
         impl.cancel_token_, buffers, handler, io_ex);
 
-    ASIO_HANDLER_CREATION((context_, *p.p, "socket",
+    BOOST_ASIO_HANDLER_CREATION((context_, *p.p, "socket",
           &impl, impl.socket_, "async_send"));
 
-    buffer_sequence_adapter<asio::const_buffer,
+    buffer_sequence_adapter<boost::asio::const_buffer,
         ConstBufferSequence> bufs(buffers);
 
     // Optionally register for per-operation cancellation.
@@ -332,11 +332,11 @@ public:
   {
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_null_buffers_op<Handler, IoExecutor> op;
-    typename op::ptr p = { asio::detail::addressof(handler),
+    typename op::ptr p = { boost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl.cancel_token_, handler, io_ex);
 
-    ASIO_HANDLER_CREATION((context_, *p.p, "socket",
+    BOOST_ASIO_HANDLER_CREATION((context_, *p.p, "socket",
           &impl, impl.socket_, "async_send(null_buffers)"));
 
     start_reactor_op(impl, select_reactor::write_op, p.p);
@@ -347,9 +347,9 @@ public:
   template <typename MutableBufferSequence>
   size_t receive(base_implementation_type& impl,
       const MutableBufferSequence& buffers,
-      socket_base::message_flags flags, asio::error_code& ec)
+      socket_base::message_flags flags, boost::system::error_code& ec)
   {
-    buffer_sequence_adapter<asio::mutable_buffer,
+    buffer_sequence_adapter<boost::asio::mutable_buffer,
         MutableBufferSequence> bufs(buffers);
 
     return socket_ops::sync_recv(impl.socket_, impl.state_,
@@ -358,7 +358,7 @@ public:
 
   // Wait until data can be received without blocking.
   size_t receive(base_implementation_type& impl, const null_buffers&,
-      socket_base::message_flags, asio::error_code& ec)
+      socket_base::message_flags, boost::system::error_code& ec)
   {
     // Wait for socket to become ready.
     socket_ops::poll_read(impl.socket_, impl.state_, -1, ec);
@@ -374,21 +374,21 @@ public:
       const MutableBufferSequence& buffers, socket_base::message_flags flags,
       Handler& handler, const IoExecutor& io_ex)
   {
-    typename associated_cancellation_slot<Handler>::type slot
-      = asio::get_associated_cancellation_slot(handler);
+    associated_cancellation_slot_t<Handler> slot
+      = boost::asio::get_associated_cancellation_slot(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_socket_recv_op<
         MutableBufferSequence, Handler, IoExecutor> op;
-    typename op::ptr p = { asio::detail::addressof(handler),
+    typename op::ptr p = { boost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     operation* o = p.p = new (p.v) op(impl.state_,
         impl.cancel_token_, buffers, handler, io_ex);
 
-    ASIO_HANDLER_CREATION((context_, *p.p, "socket",
+    BOOST_ASIO_HANDLER_CREATION((context_, *p.p, "socket",
           &impl, impl.socket_, "async_receive"));
 
-    buffer_sequence_adapter<asio::mutable_buffer,
+    buffer_sequence_adapter<boost::asio::mutable_buffer,
         MutableBufferSequence> bufs(buffers);
 
     // Optionally register for per-operation cancellation.
@@ -407,16 +407,16 @@ public:
       const null_buffers&, socket_base::message_flags flags,
       Handler& handler, const IoExecutor& io_ex)
   {
-    typename associated_cancellation_slot<Handler>::type slot
-      = asio::get_associated_cancellation_slot(handler);
+    associated_cancellation_slot_t<Handler> slot
+      = boost::asio::get_associated_cancellation_slot(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_null_buffers_op<Handler, IoExecutor> op;
-    typename op::ptr p = { asio::detail::addressof(handler),
+    typename op::ptr p = { boost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl.cancel_token_, handler, io_ex);
 
-    ASIO_HANDLER_CREATION((context_, *p.p, "socket",
+    BOOST_ASIO_HANDLER_CREATION((context_, *p.p, "socket",
           &impl, impl.socket_, "async_receive(null_buffers)"));
 
     // Optionally register for per-operation cancellation.
@@ -445,9 +445,9 @@ public:
   size_t receive_with_flags(base_implementation_type& impl,
       const MutableBufferSequence& buffers,
       socket_base::message_flags in_flags,
-      socket_base::message_flags& out_flags, asio::error_code& ec)
+      socket_base::message_flags& out_flags, boost::system::error_code& ec)
   {
-    buffer_sequence_adapter<asio::mutable_buffer,
+    buffer_sequence_adapter<boost::asio::mutable_buffer,
         MutableBufferSequence> bufs(buffers);
 
     return socket_ops::sync_recvmsg(impl.socket_, impl.state_,
@@ -457,7 +457,7 @@ public:
   // Wait until data can be received without blocking.
   size_t receive_with_flags(base_implementation_type& impl,
       const null_buffers&, socket_base::message_flags,
-      socket_base::message_flags& out_flags, asio::error_code& ec)
+      socket_base::message_flags& out_flags, boost::system::error_code& ec)
   {
     // Wait for socket to become ready.
     socket_ops::poll_read(impl.socket_, impl.state_, -1, ec);
@@ -478,21 +478,21 @@ public:
       socket_base::message_flags& out_flags, Handler& handler,
       const IoExecutor& io_ex)
   {
-    typename associated_cancellation_slot<Handler>::type slot
-      = asio::get_associated_cancellation_slot(handler);
+    associated_cancellation_slot_t<Handler> slot
+      = boost::asio::get_associated_cancellation_slot(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_socket_recvmsg_op<
         MutableBufferSequence, Handler, IoExecutor> op;
-    typename op::ptr p = { asio::detail::addressof(handler),
+    typename op::ptr p = { boost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     operation* o = p.p = new (p.v) op(impl.cancel_token_,
         buffers, out_flags, handler, io_ex);
 
-    ASIO_HANDLER_CREATION((context_, *p.p, "socket",
+    BOOST_ASIO_HANDLER_CREATION((context_, *p.p, "socket",
           &impl, impl.socket_, "async_receive_with_flags"));
 
-    buffer_sequence_adapter<asio::mutable_buffer,
+    buffer_sequence_adapter<boost::asio::mutable_buffer,
         MutableBufferSequence> bufs(buffers);
 
     // Optionally register for per-operation cancellation.
@@ -510,16 +510,16 @@ public:
       socket_base::message_flags& out_flags, Handler& handler,
       const IoExecutor& io_ex)
   {
-    typename associated_cancellation_slot<Handler>::type slot
-      = asio::get_associated_cancellation_slot(handler);
+    associated_cancellation_slot_t<Handler> slot
+      = boost::asio::get_associated_cancellation_slot(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_null_buffers_op<Handler, IoExecutor> op;
-    typename op::ptr p = { asio::detail::addressof(handler),
+    typename op::ptr p = { boost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl.cancel_token_, handler, io_ex);
 
-    ASIO_HANDLER_CREATION((context_, *p.p, "socket",
+    BOOST_ASIO_HANDLER_CREATION((context_, *p.p, "socket",
           &impl, impl.socket_, "async_receive_with_flags(null_buffers)"));
 
     // Reset out_flags since it can be given no sensible value at this time.
@@ -546,73 +546,73 @@ public:
   }
 
   // Helper function to restart an asynchronous accept operation.
-  ASIO_DECL void restart_accept_op(socket_type s,
+  BOOST_ASIO_DECL void restart_accept_op(socket_type s,
       socket_holder& new_socket, int family, int type,
       int protocol, void* output_buffer, DWORD address_length,
       long* cancel_requested, operation* op);
 
 protected:
   // Open a new socket implementation.
-  ASIO_DECL asio::error_code do_open(
+  BOOST_ASIO_DECL boost::system::error_code do_open(
       base_implementation_type& impl, int family, int type,
-      int protocol, asio::error_code& ec);
+      int protocol, boost::system::error_code& ec);
 
   // Assign a native socket to a socket implementation.
-  ASIO_DECL asio::error_code do_assign(
+  BOOST_ASIO_DECL boost::system::error_code do_assign(
       base_implementation_type& impl, int type,
-      socket_type native_socket, asio::error_code& ec);
+      socket_type native_socket, boost::system::error_code& ec);
 
   // Helper function to start an asynchronous send operation.
-  ASIO_DECL void start_send_op(base_implementation_type& impl,
+  BOOST_ASIO_DECL void start_send_op(base_implementation_type& impl,
       WSABUF* buffers, std::size_t buffer_count,
       socket_base::message_flags flags, bool noop, operation* op);
 
   // Helper function to start an asynchronous send_to operation.
-  ASIO_DECL void start_send_to_op(base_implementation_type& impl,
+  BOOST_ASIO_DECL void start_send_to_op(base_implementation_type& impl,
       WSABUF* buffers, std::size_t buffer_count, const void* addr,
       int addrlen, socket_base::message_flags flags, operation* op);
 
   // Helper function to start an asynchronous receive operation.
-  ASIO_DECL void start_receive_op(base_implementation_type& impl,
+  BOOST_ASIO_DECL void start_receive_op(base_implementation_type& impl,
       WSABUF* buffers, std::size_t buffer_count,
       socket_base::message_flags flags, bool noop, operation* op);
 
   // Helper function to start an asynchronous null_buffers receive operation.
-  ASIO_DECL int start_null_buffers_receive_op(
+  BOOST_ASIO_DECL int start_null_buffers_receive_op(
       base_implementation_type& impl, socket_base::message_flags flags,
       reactor_op* op, operation* iocp_op);
 
   // Helper function to start an asynchronous receive_from operation.
-  ASIO_DECL void start_receive_from_op(base_implementation_type& impl,
+  BOOST_ASIO_DECL void start_receive_from_op(base_implementation_type& impl,
       WSABUF* buffers, std::size_t buffer_count, void* addr,
       socket_base::message_flags flags, int* addrlen, operation* op);
 
   // Helper function to start an asynchronous accept operation.
-  ASIO_DECL void start_accept_op(base_implementation_type& impl,
+  BOOST_ASIO_DECL void start_accept_op(base_implementation_type& impl,
       bool peer_is_open, socket_holder& new_socket, int family, int type,
       int protocol, void* output_buffer, DWORD address_length, operation* op);
 
   // Start an asynchronous read or write operation using the reactor.
-  ASIO_DECL void start_reactor_op(base_implementation_type& impl,
+  BOOST_ASIO_DECL void start_reactor_op(base_implementation_type& impl,
       int op_type, reactor_op* op);
 
   // Start the asynchronous connect operation using the reactor.
-  ASIO_DECL int start_connect_op(base_implementation_type& impl,
+  BOOST_ASIO_DECL int start_connect_op(base_implementation_type& impl,
       int family, int type, const void* remote_addr, std::size_t remote_addrlen,
       win_iocp_socket_connect_op_base* op, operation* iocp_op);
 
   // Helper function to close a socket when the associated object is being
   // destroyed.
-  ASIO_DECL void close_for_destruction(base_implementation_type& impl);
+  BOOST_ASIO_DECL void close_for_destruction(base_implementation_type& impl);
 
   // Update the ID of the thread from which cancellation is safe.
-  ASIO_DECL void update_cancellation_thread_id(
+  BOOST_ASIO_DECL void update_cancellation_thread_id(
       base_implementation_type& impl);
 
   // Helper function to get the reactor. If no reactor has been created yet, a
   // new one is obtained from the execution context and a pointer to it is
   // cached in this service.
-  ASIO_DECL select_reactor& get_reactor();
+  BOOST_ASIO_DECL select_reactor& get_reactor();
 
   // The type of a ConnectEx function pointer, as old SDKs may not provide it.
   typedef BOOL (PASCAL *connect_ex_fn)(SOCKET,
@@ -621,7 +621,7 @@ protected:
   // Helper function to get the ConnectEx pointer. If no ConnectEx pointer has
   // been obtained yet, one is obtained using WSAIoctl and the pointer is
   // cached. Returns a null pointer if ConnectEx is not available.
-  ASIO_DECL connect_ex_fn get_connect_ex(
+  BOOST_ASIO_DECL connect_ex_fn get_connect_ex(
       base_implementation_type& impl, int type);
 
   // The type of a NtSetInformationFile function pointer.
@@ -631,19 +631,19 @@ protected:
   // NtSetInformationFile pointer has been obtained yet, one is obtained using
   // GetProcAddress and the pointer is cached. Returns a null pointer if
   // NtSetInformationFile is not available.
-  ASIO_DECL nt_set_info_fn get_nt_set_info();
+  BOOST_ASIO_DECL nt_set_info_fn get_nt_set_info();
 
   // Helper function to emulate InterlockedCompareExchangePointer functionality
   // for:
   // - very old Platform SDKs; and
   // - platform SDKs where MSVC's /Wp64 option causes spurious warnings.
-  ASIO_DECL void* interlocked_compare_exchange_pointer(
+  BOOST_ASIO_DECL void* interlocked_compare_exchange_pointer(
       void** dest, void* exch, void* cmp);
 
   // Helper function to emulate InterlockedExchangePointer functionality for:
   // - very old Platform SDKs; and
   // - platform SDKs where MSVC's /Wp64 option causes spurious warnings.
-  ASIO_DECL void* interlocked_exchange_pointer(void** dest, void* val);
+  BOOST_ASIO_DECL void* interlocked_exchange_pointer(void** dest, void* val);
 
   // Helper class used to implement per operation cancellation.
   class iocp_op_cancellation : public operation
@@ -657,7 +657,7 @@ protected:
     }
 
     static void do_complete(void* owner, operation* base,
-        const asio::error_code& result_ec,
+        const boost::system::error_code& result_ec,
         std::size_t bytes_transferred)
     {
       iocp_op_cancellation* o = static_cast<iocp_op_cancellation*>(base);
@@ -698,7 +698,7 @@ protected:
     }
 
     static void do_complete(void* owner, operation* base,
-        const asio::error_code& result_ec,
+        const boost::system::error_code& result_ec,
         std::size_t bytes_transferred)
     {
       accept_op_cancellation* o = static_cast<accept_op_cancellation*>(base);
@@ -755,7 +755,7 @@ protected:
     }
 
     static void do_complete(void* owner, operation* base,
-        const asio::error_code& result_ec,
+        const boost::system::error_code& result_ec,
         std::size_t bytes_transferred)
     {
       reactor_op_cancellation* o = static_cast<reactor_op_cancellation*>(base);
@@ -809,8 +809,8 @@ protected:
   // Pointer to NtSetInformationFile implementation.
   void* nt_set_info_;
 
-  // Mutex to protect access to the linked list of implementations. 
-  asio::detail::mutex mutex_;
+  // Mutex to protect access to the linked list of implementations.
+  boost::asio::detail::mutex mutex_;
 
   // The head of a linked list of all implementations.
   base_implementation_type* impl_list_;
@@ -818,13 +818,14 @@ protected:
 
 } // namespace detail
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#if defined(ASIO_HEADER_ONLY)
-# include "asio/detail/impl/win_iocp_socket_service_base.ipp"
-#endif // defined(ASIO_HEADER_ONLY)
+#if defined(BOOST_ASIO_HEADER_ONLY)
+# include <boost/asio/detail/impl/win_iocp_socket_service_base.ipp>
+#endif // defined(BOOST_ASIO_HEADER_ONLY)
 
-#endif // defined(ASIO_HAS_IOCP)
+#endif // defined(BOOST_ASIO_HAS_IOCP)
 
-#endif // ASIO_DETAIL_WIN_IOCP_SOCKET_SERVICE_BASE_HPP
+#endif // BOOST_ASIO_DETAIL_WIN_IOCP_SOCKET_SERVICE_BASE_HPP

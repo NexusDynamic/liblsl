@@ -2,44 +2,45 @@
 // require_concept.hpp
 // ~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_REQUIRE_CONCEPT_HPP
-#define ASIO_REQUIRE_CONCEPT_HPP
+#ifndef BOOST_ASIO_REQUIRE_CONCEPT_HPP
+#define BOOST_ASIO_REQUIRE_CONCEPT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/detail/type_traits.hpp"
-#include "asio/is_applicable_property.hpp"
-#include "asio/traits/require_concept_member.hpp"
-#include "asio/traits/require_concept_free.hpp"
-#include "asio/traits/static_require_concept.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <boost/asio/detail/type_traits.hpp>
+#include <boost/asio/is_applicable_property.hpp>
+#include <boost/asio/traits/require_concept_member.hpp>
+#include <boost/asio/traits/require_concept_free.hpp>
+#include <boost/asio/traits/static_require_concept.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
 #if defined(GENERATING_DOCUMENTATION)
 
+namespace boost {
 namespace asio {
 
 /// A customisation point that applies a concept-enforcing property to an
 /// object.
 /**
  * The name <tt>require_concept</tt> denotes a customization point object. The
- * expression <tt>asio::require_concept(E, P)</tt> for some
+ * expression <tt>boost::asio::require_concept(E, P)</tt> for some
  * subexpressions <tt>E</tt> and <tt>P</tt> (with types <tt>T =
  * decay_t<decltype(E)></tt> and <tt>Prop = decay_t<decltype(P)></tt>) is
  * expression-equivalent to:
  *
  * @li If <tt>is_applicable_property_v<T, Prop> &&
  *   Prop::is_requirable_concept</tt> is not a well-formed constant expression
- *   with value <tt>true</tt>, <tt>asio::require_concept(E, P)</tt> is
+ *   with value <tt>true</tt>, <tt>boost::asio::require_concept(E, P)</tt> is
  *   ill-formed.
  *
  * @li Otherwise, <tt>E</tt> if the expression <tt>Prop::template
@@ -54,7 +55,7 @@ namespace asio {
  *   resolution performed in a context that does not include the declaration
  *   of the <tt>require_concept</tt> customization point object.
  *
- * @li Otherwise, <tt>asio::require_concept(E, P)</tt> is ill-formed.
+ * @li Otherwise, <tt>boost::asio::require_concept(E, P)</tt> is ill-formed.
  */
 inline constexpr unspecified require_concept = unspecified;
 
@@ -63,7 +64,7 @@ inline constexpr unspecified require_concept = unspecified;
 /**
  * Class template @c can_require_concept is a trait that is derived from
  * @c true_type if the expression
- * <tt>asio::require_concept(std::declval<T>(),
+ * <tt>boost::asio::require_concept(std::declval<T>(),
  * std::declval<Property>())</tt> is well formed; otherwise @c false_type.
  */
 template <typename T, typename Property>
@@ -77,7 +78,7 @@ struct can_require_concept :
 /**
  * Class template @c is_nothrow_require_concept is a trait that is derived from
  * @c true_type if the expression
- * <tt>asio::require_concept(std::declval<T>(),
+ * <tt>boost::asio::require_concept(std::declval<T>(),
  * std::declval<Property>())</tt> is @c noexcept; otherwise @c false_type.
  */
 template <typename T, typename Property>
@@ -91,7 +92,7 @@ struct is_nothrow_require_concept :
 /**
  * Class template @c require_concept_result is a trait that determines the
  * result type of the expression
- * <tt>asio::require_concept(std::declval<T>(),
+ * <tt>boost::asio::require_concept(std::declval<T>(),
  * std::declval<Property>())</tt>.
  */
 template <typename T, typename Property>
@@ -102,19 +103,20 @@ struct require_concept_result
 };
 
 } // namespace asio
+} // namespace boost
 
 #else // defined(GENERATING_DOCUMENTATION)
 
-namespace asio_require_concept_fn {
+namespace boost_asio_require_concept_fn {
 
-using asio::conditional;
-using asio::decay;
-using asio::declval;
-using asio::enable_if;
-using asio::is_applicable_property;
-using asio::traits::require_concept_free;
-using asio::traits::require_concept_member;
-using asio::traits::static_require_concept;
+using boost::asio::conditional_t;
+using boost::asio::decay_t;
+using boost::asio::declval;
+using boost::asio::enable_if_t;
+using boost::asio::is_applicable_property;
+using boost::asio::traits::require_concept_free;
+using boost::asio::traits::require_concept_member;
+using boost::asio::traits::static_require_concept;
 
 void require_concept();
 
@@ -130,85 +132,85 @@ template <typename Impl, typename T, typename Properties, typename = void,
     typename = void, typename = void, typename = void, typename = void>
 struct call_traits
 {
-  ASIO_STATIC_CONSTEXPR(overload_type, overload = ill_formed);
-  ASIO_STATIC_CONSTEXPR(bool, is_noexcept = false);
+  static constexpr overload_type overload = ill_formed;
+  static constexpr bool is_noexcept = false;
   typedef void result_type;
 };
 
 template <typename Impl, typename T, typename Property>
 struct call_traits<Impl, T, void(Property),
-  typename enable_if<
+  enable_if_t<
     is_applicable_property<
-      typename decay<T>::type,
-      typename decay<Property>::type
+      decay_t<T>,
+      decay_t<Property>
     >::value
-  >::type,
-  typename enable_if<
-    decay<Property>::type::is_requirable_concept
-  >::type,
-  typename enable_if<
+  >,
+  enable_if_t<
+    decay_t<Property>::is_requirable_concept
+  >,
+  enable_if_t<
     static_require_concept<T, Property>::is_valid
-  >::type>
+  >>
 {
-  ASIO_STATIC_CONSTEXPR(overload_type, overload = identity);
-  ASIO_STATIC_CONSTEXPR(bool, is_noexcept = true);
-  typedef ASIO_MOVE_ARG(T) result_type;
+  static constexpr overload_type overload = identity;
+  static constexpr bool is_noexcept = true;
+  typedef T&& result_type;
 };
 
 template <typename Impl, typename T, typename Property>
 struct call_traits<Impl, T, void(Property),
-  typename enable_if<
+  enable_if_t<
     is_applicable_property<
-      typename decay<T>::type,
-      typename decay<Property>::type
+      decay_t<T>,
+      decay_t<Property>
     >::value
-  >::type,
-  typename enable_if<
-    decay<Property>::type::is_requirable_concept
-  >::type,
-  typename enable_if<
+  >,
+  enable_if_t<
+    decay_t<Property>::is_requirable_concept
+  >,
+  enable_if_t<
     !static_require_concept<T, Property>::is_valid
-  >::type,
-  typename enable_if<
+  >,
+  enable_if_t<
     require_concept_member<
       typename Impl::template proxy<T>::type,
       Property
     >::is_valid
-  >::type> :
+  >> :
   require_concept_member<
     typename Impl::template proxy<T>::type,
     Property
   >
 {
-  ASIO_STATIC_CONSTEXPR(overload_type, overload = call_member);
+  static constexpr overload_type overload = call_member;
 };
 
 template <typename Impl, typename T, typename Property>
 struct call_traits<Impl, T, void(Property),
-  typename enable_if<
+  enable_if_t<
     is_applicable_property<
-      typename decay<T>::type,
-      typename decay<Property>::type
+      decay_t<T>,
+      decay_t<Property>
     >::value
-  >::type,
-  typename enable_if<
-    decay<Property>::type::is_requirable_concept
-  >::type,
-  typename enable_if<
+  >,
+  enable_if_t<
+    decay_t<Property>::is_requirable_concept
+  >,
+  enable_if_t<
     !static_require_concept<T, Property>::is_valid
-  >::type,
-  typename enable_if<
+  >,
+  enable_if_t<
     !require_concept_member<
       typename Impl::template proxy<T>::type,
       Property
     >::is_valid
-  >::type,
-  typename enable_if<
+  >,
+  enable_if_t<
     require_concept_free<T, Property>::is_valid
-  >::type> :
+  >> :
   require_concept_free<T, Property>
 {
-  ASIO_STATIC_CONSTEXPR(overload_type, overload = call_free);
+  static constexpr overload_type overload = call_free;
 };
 
 struct impl
@@ -216,70 +218,58 @@ struct impl
   template <typename T>
   struct proxy
   {
-#if defined(ASIO_HAS_DEDUCED_REQUIRE_CONCEPT_MEMBER_TRAIT)
+#if defined(BOOST_ASIO_HAS_DEDUCED_REQUIRE_CONCEPT_MEMBER_TRAIT)
     struct type
     {
       template <typename P>
-      auto require_concept(ASIO_MOVE_ARG(P) p)
+      auto require_concept(P&& p)
         noexcept(
           noexcept(
-            declval<typename conditional<true, T, P>::type>().require_concept(
-              ASIO_MOVE_CAST(P)(p))
+            declval<conditional_t<true, T, P>>().require_concept(
+              static_cast<P&&>(p))
           )
         )
         -> decltype(
-          declval<typename conditional<true, T, P>::type>().require_concept(
-            ASIO_MOVE_CAST(P)(p))
+          declval<conditional_t<true, T, P>>().require_concept(
+            static_cast<P&&>(p))
         );
     };
-#else // defined(ASIO_HAS_DEDUCED_REQUIRE_CONCEPT_MEMBER_TRAIT)
+#else // defined(BOOST_ASIO_HAS_DEDUCED_REQUIRE_CONCEPT_MEMBER_TRAIT)
     typedef T type;
-#endif // defined(ASIO_HAS_DEDUCED_REQUIRE_CONCEPT_MEMBER_TRAIT)
+#endif // defined(BOOST_ASIO_HAS_DEDUCED_REQUIRE_CONCEPT_MEMBER_TRAIT)
   };
 
   template <typename T, typename Property>
-  ASIO_NODISCARD ASIO_CONSTEXPR typename enable_if<
+  BOOST_ASIO_NODISCARD constexpr enable_if_t<
     call_traits<impl, T, void(Property)>::overload == identity,
     typename call_traits<impl, T, void(Property)>::result_type
-  >::type
-  operator()(
-      ASIO_MOVE_ARG(T) t,
-      ASIO_MOVE_ARG(Property)) const
-    ASIO_NOEXCEPT_IF((
-      call_traits<impl, T, void(Property)>::is_noexcept))
+  >
+  operator()(T&& t, Property&&) const
+    noexcept(call_traits<impl, T, void(Property)>::is_noexcept)
   {
-    return ASIO_MOVE_CAST(T)(t);
+    return static_cast<T&&>(t);
   }
 
   template <typename T, typename Property>
-  ASIO_NODISCARD ASIO_CONSTEXPR typename enable_if<
+  BOOST_ASIO_NODISCARD constexpr enable_if_t<
     call_traits<impl, T, void(Property)>::overload == call_member,
     typename call_traits<impl, T, void(Property)>::result_type
-  >::type
-  operator()(
-      ASIO_MOVE_ARG(T) t,
-      ASIO_MOVE_ARG(Property) p) const
-    ASIO_NOEXCEPT_IF((
-      call_traits<impl, T, void(Property)>::is_noexcept))
+  >
+  operator()(T&& t, Property&& p) const
+    noexcept(call_traits<impl, T, void(Property)>::is_noexcept)
   {
-    return ASIO_MOVE_CAST(T)(t).require_concept(
-        ASIO_MOVE_CAST(Property)(p));
+    return static_cast<T&&>(t).require_concept(static_cast<Property&&>(p));
   }
 
   template <typename T, typename Property>
-  ASIO_NODISCARD ASIO_CONSTEXPR typename enable_if<
+  BOOST_ASIO_NODISCARD constexpr enable_if_t<
     call_traits<impl, T, void(Property)>::overload == call_free,
     typename call_traits<impl, T, void(Property)>::result_type
-  >::type
-  operator()(
-      ASIO_MOVE_ARG(T) t,
-      ASIO_MOVE_ARG(Property) p) const
-    ASIO_NOEXCEPT_IF((
-      call_traits<impl, T, void(Property)>::is_noexcept))
+  >
+  operator()(T&& t, Property&& p) const
+    noexcept(call_traits<impl, T, void(Property)>::is_noexcept)
   {
-    return require_concept(
-        ASIO_MOVE_CAST(T)(t),
-        ASIO_MOVE_CAST(Property)(p));
+    return require_concept(static_cast<T&&>(t), static_cast<Property&&>(p));
   }
 };
 
@@ -292,61 +282,66 @@ struct static_instance
 template <typename T>
 const T static_instance<T>::instance = {};
 
-} // namespace asio_require_concept_fn
+} // namespace boost_asio_require_concept_fn
+namespace boost {
 namespace asio {
 namespace {
 
-static ASIO_CONSTEXPR const asio_require_concept_fn::impl&
-  require_concept = asio_require_concept_fn::static_instance<>::instance;
+static constexpr const boost_asio_require_concept_fn::impl&
+  require_concept = boost_asio_require_concept_fn::static_instance<>::instance;
 
 } // namespace
 
-typedef asio_require_concept_fn::impl require_concept_t;
+typedef boost_asio_require_concept_fn::impl require_concept_t;
 
 template <typename T, typename Property>
 struct can_require_concept :
   integral_constant<bool,
-    asio_require_concept_fn::call_traits<
+    boost_asio_require_concept_fn::call_traits<
       require_concept_t, T, void(Property)>::overload !=
-        asio_require_concept_fn::ill_formed>
+        boost_asio_require_concept_fn::ill_formed>
 {
 };
 
-#if defined(ASIO_HAS_VARIABLE_TEMPLATES)
+#if defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
 
 template <typename T, typename Property>
-constexpr bool can_require_concept_v
-  = can_require_concept<T, Property>::value;
+constexpr bool can_require_concept_v = can_require_concept<T, Property>::value;
 
-#endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
 
 template <typename T, typename Property>
 struct is_nothrow_require_concept :
   integral_constant<bool,
-    asio_require_concept_fn::call_traits<
+    boost_asio_require_concept_fn::call_traits<
       require_concept_t, T, void(Property)>::is_noexcept>
 {
 };
 
-#if defined(ASIO_HAS_VARIABLE_TEMPLATES)
+#if defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
 
 template <typename T, typename Property>
 constexpr bool is_nothrow_require_concept_v
   = is_nothrow_require_concept<T, Property>::value;
 
-#endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
 
 template <typename T, typename Property>
 struct require_concept_result
 {
-  typedef typename asio_require_concept_fn::call_traits<
+  typedef typename boost_asio_require_concept_fn::call_traits<
       require_concept_t, T, void(Property)>::result_type type;
 };
 
+template <typename T, typename Property>
+using require_concept_result_t =
+  typename require_concept_result<T, Property>::type;
+
 } // namespace asio
+} // namespace boost
 
 #endif // defined(GENERATING_DOCUMENTATION)
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_REQUIRE_CONCEPT_HPP
+#endif // BOOST_ASIO_REQUIRE_CONCEPT_HPP

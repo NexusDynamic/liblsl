@@ -2,24 +2,25 @@
 // signal_set_base.hpp
 // ~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_SIGNAL_SET_BASE_HPP
-#define ASIO_SIGNAL_SET_BASE_HPP
+#ifndef BOOST_ASIO_SIGNAL_SET_BASE_HPP
+#define BOOST_ASIO_SIGNAL_SET_BASE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/detail/socket_types.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <boost/asio/detail/socket_types.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 
 /// The signal_set_base class is used as a base for the basic_signal_set class
@@ -56,32 +57,21 @@ public:
 
   /// Portability typedef.
   typedef flags flags_t;
-#elif defined(ASIO_HAS_ENUM_CLASS)
+
+#else // defined(GENERATING_DOCUMENTATION)
+
   enum class flags : int
   {
     none = 0,
-    restart = ASIO_OS_DEF(SA_RESTART),
-    no_child_stop = ASIO_OS_DEF(SA_NOCLDSTOP),
-    no_child_wait = ASIO_OS_DEF(SA_NOCLDWAIT),
+    restart = BOOST_ASIO_OS_DEF(SA_RESTART),
+    no_child_stop = BOOST_ASIO_OS_DEF(SA_NOCLDSTOP),
+    no_child_wait = BOOST_ASIO_OS_DEF(SA_NOCLDWAIT),
     dont_care = -1
   };
 
   typedef flags flags_t;
-#else // defined(ASIO_HAS_ENUM_CLASS)
-  struct flags
-  {
-    enum flags_t
-    {
-      none = 0,
-      restart = ASIO_OS_DEF(SA_RESTART),
-      no_child_stop = ASIO_OS_DEF(SA_NOCLDSTOP),
-      no_child_wait = ASIO_OS_DEF(SA_NOCLDWAIT),
-      dont_care = -1
-    };
-  };
 
-  typedef flags::flags_t flags_t;
-#endif // defined(ASIO_HAS_ENUM_CLASS)
+#endif // defined(GENERATING_DOCUMENTATION)
 
 protected:
   /// Protected destructor to prevent deletion through this type.
@@ -94,7 +84,7 @@ protected:
 /**
  * @relates signal_set_base::flags
  */
-inline ASIO_CONSTEXPR bool operator!(signal_set_base::flags_t x)
+inline constexpr bool operator!(signal_set_base::flags_t x)
 {
   return static_cast<int>(x) == 0;
 }
@@ -103,7 +93,7 @@ inline ASIO_CONSTEXPR bool operator!(signal_set_base::flags_t x)
 /**
  * @relates signal_set_base::flags
  */
-inline ASIO_CONSTEXPR signal_set_base::flags_t operator&(
+inline constexpr signal_set_base::flags_t operator&(
     signal_set_base::flags_t x, signal_set_base::flags_t y)
 {
   return static_cast<signal_set_base::flags_t>(
@@ -114,7 +104,7 @@ inline ASIO_CONSTEXPR signal_set_base::flags_t operator&(
 /**
  * @relates signal_set_base::flags
  */
-inline ASIO_CONSTEXPR signal_set_base::flags_t operator|(
+inline constexpr signal_set_base::flags_t operator|(
     signal_set_base::flags_t x, signal_set_base::flags_t y)
 {
   return static_cast<signal_set_base::flags_t>(
@@ -125,7 +115,7 @@ inline ASIO_CONSTEXPR signal_set_base::flags_t operator|(
 /**
  * @relates signal_set_base::flags
  */
-inline ASIO_CONSTEXPR signal_set_base::flags_t operator^(
+inline constexpr signal_set_base::flags_t operator^(
     signal_set_base::flags_t x, signal_set_base::flags_t y)
 {
   return static_cast<signal_set_base::flags_t>(
@@ -136,7 +126,7 @@ inline ASIO_CONSTEXPR signal_set_base::flags_t operator^(
 /**
  * @relates signal_set_base::flags
  */
-inline ASIO_CONSTEXPR signal_set_base::flags_t operator~(
+inline constexpr signal_set_base::flags_t operator~(
     signal_set_base::flags_t x)
 {
   return static_cast<signal_set_base::flags_t>(~static_cast<int>(x));
@@ -176,7 +166,8 @@ inline signal_set_base::flags_t& operator^=(
 }
 
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_SIGNAL_SET_BASE_HPP
+#endif // BOOST_ASIO_SIGNAL_SET_BASE_HPP

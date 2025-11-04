@@ -2,30 +2,31 @@
 // detail/impl/buffer_sequence_adapter.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_DETAIL_IMPL_BUFFER_SEQUENCE_ADAPTER_IPP
-#define ASIO_DETAIL_IMPL_BUFFER_SEQUENCE_ADAPTER_IPP
+#ifndef BOOST_ASIO_DETAIL_IMPL_BUFFER_SEQUENCE_ADAPTER_IPP
+#define BOOST_ASIO_DETAIL_IMPL_BUFFER_SEQUENCE_ADAPTER_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 
-#if defined(ASIO_WINDOWS_RUNTIME)
+#if defined(BOOST_ASIO_WINDOWS_RUNTIME)
 
 #include <robuffer.h>
 #include <windows.storage.streams.h>
 #include <wrl/implements.h>
-#include "asio/detail/buffer_sequence_adapter.hpp"
+#include <boost/asio/detail/buffer_sequence_adapter.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -37,14 +38,14 @@ class winrt_buffer_impl :
     Windows::Storage::Streams::IBufferByteAccess>
 {
 public:
-  explicit winrt_buffer_impl(const asio::const_buffer& b)
+  explicit winrt_buffer_impl(const boost::asio::const_buffer& b)
   {
     bytes_ = const_cast<byte*>(static_cast<const byte*>(b.data()));
     length_ = b.size();
     capacity_ = b.size();
   }
 
-  explicit winrt_buffer_impl(const asio::mutable_buffer& b)
+  explicit winrt_buffer_impl(const boost::asio::mutable_buffer& b)
   {
     bytes_ = static_cast<byte*>(b.data());
     length_ = 0;
@@ -89,7 +90,7 @@ private:
 
 void buffer_sequence_adapter_base::init_native_buffer(
     buffer_sequence_adapter_base::native_buffer_type& buf,
-    const asio::mutable_buffer& buffer)
+    const boost::asio::mutable_buffer& buffer)
 {
   std::memset(&buf, 0, sizeof(native_buffer_type));
   Microsoft::WRL::ComPtr<IInspectable> insp
@@ -99,7 +100,7 @@ void buffer_sequence_adapter_base::init_native_buffer(
 
 void buffer_sequence_adapter_base::init_native_buffer(
     buffer_sequence_adapter_base::native_buffer_type& buf,
-    const asio::const_buffer& buffer)
+    const boost::asio::const_buffer& buffer)
 {
   std::memset(&buf, 0, sizeof(native_buffer_type));
   Microsoft::WRL::ComPtr<IInspectable> insp
@@ -110,9 +111,10 @@ void buffer_sequence_adapter_base::init_native_buffer(
 
 } // namespace detail
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // defined(ASIO_WINDOWS_RUNTIME)
+#endif // defined(BOOST_ASIO_WINDOWS_RUNTIME)
 
-#endif // ASIO_DETAIL_IMPL_BUFFER_SEQUENCE_ADAPTER_IPP
+#endif // BOOST_ASIO_DETAIL_IMPL_BUFFER_SEQUENCE_ADAPTER_IPP

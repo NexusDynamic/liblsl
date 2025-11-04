@@ -2,27 +2,31 @@
 // basic_io_object.hpp
 // ~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_BASIC_IO_OBJECT_HPP
-#define ASIO_BASIC_IO_OBJECT_HPP
+#ifndef BOOST_ASIO_BASIC_IO_OBJECT_HPP
+#define BOOST_ASIO_BASIC_IO_OBJECT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/io_context.hpp"
+#include <boost/asio/detail/config.hpp>
 
-#include "asio/detail/push_options.hpp"
+#if !defined(BOOST_ASIO_NO_DEPRECATED) \
+  || defined(GENERATING_DOCUMENTATION)
 
+#include <boost/asio/io_context.hpp>
+
+#include <boost/asio/detail/push_options.hpp>
+
+namespace boost {
 namespace asio {
 
-#if defined(ASIO_HAS_MOVE)
 namespace detail
 {
   // Type trait used to determine whether a service supports move.
@@ -45,14 +49,13 @@ namespace detail
         static_cast<implementation_type*>(0))) == 1;
   };
 }
-#endif // defined(ASIO_HAS_MOVE)
 
-/// Base class for all I/O objects.
+/// (Deprecated) Base class for all I/O objects.
 /**
  * @note All I/O objects are non-copyable. However, when using C++0x, certain
  * I/O objects do support move construction and move assignment.
  */
-#if !defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
+#if defined(GENERATING_DOCUMENTATION)
 template <typename IoObjectService>
 #else
 template <typename IoObjectService,
@@ -67,9 +70,7 @@ public:
   /// The underlying implementation type of I/O object.
   typedef typename service_type::implementation_type implementation_type;
 
-#if !defined(ASIO_NO_DEPRECATED)
-  /// (Deprecated: Use get_executor().) Get the io_context associated with the
-  /// object.
+  /// Get the io_context associated with the object.
   /**
    * This function may be used to obtain the io_context object that the I/O
    * object uses to dispatch handlers for asynchronous operations.
@@ -77,13 +78,12 @@ public:
    * @return A reference to the io_context object that the I/O object will use
    * to dispatch handlers. Ownership is not transferred to the caller.
    */
-  asio::io_context& get_io_context()
+  boost::asio::io_context& get_io_context()
   {
     return service_.get_io_context();
   }
 
-  /// (Deprecated: Use get_executor().) Get the io_context associated with the
-  /// object.
+  /// Get the io_context associated with the object.
   /**
    * This function may be used to obtain the io_context object that the I/O
    * object uses to dispatch handlers for asynchronous operations.
@@ -91,17 +91,16 @@ public:
    * @return A reference to the io_context object that the I/O object will use
    * to dispatch handlers. Ownership is not transferred to the caller.
    */
-  asio::io_context& get_io_service()
+  boost::asio::io_context& get_io_service()
   {
     return service_.get_io_context();
   }
-#endif // !defined(ASIO_NO_DEPRECATED)
 
   /// The type of the executor associated with the object.
-  typedef asio::io_context::executor_type executor_type;
+  typedef boost::asio::io_context::executor_type executor_type;
 
   /// Get the executor associated with the object.
-  executor_type get_executor() ASIO_NOEXCEPT
+  executor_type get_executor() noexcept
   {
     return service_.get_io_context().get_executor();
   }
@@ -112,8 +111,8 @@ protected:
    * Performs:
    * @code get_service().construct(get_implementation()); @endcode
    */
-  explicit basic_io_object(asio::io_context& io_context)
-    : service_(asio::use_service<IoObjectService>(io_context))
+  explicit basic_io_object(boost::asio::io_context& io_context)
+    : service_(boost::asio::use_service<IoObjectService>(io_context))
   {
     service_.construct(implementation_);
   }
@@ -190,7 +189,6 @@ private:
   implementation_type implementation_;
 };
 
-#if defined(ASIO_HAS_MOVE)
 // Specialisation for movable objects.
 template <typename IoObjectService>
 class basic_io_object<IoObjectService, true>
@@ -199,28 +197,26 @@ public:
   typedef IoObjectService service_type;
   typedef typename service_type::implementation_type implementation_type;
 
-#if !defined(ASIO_NO_DEPRECATED)
-  asio::io_context& get_io_context()
+  boost::asio::io_context& get_io_context()
   {
     return service_->get_io_context();
   }
 
-  asio::io_context& get_io_service()
+  boost::asio::io_context& get_io_service()
   {
     return service_->get_io_context();
   }
-#endif // !defined(ASIO_NO_DEPRECATED)
 
-  typedef asio::io_context::executor_type executor_type;
+  typedef boost::asio::io_context::executor_type executor_type;
 
-  executor_type get_executor() ASIO_NOEXCEPT
+  executor_type get_executor() noexcept
   {
     return service_->get_io_context().get_executor();
   }
 
 protected:
-  explicit basic_io_object(asio::io_context& io_context)
-    : service_(&asio::use_service<IoObjectService>(io_context))
+  explicit basic_io_object(boost::asio::io_context& io_context)
+    : service_(&boost::asio::use_service<IoObjectService>(io_context))
   {
     service_->construct(implementation_);
   }
@@ -234,7 +230,7 @@ protected:
   template <typename IoObjectService1>
   basic_io_object(IoObjectService1& other_service,
       typename IoObjectService1::implementation_type& other_implementation)
-    : service_(&asio::use_service<IoObjectService>(
+    : service_(&boost::asio::use_service<IoObjectService>(
           other_service.get_io_context()))
   {
     service_->converting_move_construct(implementation_,
@@ -281,10 +277,13 @@ private:
   IoObjectService* service_;
   implementation_type implementation_;
 };
-#endif // defined(ASIO_HAS_MOVE)
 
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_BASIC_IO_OBJECT_HPP
+#endif // !defined(BOOST_ASIO_NO_DEPRECATED)
+       //   || defined(GENERATING_DOCUMENTATION)
+
+#endif // BOOST_ASIO_BASIC_IO_OBJECT_HPP

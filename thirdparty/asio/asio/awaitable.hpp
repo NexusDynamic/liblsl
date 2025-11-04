@@ -2,44 +2,45 @@
 // awaitable.hpp
 // ~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_AWAITABLE_HPP
-#define ASIO_AWAITABLE_HPP
+#ifndef BOOST_ASIO_AWAITABLE_HPP
+#define BOOST_ASIO_AWAITABLE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 
-#if defined(ASIO_HAS_CO_AWAIT) || defined(GENERATING_DOCUMENTATION)
+#if defined(BOOST_ASIO_HAS_CO_AWAIT) || defined(GENERATING_DOCUMENTATION)
 
-#if defined(ASIO_HAS_STD_COROUTINE)
+#if defined(BOOST_ASIO_HAS_STD_COROUTINE)
 # include <coroutine>
-#else // defined(ASIO_HAS_STD_COROUTINE)
+#else // defined(BOOST_ASIO_HAS_STD_COROUTINE)
 # include <experimental/coroutine>
-#endif // defined(ASIO_HAS_STD_COROUTINE)
+#endif // defined(BOOST_ASIO_HAS_STD_COROUTINE)
 
 #include <utility>
-#include "asio/any_io_executor.hpp"
+#include <boost/asio/any_io_executor.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace detail {
 
-#if defined(ASIO_HAS_STD_COROUTINE)
+#if defined(BOOST_ASIO_HAS_STD_COROUTINE)
 using std::coroutine_handle;
 using std::suspend_always;
-#else // defined(ASIO_HAS_STD_COROUTINE)
+#else // defined(BOOST_ASIO_HAS_STD_COROUTINE)
 using std::experimental::coroutine_handle;
 using std::experimental::suspend_always;
-#endif // defined(ASIO_HAS_STD_COROUTINE)
+#endif // defined(BOOST_ASIO_HAS_STD_COROUTINE)
 
 template <typename> class awaitable_thread;
 template <typename, typename> class awaitable_frame;
@@ -48,7 +49,7 @@ template <typename, typename> class awaitable_frame;
 
 /// The return type of a coroutine or asynchronous operation.
 template <typename T, typename Executor = any_io_executor>
-class ASIO_NODISCARD awaitable
+class BOOST_ASIO_NODISCARD awaitable
 {
 public:
   /// The type of the awaited value.
@@ -132,11 +133,15 @@ private:
 };
 
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#include "asio/impl/awaitable.hpp"
+#include <boost/asio/impl/awaitable.hpp>
+#if defined(BOOST_ASIO_HEADER_ONLY)
+# include <boost/asio/impl/awaitable.ipp>
+#endif // defined(BOOST_ASIO_HEADER_ONLY)
 
-#endif // defined(ASIO_HAS_CO_AWAIT) || defined(GENERATING_DOCUMENTATION)
+#endif // defined(BOOST_ASIO_HAS_CO_AWAIT) || defined(GENERATING_DOCUMENTATION)
 
-#endif // ASIO_AWAITABLE_HPP
+#endif // BOOST_ASIO_AWAITABLE_HPP

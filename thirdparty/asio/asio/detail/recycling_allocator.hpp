@@ -2,26 +2,27 @@
 // detail/recycling_allocator.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_DETAIL_RECYCLING_ALLOCATOR_HPP
-#define ASIO_DETAIL_RECYCLING_ALLOCATOR_HPP
+#ifndef BOOST_ASIO_DETAIL_RECYCLING_ALLOCATOR_HPP
+#define BOOST_ASIO_DETAIL_RECYCLING_ALLOCATOR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/detail/memory.hpp"
-#include "asio/detail/thread_context.hpp"
-#include "asio/detail/thread_info_base.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <boost/asio/detail/memory.hpp>
+#include <boost/asio/detail/thread_context.hpp>
+#include <boost/asio/detail/thread_info_base.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -48,16 +49,25 @@ public:
 
   T* allocate(std::size_t n)
   {
+#if !defined(BOOST_ASIO_DISABLE_SMALL_BLOCK_RECYCLING)
     void* p = thread_info_base::allocate(Purpose(),
         thread_context::top_of_thread_call_stack(),
-        sizeof(T) * n, ASIO_ALIGNOF(T));
+        sizeof(T) * n, alignof(T));
+#else // !defined(BOOST_ASIO_DISABLE_SMALL_BLOCK_RECYCLING)
+    void* p = boost::asio::aligned_new(alignof(T), sizeof(T) * n);
+#endif // !defined(BOOST_ASIO_DISABLE_SMALL_BLOCK_RECYCLING)
     return static_cast<T*>(p);
   }
 
   void deallocate(T* p, std::size_t n)
   {
+#if !defined(BOOST_ASIO_DISABLE_SMALL_BLOCK_RECYCLING)
     thread_info_base::deallocate(Purpose(),
         thread_context::top_of_thread_call_stack(), p, sizeof(T) * n);
+#else // !defined(BOOST_ASIO_DISABLE_SMALL_BLOCK_RECYCLING)
+    (void)n;
+    boost::asio::aligned_delete(p);
+#endif // !defined(BOOST_ASIO_DISABLE_SMALL_BLOCK_RECYCLING)
   }
 };
 
@@ -99,7 +109,8 @@ struct get_recycling_allocator<std::allocator<T>, Purpose>
 
 } // namespace detail
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_DETAIL_RECYCLING_ALLOCATOR_HPP
+#endif // BOOST_ASIO_DETAIL_RECYCLING_ALLOCATOR_HPP

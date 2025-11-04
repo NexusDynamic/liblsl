@@ -8,19 +8,14 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_DETAIL_LIMITS_HPP
-#define ASIO_DETAIL_LIMITS_HPP
+#ifndef BOOST_ASIO_DETAIL_LIMITS_HPP
+#define BOOST_ASIO_DETAIL_LIMITS_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <limits>
 
-#if defined(ASIO_HAS_BOOST_LIMITS)
-# include <boost/limits.hpp>
-#else // defined(ASIO_HAS_BOOST_LIMITS)
-# include <limits>
-#endif // defined(ASIO_HAS_BOOST_LIMITS)
-
-#endif // ASIO_DETAIL_LIMITS_HPP
+#endif // BOOST_ASIO_DETAIL_LIMITS_HPP

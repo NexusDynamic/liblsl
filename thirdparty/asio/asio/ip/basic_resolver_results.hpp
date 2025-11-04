@@ -2,38 +2,39 @@
 // ip/basic_resolver_results.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_IP_BASIC_RESOLVER_RESULTS_HPP
-#define ASIO_IP_BASIC_RESOLVER_RESULTS_HPP
+#ifndef BOOST_ASIO_IP_BASIC_RESOLVER_RESULTS_HPP
+#define BOOST_ASIO_IP_BASIC_RESOLVER_RESULTS_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 #include <cstddef>
 #include <cstring>
-#include "asio/detail/socket_ops.hpp"
-#include "asio/detail/socket_types.hpp"
-#include "asio/ip/basic_resolver_iterator.hpp"
+#include <boost/asio/detail/socket_ops.hpp>
+#include <boost/asio/detail/socket_types.hpp>
+#include <boost/asio/ip/basic_resolver_iterator.hpp>
 
-#if defined(ASIO_WINDOWS_RUNTIME)
-# include "asio/detail/winrt_utils.hpp"
-#endif // defined(ASIO_WINDOWS_RUNTIME)
+#if defined(BOOST_ASIO_WINDOWS_RUNTIME)
+# include <boost/asio/detail/winrt_utils.hpp>
+#endif // defined(BOOST_ASIO_WINDOWS_RUNTIME)
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace ip {
 
 /// A range of entries produced by a resolver.
 /**
- * The asio::ip::basic_resolver_results class template is used to define
+ * The boost::asio::ip::basic_resolver_results class template is used to define
  * a range over the results returned by a resolver.
  *
  * The iterator's value_type, obtained when a results iterator is dereferenced,
@@ -48,11 +49,7 @@ namespace ip {
  */
 template <typename InternetProtocol>
 class basic_resolver_results
-#if !defined(ASIO_NO_DEPRECATED)
-  : public basic_resolver_iterator<InternetProtocol>
-#else // !defined(ASIO_NO_DEPRECATED)
   : private basic_resolver_iterator<InternetProtocol>
-#endif // !defined(ASIO_NO_DEPRECATED)
 {
 public:
   /// The protocol type associated with the results.
@@ -93,14 +90,12 @@ public:
   {
   }
 
-#if defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
   /// Move constructor.
   basic_resolver_results(basic_resolver_results&& other)
     : basic_resolver_iterator<InternetProtocol>(
-        ASIO_MOVE_CAST(basic_resolver_results)(other))
+        static_cast<basic_resolver_results&&>(other))
   {
   }
-#endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
 
   /// Assignment operator.
   basic_resolver_results& operator=(const basic_resolver_results& other)
@@ -109,20 +104,18 @@ public:
     return *this;
   }
 
-#if defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
   /// Move-assignment operator.
   basic_resolver_results& operator=(basic_resolver_results&& other)
   {
     basic_resolver_iterator<InternetProtocol>::operator=(
-        ASIO_MOVE_CAST(basic_resolver_results)(other));
+        static_cast<basic_resolver_results&&>(other));
     return *this;
   }
-#endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
 
 #if !defined(GENERATING_DOCUMENTATION)
   // Create results from an addrinfo list returned by getaddrinfo.
   static basic_resolver_results create(
-      asio::detail::addrinfo_type* address_info,
+      boost::asio::detail::addrinfo_type* address_info,
       const std::string& host_name, const std::string& service_name)
   {
     basic_resolver_results results;
@@ -137,8 +130,8 @@ public:
 
     while (address_info)
     {
-      if (address_info->ai_family == ASIO_OS_DEF(AF_INET)
-          || address_info->ai_family == ASIO_OS_DEF(AF_INET6))
+      if (address_info->ai_family == BOOST_ASIO_OS_DEF(AF_INET)
+          || address_info->ai_family == BOOST_ASIO_OS_DEF(AF_INET6))
       {
         using namespace std; // For memcpy.
         typename InternetProtocol::endpoint endpoint;
@@ -187,12 +180,12 @@ public:
     return results;
   }
 
-# if defined(ASIO_WINDOWS_RUNTIME)
+# if defined(BOOST_ASIO_WINDOWS_RUNTIME)
   // Create results from a Windows Runtime list of EndpointPair objects.
   static basic_resolver_results create(
       Windows::Foundation::Collections::IVectorView<
         Windows::Networking::EndpointPair^>^ endpoints,
-      const asio::detail::addrinfo_type& hints,
+      const boost::asio::detail::addrinfo_type& hints,
       const std::string& host_name, const std::string& service_name)
   {
     basic_resolver_results results;
@@ -203,12 +196,12 @@ public:
       {
         auto pair = endpoints->GetAt(i);
 
-        if (hints.ai_family == ASIO_OS_DEF(AF_INET)
+        if (hints.ai_family == BOOST_ASIO_OS_DEF(AF_INET)
             && pair->RemoteHostName->Type
               != Windows::Networking::HostNameType::Ipv4)
           continue;
 
-        if (hints.ai_family == ASIO_OS_DEF(AF_INET6)
+        if (hints.ai_family == BOOST_ASIO_OS_DEF(AF_INET6)
             && pair->RemoteHostName->Type
               != Windows::Networking::HostNameType::Ipv6)
           continue;
@@ -217,32 +210,32 @@ public:
             basic_resolver_entry<InternetProtocol>(
               typename InternetProtocol::endpoint(
                 ip::make_address(
-                  asio::detail::winrt_utils::string(
+                  boost::asio::detail::winrt_utils::string(
                     pair->RemoteHostName->CanonicalName)),
-                asio::detail::winrt_utils::integer(
+                boost::asio::detail::winrt_utils::integer(
                   pair->RemoteServiceName)),
               host_name, service_name));
       }
     }
     return results;
   }
-# endif // defined(ASIO_WINDOWS_RUNTIME)
+# endif // defined(BOOST_ASIO_WINDOWS_RUNTIME)
 #endif // !defined(GENERATING_DOCUMENTATION)
 
   /// Get the number of entries in the results range.
-  size_type size() const ASIO_NOEXCEPT
+  size_type size() const noexcept
   {
     return this->values_ ? this->values_->size() : 0;
   }
 
   /// Get the maximum number of entries permitted in a results range.
-  size_type max_size() const ASIO_NOEXCEPT
+  size_type max_size() const noexcept
   {
     return this->values_ ? this->values_->max_size() : values_type().max_size();
   }
 
   /// Determine whether the results range is empty.
-  bool empty() const ASIO_NOEXCEPT
+  bool empty() const noexcept
   {
     return this->values_ ? this->values_->empty() : true;
   }
@@ -252,7 +245,7 @@ public:
   {
     basic_resolver_results tmp(*this);
     tmp.index_ = 0;
-    return ASIO_MOVE_CAST(basic_resolver_results)(tmp);
+    return static_cast<basic_resolver_results&&>(tmp);
   }
 
   /// Obtain an end iterator for the results range.
@@ -274,7 +267,7 @@ public:
   }
 
   /// Swap the results range with another.
-  void swap(basic_resolver_results& that) ASIO_NOEXCEPT
+  void swap(basic_resolver_results& that) noexcept
   {
     if (this != &that)
     {
@@ -300,12 +293,13 @@ public:
   }
 
 private:
-  typedef std::vector<basic_resolver_entry<InternetProtocol> > values_type;
+  typedef std::vector<basic_resolver_entry<InternetProtocol>> values_type;
 };
 
 } // namespace ip
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_IP_BASIC_RESOLVER_RESULTS_HPP
+#endif // BOOST_ASIO_IP_BASIC_RESOLVER_RESULTS_HPP

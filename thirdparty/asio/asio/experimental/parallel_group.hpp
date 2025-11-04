@@ -2,28 +2,31 @@
 // experimental/parallel_group.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_EXPERIMENTAL_PARALLEL_GROUP_HPP
-#define ASIO_EXPERIMENTAL_PARALLEL_GROUP_HPP
+#ifndef BOOST_ASIO_EXPERIMENTAL_PARALLEL_GROUP_HPP
+#define BOOST_ASIO_EXPERIMENTAL_PARALLEL_GROUP_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 #include <vector>
-#include "asio/detail/array.hpp"
-#include "asio/detail/memory.hpp"
-#include "asio/detail/utility.hpp"
-#include "asio/experimental/cancellation_condition.hpp"
+#include <boost/asio/async_result.hpp>
+#include <boost/asio/detail/array.hpp>
+#include <boost/asio/detail/memory.hpp>
+#include <boost/asio/detail/type_traits.hpp>
+#include <boost/asio/detail/utility.hpp>
+#include <boost/asio/experimental/cancellation_condition.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace experimental {
 namespace detail {
@@ -36,7 +39,7 @@ struct parallel_op_signature_as_tuple;
 template <typename R, typename... Args>
 struct parallel_op_signature_as_tuple<R(Args...)>
 {
-  typedef std::tuple<typename decay<Args>::type...> type;
+  typedef std::tuple<decay_t<Args>...> type;
 };
 
 // Helper trait for concatenating completion signatures.
@@ -47,7 +50,7 @@ struct parallel_group_signature;
 template <std::size_t N, typename R0, typename... Args0>
 struct parallel_group_signature<N, R0(Args0...)>
 {
-  typedef asio::detail::array<std::size_t, N> order_type;
+  typedef boost::asio::detail::array<std::size_t, N> order_type;
   typedef R0 raw_type(Args0...);
   typedef R0 type(order_type, Args0...);
 };
@@ -57,7 +60,7 @@ template <std::size_t N,
     typename R1, typename... Args1>
 struct parallel_group_signature<N, R0(Args0...), R1(Args1...)>
 {
-  typedef asio::detail::array<std::size_t, N> order_type;
+  typedef boost::asio::detail::array<std::size_t, N> order_type;
   typedef R0 raw_type(Args0..., Args1...);
   typedef R0 type(order_type, Args0..., Args1...);
 };
@@ -66,7 +69,7 @@ template <std::size_t N, typename Sig0,
     typename Sig1, typename... SigN>
 struct parallel_group_signature<N, Sig0, Sig1, SigN...>
 {
-  typedef asio::detail::array<std::size_t, N> order_type;
+  typedef boost::asio::detail::array<std::size_t, N> order_type;
   typedef typename parallel_group_signature<N,
     typename parallel_group_signature<N, Sig0, Sig1>::raw_type,
       SigN...>::raw_type raw_type;
@@ -78,7 +81,7 @@ struct parallel_group_signature<N, Sig0, Sig1, SigN...>
 template <typename Condition, typename Handler,
     typename... Ops, std::size_t... I>
 void parallel_group_launch(Condition cancellation_condition, Handler handler,
-    std::tuple<Ops...>& ops, asio::detail::index_sequence<I...>);
+    std::tuple<Ops...>& ops, boost::asio::detail::index_sequence<I...>);
 
 // Helper trait for determining ranged parallel group completion signatures.
 
@@ -89,11 +92,11 @@ template <typename R, typename... Args, typename Allocator>
 struct ranged_parallel_group_signature<R(Args...), Allocator>
 {
   typedef std::vector<std::size_t,
-    ASIO_REBIND_ALLOC(Allocator, std::size_t)> order_type;
+    BOOST_ASIO_REBIND_ALLOC(Allocator, std::size_t)> order_type;
   typedef R raw_type(
-      std::vector<Args, ASIO_REBIND_ALLOC(Allocator, Args)>...);
+      std::vector<Args, BOOST_ASIO_REBIND_ALLOC(Allocator, Args)>...);
   typedef R type(order_type,
-      std::vector<Args, ASIO_REBIND_ALLOC(Allocator, Args)>...);
+      std::vector<Args, BOOST_ASIO_REBIND_ALLOC(Allocator, Args)>...);
 };
 
 template <typename Condition, typename Handler,
@@ -133,7 +136,7 @@ struct is_async_operation_range
 
 /// A group of asynchronous operations that may be launched in parallel.
 /**
- * See the documentation for asio::experimental::make_parallel_group for
+ * See the documentation for boost::asio::experimental::make_parallel_group for
  * a usage example.
  */
 template <typename... Ops>
@@ -147,7 +150,7 @@ private:
     {
       detail::parallel_group_launch(
           std::forward<Condition>(c), std::forward<Handler>(h),
-          ops, asio::detail::index_sequence_for<Ops...>());
+          ops, boost::asio::detail::index_sequence_for<Ops...>());
     }
   };
 
@@ -162,7 +165,7 @@ public:
 
   /// The completion signature for the group of operations.
   typedef typename detail::parallel_group_signature<sizeof...(Ops),
-      typename completion_signature_of<Ops>::type...>::type signature;
+      completion_signature_of_t<Ops>...>::type signature;
 
   /// Initiate an asynchronous wait for the group of operations.
   /**
@@ -172,8 +175,8 @@ public:
    * an operation within the group, that is used to determine whether to cancel
    * the remaining operations. The function object is passed the arguments of
    * the completed operation's handler. To trigger cancellation of the remaining
-   * operations, it must return a asio::cancellation_type value other
-   * than <tt>asio::cancellation_type::none</tt>.
+   * operations, it must return a boost::asio::cancellation_type value other
+   * than <tt>boost::asio::cancellation_type::none</tt>.
    *
    * @param token A @ref completion_token whose signature is comprised of
    * a @c std::array<std::size_t, N> indicating the completion order of the
@@ -181,22 +184,21 @@ public:
    *
    * The library provides the following @c cancellation_condition types:
    *
-   * @li asio::experimental::wait_for_all
-   * @li asio::experimental::wait_for_one
-   * @li asio::experimental::wait_for_one_error
-   * @li asio::experimental::wait_for_one_success
+   * @li boost::asio::experimental::wait_for_all
+   * @li boost::asio::experimental::wait_for_one
+   * @li boost::asio::experimental::wait_for_one_error
+   * @li boost::asio::experimental::wait_for_one_success
    */
   template <typename CancellationCondition,
-      ASIO_COMPLETION_TOKEN_FOR(signature) CompletionToken>
-  ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX(CompletionToken, signature)
-  async_wait(CancellationCondition cancellation_condition,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(signature) CompletionToken>
+  auto async_wait(CancellationCondition cancellation_condition,
       CompletionToken&& token)
-    ASIO_INITFN_AUTO_RESULT_TYPE_SUFFIX((
-      asio::async_initiate<CompletionToken, signature>(
-          declval<initiate_async_wait>(), token,
-          std::move(cancellation_condition), std::move(ops_))))
+    -> decltype(
+      boost::asio::async_initiate<CompletionToken, signature>(
+        declval<initiate_async_wait>(), token,
+        std::move(cancellation_condition), std::move(ops_)))
   {
-    return asio::async_initiate<CompletionToken, signature>(
+    return boost::asio::async_initiate<CompletionToken, signature>(
         initiate_async_wait(), token,
         std::move(cancellation_condition), std::move(ops_));
   }
@@ -205,21 +207,51 @@ public:
 /// Create a group of operations that may be launched in parallel.
 /**
  * For example:
- * @code asio::experimental::make_parallel_group(
+ * @code boost::asio::experimental::make_parallel_group(
+ *    in.async_read_some(boost::asio::buffer(data)),
+ *    timer.async_wait()
+ *  ).async_wait(
+ *    boost::asio::experimental::wait_for_all(),
+ *    [](
+ *        std::array<std::size_t, 2> completion_order,
+ *        boost::system::error_code ec1, std::size_t n1,
+ *        boost::system::error_code ec2
+ *    )
+ *    {
+ *      switch (completion_order[0])
+ *      {
+ *      case 0:
+ *        {
+ *          std::cout << "descriptor finished: " << ec1 << ", " << n1 << "\n";
+ *        }
+ *        break;
+ *      case 1:
+ *        {
+ *          std::cout << "timer finished: " << ec2 << "\n";
+ *        }
+ *        break;
+ *      }
+ *    }
+ *  );
+ * @endcode
+ *
+ * If preferred, the asynchronous operations may be explicitly packaged as
+ * function objects:
+ * @code boost::asio::experimental::make_parallel_group(
  *    [&](auto token)
  *    {
- *      return in.async_read_some(asio::buffer(data), token);
+ *      return in.async_read_some(boost::asio::buffer(data), token);
  *    },
  *    [&](auto token)
  *    {
  *      return timer.async_wait(token);
  *    }
  *  ).async_wait(
- *    asio::experimental::wait_for_all(),
+ *    boost::asio::experimental::wait_for_all(),
  *    [](
  *        std::array<std::size_t, 2> completion_order,
- *        std::error_code ec1, std::size_t n1,
- *        std::error_code ec2
+ *        boost::system::error_code ec1, std::size_t n1,
+ *        boost::system::error_code ec2
  *    )
  *    {
  *      switch (completion_order[0])
@@ -240,7 +272,7 @@ public:
  * @endcode
  */
 template <typename... Ops>
-ASIO_NODISCARD inline parallel_group<Ops...>
+BOOST_ASIO_NODISCARD inline parallel_group<Ops...>
 make_parallel_group(Ops... ops)
 {
   return parallel_group<Ops...>(std::move(ops)...);
@@ -249,10 +281,10 @@ make_parallel_group(Ops... ops)
 /// A range-based group of asynchronous operations that may be launched in
 /// parallel.
 /**
- * See the documentation for asio::experimental::make_parallel_group for
+ * See the documentation for boost::asio::experimental::make_parallel_group for
  * a usage example.
  */
-template <typename Range, typename Allocator = std::allocator<void> >
+template <typename Range, typename Allocator = std::allocator<void>>
 class ranged_parallel_group
 {
 private:
@@ -281,9 +313,8 @@ public:
 
   /// The completion signature for the group of operations.
   typedef typename detail::ranged_parallel_group_signature<
-      typename completion_signature_of<
-        typename std::decay<
-          decltype(*std::declval<typename Range::iterator>())>::type>::type,
+      completion_signature_of_t<
+        decay_t<decltype(*std::declval<typename Range::iterator>())>>,
       Allocator>::type signature;
 
   /// Initiate an asynchronous wait for the group of operations.
@@ -294,8 +325,8 @@ public:
    * an operation within the group, that is used to determine whether to cancel
    * the remaining operations. The function object is passed the arguments of
    * the completed operation's handler. To trigger cancellation of the remaining
-   * operations, it must return a asio::cancellation_type value other
-   * than <tt>asio::cancellation_type::none</tt>.
+   * operations, it must return a boost::asio::cancellation_type value other
+   * than <tt>boost::asio::cancellation_type::none</tt>.
    *
    * @param token A @ref completion_token whose signature is comprised of
    * a @c std::vector<std::size_t, Allocator> indicating the completion order of
@@ -304,23 +335,22 @@ public:
    *
    * The library provides the following @c cancellation_condition types:
    *
-   * @li asio::experimental::wait_for_all
-   * @li asio::experimental::wait_for_one
-   * @li asio::experimental::wait_for_one_error
-   * @li asio::experimental::wait_for_one_success
+   * @li boost::asio::experimental::wait_for_all
+   * @li boost::asio::experimental::wait_for_one
+   * @li boost::asio::experimental::wait_for_one_error
+   * @li boost::asio::experimental::wait_for_one_success
    */
   template <typename CancellationCondition,
-      ASIO_COMPLETION_TOKEN_FOR(signature) CompletionToken>
-  ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX(CompletionToken, signature)
-  async_wait(CancellationCondition cancellation_condition,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(signature) CompletionToken>
+  auto async_wait(CancellationCondition cancellation_condition,
       CompletionToken&& token)
-    ASIO_INITFN_AUTO_RESULT_TYPE_SUFFIX((
-      asio::async_initiate<CompletionToken, signature>(
-          declval<initiate_async_wait>(), token,
-          std::move(cancellation_condition),
-          std::move(range_), allocator_)))
+    -> decltype(
+      boost::asio::async_initiate<CompletionToken, signature>(
+        declval<initiate_async_wait>(), token,
+        std::move(cancellation_condition),
+        std::move(range_), allocator_))
   {
-    return asio::async_initiate<CompletionToken, signature>(
+    return boost::asio::async_initiate<CompletionToken, signature>(
         initiate_async_wait(), token,
         std::move(cancellation_condition),
         std::move(range_), allocator_);
@@ -333,34 +363,18 @@ public:
  *
  * For example:
  * @code
- * using op_type = decltype(
- *     socket1.async_read_some(
- *       asio::buffer(data1),
- *       asio::deferred
- *     )
- *   );
+ * using op_type =
+ *   decltype(socket1.async_read_some(boost::asio::buffer(data1)));
  *
  * std::vector<op_type> ops;
+ * ops.push_back(socket1.async_read_some(boost::asio::buffer(data1)));
+ * ops.push_back(socket2.async_read_some(boost::asio::buffer(data2)));
  *
- * ops.push_back(
- *     socket1.async_read_some(
- *       asio::buffer(data1),
- *       asio::deferred
- *     )
- *   );
- *
- * ops.push_back(
- *     socket2.async_read_some(
- *       asio::buffer(data2),
- *       asio::deferred
- *     )
- *   );
- *
- * asio::experimental::make_parallel_group(ops).async_wait(
- *     asio::experimental::wait_for_all(),
+ * boost::asio::experimental::make_parallel_group(ops).async_wait(
+ *     boost::asio::experimental::wait_for_all(),
  *     [](
  *         std::vector<std::size_t> completion_order,
- *         std::vector<std::error_code> e,
+ *         std::vector<boost::system::error_code> e,
  *         std::vector<std::size_t> n
  *       )
  *     {
@@ -375,15 +389,13 @@ public:
  * @endcode
  */
 template <typename Range>
-ASIO_NODISCARD inline
-ranged_parallel_group<typename std::decay<Range>::type>
+BOOST_ASIO_NODISCARD inline ranged_parallel_group<decay_t<Range>>
 make_parallel_group(Range&& range,
-    typename constraint<
-      is_async_operation_range<typename std::decay<Range>::type>::value
-    >::type = 0)
+    constraint_t<
+      is_async_operation_range<decay_t<Range>>::value
+    > = 0)
 {
-  return ranged_parallel_group<typename std::decay<Range>::type>(
-      std::forward<Range>(range));
+  return ranged_parallel_group<decay_t<Range>>(std::forward<Range>(range));
 }
 
 /// Create a group of operations that may be launched in parallel.
@@ -394,38 +406,22 @@ make_parallel_group(Range&& range,
  *
  * For example:
  * @code
- * using op_type = decltype(
- *     socket1.async_read_some(
- *       asio::buffer(data1),
- *       asio::deferred
- *     )
- *   );
+ * using op_type =
+ *   decltype(socket1.async_read_some(boost::asio::buffer(data1)));
  *
  * std::vector<op_type> ops;
+ * ops.push_back(socket1.async_read_some(boost::asio::buffer(data1)));
+ * ops.push_back(socket2.async_read_some(boost::asio::buffer(data2)));
  *
- * ops.push_back(
- *     socket1.async_read_some(
- *       asio::buffer(data1),
- *       asio::deferred
- *     )
- *   );
- *
- * ops.push_back(
- *     socket2.async_read_some(
- *       asio::buffer(data2),
- *       asio::deferred
- *     )
- *   );
- *
- * asio::experimental::make_parallel_group(
+ * boost::asio::experimental::make_parallel_group(
  *     std::allocator_arg_t,
  *     my_allocator,
  *     ops
  *   ).async_wait(
- *     asio::experimental::wait_for_all(),
+ *     boost::asio::experimental::wait_for_all(),
  *     [](
  *         std::vector<std::size_t> completion_order,
- *         std::vector<std::error_code> e,
+ *         std::vector<boost::system::error_code> e,
  *         std::vector<std::size_t> n
  *       )
  *     {
@@ -440,22 +436,22 @@ make_parallel_group(Range&& range,
  * @endcode
  */
 template <typename Allocator, typename Range>
-ASIO_NODISCARD inline
-ranged_parallel_group<typename std::decay<Range>::type, Allocator>
+BOOST_ASIO_NODISCARD inline ranged_parallel_group<decay_t<Range>, Allocator>
 make_parallel_group(allocator_arg_t, const Allocator& allocator, Range&& range,
-    typename constraint<
-      is_async_operation_range<typename std::decay<Range>::type>::value
-    >::type = 0)
+    constraint_t<
+      is_async_operation_range<decay_t<Range>>::value
+    > = 0)
 {
-  return ranged_parallel_group<typename std::decay<Range>::type, Allocator>(
+  return ranged_parallel_group<decay_t<Range>, Allocator>(
       std::forward<Range>(range), allocator);
 }
 
 } // namespace experimental
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#include "asio/experimental/impl/parallel_group.hpp"
+#include <boost/asio/experimental/impl/parallel_group.hpp>
 
-#endif // ASIO_EXPERIMENTAL_PARALLEL_GROUP_HPP
+#endif // BOOST_ASIO_EXPERIMENTAL_PARALLEL_GROUP_HPP

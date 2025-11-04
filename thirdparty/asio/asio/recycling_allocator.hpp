@@ -2,24 +2,25 @@
 // recycling_allocator.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_RECYCLING_ALLOCATOR_HPP
-#define ASIO_RECYCLING_ALLOCATOR_HPP
+#ifndef BOOST_ASIO_RECYCLING_ALLOCATOR_HPP
+#define BOOST_ASIO_RECYCLING_ALLOCATOR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/detail/recycling_allocator.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <boost/asio/detail/recycling_allocator.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 
 /// An allocator that caches memory blocks in thread-local storage for reuse.
@@ -44,27 +45,27 @@ public:
   };
 
   /// Default constructor.
-  ASIO_CONSTEXPR recycling_allocator() ASIO_NOEXCEPT
+  constexpr recycling_allocator() noexcept
   {
   }
 
   /// Converting constructor.
   template <typename U>
-  ASIO_CONSTEXPR recycling_allocator(
-      const recycling_allocator<U>&) ASIO_NOEXCEPT
+  constexpr recycling_allocator(
+      const recycling_allocator<U>&) noexcept
   {
   }
 
   /// Equality operator. Always returns true.
-  ASIO_CONSTEXPR bool operator==(
-      const recycling_allocator&) const ASIO_NOEXCEPT
+  constexpr bool operator==(
+      const recycling_allocator&) const noexcept
   {
     return true;
   }
 
   /// Inequality operator. Always returns false.
-  ASIO_CONSTEXPR bool operator!=(
-      const recycling_allocator&) const ASIO_NOEXCEPT
+  constexpr bool operator!=(
+      const recycling_allocator&) const noexcept
   {
     return false;
   }
@@ -105,34 +106,35 @@ public:
   };
 
   /// Default constructor.
-  ASIO_CONSTEXPR recycling_allocator() ASIO_NOEXCEPT
+  constexpr recycling_allocator() noexcept
   {
   }
 
   /// Converting constructor.
   template <typename U>
-  ASIO_CONSTEXPR recycling_allocator(
-      const recycling_allocator<U>&) ASIO_NOEXCEPT
+  constexpr recycling_allocator(
+      const recycling_allocator<U>&) noexcept
   {
   }
 
   /// Equality operator. Always returns true.
-  ASIO_CONSTEXPR bool operator==(
-      const recycling_allocator&) const ASIO_NOEXCEPT
+  constexpr bool operator==(
+      const recycling_allocator&) const noexcept
   {
     return true;
   }
 
   /// Inequality operator. Always returns false.
-  ASIO_CONSTEXPR bool operator!=(
-      const recycling_allocator&) const ASIO_NOEXCEPT
+  constexpr bool operator!=(
+      const recycling_allocator&) const noexcept
   {
     return false;
   }
 };
 
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_RECYCLING_ALLOCATOR_HPP
+#endif // BOOST_ASIO_RECYCLING_ALLOCATOR_HPP

@@ -2,30 +2,31 @@
 // windows/overlapped_ptr.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_WINDOWS_OVERLAPPED_PTR_HPP
-#define ASIO_WINDOWS_OVERLAPPED_PTR_HPP
+#ifndef BOOST_ASIO_WINDOWS_OVERLAPPED_PTR_HPP
+#define BOOST_ASIO_WINDOWS_OVERLAPPED_PTR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 
-#if defined(ASIO_HAS_WINDOWS_OVERLAPPED_PTR) \
+#if defined(BOOST_ASIO_HAS_WINDOWS_OVERLAPPED_PTR) \
   || defined(GENERATING_DOCUMENTATION)
 
-#include "asio/detail/noncopyable.hpp"
-#include "asio/detail/win_iocp_overlapped_ptr.hpp"
-#include "asio/io_context.hpp"
+#include <boost/asio/detail/noncopyable.hpp>
+#include <boost/asio/detail/win_iocp_overlapped_ptr.hpp>
+#include <boost/asio/io_context.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace windows {
 
@@ -51,23 +52,23 @@ public:
   /// Construct an overlapped_ptr to contain the specified handler.
   template <typename ExecutionContext, typename Handler>
   explicit overlapped_ptr(ExecutionContext& context,
-      ASIO_MOVE_ARG(Handler) handler,
-      typename constraint<
+      Handler&& handler,
+      constraint_t<
         is_convertible<ExecutionContext&, execution_context&>::value
-      >::type = 0)
-    : impl_(context.get_executor(), ASIO_MOVE_CAST(Handler)(handler))
+      > = 0)
+    : impl_(context.get_executor(), static_cast<Handler&&>(handler))
   {
   }
 
   /// Construct an overlapped_ptr to contain the specified handler.
   template <typename Executor, typename Handler>
   explicit overlapped_ptr(const Executor& ex,
-      ASIO_MOVE_ARG(Handler) handler,
-      typename constraint<
+      Handler&& handler,
+      constraint_t<
         execution::is_executor<Executor>::value
           || is_executor<Executor>::value
-      >::type = 0)
-    : impl_(ex, ASIO_MOVE_CAST(Handler)(handler))
+      > = 0)
+    : impl_(ex, static_cast<Handler&&>(handler))
   {
   }
 
@@ -85,24 +86,24 @@ public:
   /// Reset to contain the specified handler, freeing any current OVERLAPPED
   /// object.
   template <typename ExecutionContext, typename Handler>
-  void reset(ExecutionContext& context, ASIO_MOVE_ARG(Handler) handler,
-      typename constraint<
+  void reset(ExecutionContext& context, Handler&& handler,
+      constraint_t<
         is_convertible<ExecutionContext&, execution_context&>::value
-      >::type = 0)
+      > = 0)
   {
-    impl_.reset(context.get_executor(), ASIO_MOVE_CAST(Handler)(handler));
+    impl_.reset(context.get_executor(), static_cast<Handler&&>(handler));
   }
 
   /// Reset to contain the specified handler, freeing any current OVERLAPPED
   /// object.
   template <typename Executor, typename Handler>
-  void reset(const Executor& ex, ASIO_MOVE_ARG(Handler) handler,
-      typename constraint<
+  void reset(const Executor& ex, Handler&& handler,
+      constraint_t<
         execution::is_executor<Executor>::value
           || is_executor<Executor>::value
-      >::type = 0)
+      > = 0)
   {
-    impl_.reset(ex, ASIO_MOVE_CAST(Handler)(handler));
+    impl_.reset(ex, static_cast<Handler&&>(handler));
   }
 
   /// Get the contained OVERLAPPED object.
@@ -124,7 +125,7 @@ public:
   }
 
   /// Post completion notification for overlapped operation. Releases ownership.
-  void complete(const asio::error_code& ec,
+  void complete(const boost::system::error_code& ec,
       std::size_t bytes_transferred)
   {
     impl_.complete(ec, bytes_transferred);
@@ -136,10 +137,11 @@ private:
 
 } // namespace windows
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // defined(ASIO_HAS_WINDOWS_OVERLAPPED_PTR)
+#endif // defined(BOOST_ASIO_HAS_WINDOWS_OVERLAPPED_PTR)
        //   || defined(GENERATING_DOCUMENTATION)
 
-#endif // ASIO_WINDOWS_OVERLAPPED_PTR_HPP
+#endif // BOOST_ASIO_WINDOWS_OVERLAPPED_PTR_HPP

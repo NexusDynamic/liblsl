@@ -2,39 +2,41 @@
 // ssl/stream.hpp
 // ~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_SSL_STREAM_HPP
-#define ASIO_SSL_STREAM_HPP
+#ifndef BOOST_ASIO_SSL_STREAM_HPP
+#define BOOST_ASIO_SSL_STREAM_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 
-#include "asio/async_result.hpp"
-#include "asio/detail/buffer_sequence_adapter.hpp"
-#include "asio/detail/handler_type_requirements.hpp"
-#include "asio/detail/non_const_lvalue.hpp"
-#include "asio/detail/noncopyable.hpp"
-#include "asio/detail/type_traits.hpp"
-#include "asio/ssl/context.hpp"
-#include "asio/ssl/detail/buffered_handshake_op.hpp"
-#include "asio/ssl/detail/handshake_op.hpp"
-#include "asio/ssl/detail/io.hpp"
-#include "asio/ssl/detail/read_op.hpp"
-#include "asio/ssl/detail/shutdown_op.hpp"
-#include "asio/ssl/detail/stream_core.hpp"
-#include "asio/ssl/detail/write_op.hpp"
-#include "asio/ssl/stream_base.hpp"
+#include <boost/asio/async_result.hpp>
+#include <boost/asio/buffer.hpp>
+#include <boost/asio/detail/buffer_sequence_adapter.hpp>
+#include <boost/asio/detail/handler_type_requirements.hpp>
+#include <boost/asio/detail/non_const_lvalue.hpp>
+#include <boost/asio/detail/noncopyable.hpp>
+#include <boost/asio/detail/type_traits.hpp>
+#include <boost/asio/ssl/context.hpp>
+#include <boost/asio/ssl/detail/buffered_handshake_op.hpp>
+#include <boost/asio/ssl/detail/handshake_op.hpp>
+#include <boost/asio/ssl/detail/io.hpp>
+#include <boost/asio/ssl/detail/read_op.hpp>
+#include <boost/asio/ssl/detail/shutdown_op.hpp>
+#include <boost/asio/ssl/detail/stream_core.hpp>
+#include <boost/asio/ssl/detail/write_op.hpp>
+#include <boost/asio/ssl/stream_base.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace ssl {
 
@@ -52,9 +54,9 @@ namespace ssl {
  * @par Example
  * To use the SSL stream template with an ip::tcp::socket, you would write:
  * @code
- * asio::io_context my_context;
- * asio::ssl::context ctx(asio::ssl::context::sslv23);
- * asio::ssl::stream<asio:ip::tcp::socket> sock(my_context, ctx);
+ * boost::asio::io_context my_context;
+ * boost::asio::ssl::context ctx(boost::asio::ssl::context::sslv23);
+ * boost::asio::ssl::stream<boost::asio::ip::tcp::socket> sock(my_context, ctx);
  * @endcode
  *
  * @par Concepts:
@@ -83,7 +85,7 @@ public:
   };
 
   /// The type of the next layer.
-  typedef typename remove_reference<Stream>::type next_layer_type;
+  typedef remove_reference_t<Stream> next_layer_type;
 
   /// The type of the lowest layer.
   typedef typename next_layer_type::lowest_layer_type lowest_layer_type;
@@ -91,7 +93,6 @@ public:
   /// The type of the executor associated with the object.
   typedef typename lowest_layer_type::executor_type executor_type;
 
-#if defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
   /// Construct a stream.
   /**
    * This constructor creates a stream and initialises the underlying stream
@@ -103,7 +104,7 @@ public:
    */
   template <typename Arg>
   stream(Arg&& arg, context& ctx)
-    : next_layer_(ASIO_MOVE_CAST(Arg)(arg)),
+    : next_layer_(static_cast<Arg&&>(arg)),
       core_(ctx.native_handle(), next_layer_.lowest_layer().get_executor())
   {
   }
@@ -120,27 +121,11 @@ public:
    */
   template <typename Arg>
   stream(Arg&& arg, native_handle_type handle)
-    : next_layer_(ASIO_MOVE_CAST(Arg)(arg)),
+    : next_layer_(static_cast<Arg&&>(arg)),
       core_(handle, next_layer_.lowest_layer().get_executor())
   {
   }
-#else // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
-  template <typename Arg>
-  stream(Arg& arg, context& ctx)
-    : next_layer_(arg),
-      core_(ctx.native_handle(), next_layer_.lowest_layer().get_executor())
-  {
-  }
 
-  template <typename Arg>
-  stream(Arg& arg, native_handle_type handle)
-    : next_layer_(arg),
-      core_(handle, next_layer_.lowest_layer().get_executor())
-  {
-  }
-#endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
-
-#if defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
   /// Move-construct a stream from another.
   /**
    * @param other The other stream object from which the move will occur. Must
@@ -149,8 +134,8 @@ public:
    * operation is destruction, or use as the target of a move assignment.
    */
   stream(stream&& other)
-    : next_layer_(ASIO_MOVE_CAST(Stream)(other.next_layer_)),
-      core_(ASIO_MOVE_CAST(detail::stream_core)(other.core_))
+    : next_layer_(static_cast<Stream&&>(other.next_layer_)),
+      core_(static_cast<detail::stream_core&&>(other.core_))
   {
   }
 
@@ -165,12 +150,11 @@ public:
   {
     if (this != &other)
     {
-      next_layer_ = ASIO_MOVE_CAST(Stream)(other.next_layer_);
-      core_ = ASIO_MOVE_CAST(detail::stream_core)(other.core_);
+      next_layer_ = static_cast<Stream&&>(other.next_layer_);
+      core_ = static_cast<detail::stream_core&&>(other.core_);
     }
     return *this;
   }
-#endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
 
   /// Destructor.
   /**
@@ -188,7 +172,7 @@ public:
    *
    * @return A copy of the executor that stream will use to dispatch handlers.
    */
-  executor_type get_executor() ASIO_NOEXCEPT
+  executor_type get_executor() noexcept
   {
     return next_layer_.lowest_layer().get_executor();
   }
@@ -204,7 +188,7 @@ public:
    * suitable for passing to functions such as @c SSL_get_verify_result and
    * @c SSL_get_peer_certificate:
    * @code
-   * asio::ssl::stream<asio:ip::tcp::socket> sock(my_context, ctx);
+   * boost::asio::ssl::stream<boost::asio::ip::tcp::socket> sock(io_ctx, ctx);
    *
    * // ... establish connection and perform handshake ...
    *
@@ -282,15 +266,15 @@ public:
    * @param v A bitmask of peer verification modes. See @ref verify_mode for
    * available values.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    *
    * @note Calls @c SSL_set_verify.
    */
   void set_verify_mode(verify_mode v)
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     set_verify_mode(v, ec);
-    asio::detail::throw_error(ec, "set_verify_mode");
+    boost::asio::detail::throw_error(ec, "set_verify_mode");
   }
 
   /// Set the peer verification mode.
@@ -305,11 +289,11 @@ public:
    *
    * @note Calls @c SSL_set_verify.
    */
-  ASIO_SYNC_OP_VOID set_verify_mode(
-      verify_mode v, asio::error_code& ec)
+  BOOST_ASIO_SYNC_OP_VOID set_verify_mode(
+      verify_mode v, boost::system::error_code& ec)
   {
     core_.engine_.set_verify_mode(v, ec);
-    ASIO_SYNC_OP_VOID_RETURN(ec);
+    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Set the peer verification depth.
@@ -320,15 +304,15 @@ public:
    * @param depth Maximum depth for the certificate chain verification that
    * shall be allowed.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    *
    * @note Calls @c SSL_set_verify_depth.
    */
   void set_verify_depth(int depth)
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     set_verify_depth(depth, ec);
-    asio::detail::throw_error(ec, "set_verify_depth");
+    boost::asio::detail::throw_error(ec, "set_verify_depth");
   }
 
   /// Set the peer verification depth.
@@ -343,11 +327,11 @@ public:
    *
    * @note Calls @c SSL_set_verify_depth.
    */
-  ASIO_SYNC_OP_VOID set_verify_depth(
-      int depth, asio::error_code& ec)
+  BOOST_ASIO_SYNC_OP_VOID set_verify_depth(
+      int depth, boost::system::error_code& ec)
   {
     core_.engine_.set_verify_depth(depth, ec);
-    ASIO_SYNC_OP_VOID_RETURN(ec);
+    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Set the callback used to verify peer certificates.
@@ -364,16 +348,16 @@ public:
    * The return value of the callback is true if the certificate has passed
    * verification, false otherwise.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    *
    * @note Calls @c SSL_set_verify.
    */
   template <typename VerifyCallback>
   void set_verify_callback(VerifyCallback callback)
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     this->set_verify_callback(callback, ec);
-    asio::detail::throw_error(ec, "set_verify_callback");
+    boost::asio::detail::throw_error(ec, "set_verify_callback");
   }
 
   /// Set the callback used to verify peer certificates.
@@ -395,12 +379,12 @@ public:
    * @note Calls @c SSL_set_verify.
    */
   template <typename VerifyCallback>
-  ASIO_SYNC_OP_VOID set_verify_callback(VerifyCallback callback,
-      asio::error_code& ec)
+  BOOST_ASIO_SYNC_OP_VOID set_verify_callback(VerifyCallback callback,
+      boost::system::error_code& ec)
   {
     core_.engine_.set_verify_callback(
         new detail::verify_callback<VerifyCallback>(callback), ec);
-    ASIO_SYNC_OP_VOID_RETURN(ec);
+    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Perform SSL handshaking.
@@ -411,13 +395,13 @@ public:
    * @param type The type of handshaking to be performed, i.e. as a client or as
    * a server.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    */
   void handshake(handshake_type type)
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     handshake(type, ec);
-    asio::detail::throw_error(ec, "handshake");
+    boost::asio::detail::throw_error(ec, "handshake");
   }
 
   /// Perform SSL handshaking.
@@ -430,11 +414,11 @@ public:
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  ASIO_SYNC_OP_VOID handshake(handshake_type type,
-      asio::error_code& ec)
+  BOOST_ASIO_SYNC_OP_VOID handshake(handshake_type type,
+      boost::system::error_code& ec)
   {
     detail::io(next_layer_, core_, detail::handshake_op(type), ec);
-    ASIO_SYNC_OP_VOID_RETURN(ec);
+    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Perform SSL handshaking.
@@ -447,14 +431,14 @@ public:
    *
    * @param buffers The buffered data to be reused for the handshake.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    */
   template <typename ConstBufferSequence>
   void handshake(handshake_type type, const ConstBufferSequence& buffers)
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     handshake(type, buffers, ec);
-    asio::detail::throw_error(ec, "handshake");
+    boost::asio::detail::throw_error(ec, "handshake");
   }
 
   /// Perform SSL handshaking.
@@ -470,12 +454,12 @@ public:
    * @param ec Set to indicate what error occurred, if any.
    */
   template <typename ConstBufferSequence>
-  ASIO_SYNC_OP_VOID handshake(handshake_type type,
-      const ConstBufferSequence& buffers, asio::error_code& ec)
+  BOOST_ASIO_SYNC_OP_VOID handshake(handshake_type type,
+      const ConstBufferSequence& buffers, boost::system::error_code& ec)
   {
     detail::io(next_layer_, core_,
         detail::buffered_handshake_op<ConstBufferSequence>(type, buffers), ec);
-    ASIO_SYNC_OP_VOID_RETURN(ec);
+    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Start an asynchronous SSL handshake.
@@ -493,19 +477,19 @@ public:
    * @ref yield_context, or a function object with the correct completion
    * signature. The function signature of the completion handler must be:
    * @code void handler(
-   *   const asio::error_code& error // Result of operation.
+   *   const boost::system::error_code& error // Result of operation.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using boost::asio::async_immediate().
    *
    * @par Completion Signature
-   * @code void(asio::error_code) @endcode
+   * @code void(boost::system::error_code) @endcode
    *
    * @par Per-Operation Cancellation
    * This asynchronous operation supports cancellation for the following
-   * asio::cancellation_type values:
+   * boost::asio::cancellation_type values:
    *
    * @li @c cancellation_type::terminal
    *
@@ -515,21 +499,17 @@ public:
    * @c async_write_some operations.
    */
   template <
-      ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code))
-        HandshakeToken
-          ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX(HandshakeToken,
-      void (asio::error_code))
-  async_handshake(handshake_type type,
-      ASIO_MOVE_ARG(HandshakeToken) token
-        ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
-    ASIO_INITFN_AUTO_RESULT_TYPE_SUFFIX((
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code))
+        HandshakeToken = default_completion_token_t<executor_type>>
+  auto async_handshake(handshake_type type,
+      HandshakeToken&& token = default_completion_token_t<executor_type>())
+    -> decltype(
       async_initiate<HandshakeToken,
-        void (asio::error_code)>(
-          declval<initiate_async_handshake>(), token, type)))
+        void (boost::system::error_code)>(
+          declval<initiate_async_handshake>(), token, type))
   {
     return async_initiate<HandshakeToken,
-      void (asio::error_code)>(
+      void (boost::system::error_code)>(
         initiate_async_handshake(this), token, type);
   }
 
@@ -553,20 +533,20 @@ public:
    * @ref yield_context, or a function object with the correct completion
    * signature. The function signature of the completion handler must be:
    * @code void handler(
-   *   const asio::error_code& error, // Result of operation.
+   *   const boost::system::error_code& error, // Result of operation.
    *   std::size_t bytes_transferred // Amount of buffers used in handshake.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using boost::asio::async_immediate().
    *
    * @par Completion Signature
-   * @code void(asio::error_code, std::size_t) @endcode
+   * @code void(boost::system::error_code, std::size_t) @endcode
    *
    * @par Per-Operation Cancellation
    * This asynchronous operation supports cancellation for the following
-   * asio::cancellation_type values:
+   * boost::asio::cancellation_type values:
    *
    * @li @c cancellation_type::terminal
    *
@@ -576,21 +556,22 @@ public:
    * @c async_write_some operations.
    */
   template <typename ConstBufferSequence,
-      ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
         std::size_t)) BufferedHandshakeToken
-          ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX(BufferedHandshakeToken,
-      void (asio::error_code, std::size_t))
-  async_handshake(handshake_type type, const ConstBufferSequence& buffers,
-      ASIO_MOVE_ARG(BufferedHandshakeToken) token
-        ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
-    ASIO_INITFN_AUTO_RESULT_TYPE_SUFFIX((
+          = default_completion_token_t<executor_type>>
+  auto async_handshake(handshake_type type, const ConstBufferSequence& buffers,
+      BufferedHandshakeToken&& token
+        = default_completion_token_t<executor_type>(),
+      constraint_t<
+        is_const_buffer_sequence<ConstBufferSequence>::value
+      > = 0)
+    -> decltype(
       async_initiate<BufferedHandshakeToken,
-        void (asio::error_code, std::size_t)>(
-          declval<initiate_async_buffered_handshake>(), token, type, buffers)))
+        void (boost::system::error_code, std::size_t)>(
+          declval<initiate_async_buffered_handshake>(), token, type, buffers))
   {
     return async_initiate<BufferedHandshakeToken,
-      void (asio::error_code, std::size_t)>(
+      void (boost::system::error_code, std::size_t)>(
         initiate_async_buffered_handshake(this), token, type, buffers);
   }
 
@@ -599,13 +580,13 @@ public:
    * This function is used to shut down SSL on the stream. The function call
    * will block until SSL has been shut down or an error occurs.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    */
   void shutdown()
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     shutdown(ec);
-    asio::detail::throw_error(ec, "shutdown");
+    boost::asio::detail::throw_error(ec, "shutdown");
   }
 
   /// Shut down SSL on the stream.
@@ -615,10 +596,10 @@ public:
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  ASIO_SYNC_OP_VOID shutdown(asio::error_code& ec)
+  BOOST_ASIO_SYNC_OP_VOID shutdown(boost::system::error_code& ec)
   {
     detail::io(next_layer_, core_, detail::shutdown_op(), ec);
-    ASIO_SYNC_OP_VOID_RETURN(ec);
+    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Asynchronously shut down SSL on the stream.
@@ -633,19 +614,19 @@ public:
    * @ref yield_context, or a function object with the correct completion
    * signature. The function signature of the completion handler must be:
    * @code void handler(
-   *   const asio::error_code& error // Result of operation.
+   *   const boost::system::error_code& error // Result of operation.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using boost::asio::async_immediate().
    *
    * @par Completion Signature
-   * @code void(asio::error_code) @endcode
+   * @code void(boost::system::error_code) @endcode
    *
    * @par Per-Operation Cancellation
    * This asynchronous operation supports cancellation for the following
-   * asio::cancellation_type values:
+   * boost::asio::cancellation_type values:
    *
    * @li @c cancellation_type::terminal
    *
@@ -655,21 +636,18 @@ public:
    * @c async_write_some operations.
    */
   template <
-      ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code))
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code))
         ShutdownToken
-          ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX(ShutdownToken,
-      void (asio::error_code))
-  async_shutdown(
-      ASIO_MOVE_ARG(ShutdownToken) token
-        ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
-    ASIO_INITFN_AUTO_RESULT_TYPE_SUFFIX((
+          = default_completion_token_t<executor_type>>
+  auto async_shutdown(
+      ShutdownToken&& token = default_completion_token_t<executor_type>())
+    -> decltype(
       async_initiate<ShutdownToken,
-        void (asio::error_code)>(
-          declval<initiate_async_shutdown>(), token)))
+        void (boost::system::error_code)>(
+          declval<initiate_async_shutdown>(), token))
   {
     return async_initiate<ShutdownToken,
-      void (asio::error_code)>(
+      void (boost::system::error_code)>(
         initiate_async_shutdown(this), token);
   }
 
@@ -683,7 +661,7 @@ public:
    *
    * @returns The number of bytes written.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    *
    * @note The write_some operation may not transmit all of the data to the
    * peer. Consider using the @ref write function if you need to ensure that all
@@ -692,9 +670,9 @@ public:
   template <typename ConstBufferSequence>
   std::size_t write_some(const ConstBufferSequence& buffers)
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     std::size_t n = write_some(buffers, ec);
-    asio::detail::throw_error(ec, "write_some");
+    boost::asio::detail::throw_error(ec, "write_some");
     return n;
   }
 
@@ -716,7 +694,7 @@ public:
    */
   template <typename ConstBufferSequence>
   std::size_t write_some(const ConstBufferSequence& buffers,
-      asio::error_code& ec)
+      boost::system::error_code& ec)
   {
     return detail::io(next_layer_, core_,
         detail::write_op<ConstBufferSequence>(buffers), ec);
@@ -739,16 +717,16 @@ public:
    * @ref yield_context, or a function object with the correct completion
    * signature. The function signature of the completion handler must be:
    * @code void handler(
-   *   const asio::error_code& error, // Result of operation.
+   *   const boost::system::error_code& error, // Result of operation.
    *   std::size_t bytes_transferred // Number of bytes written.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using boost::asio::async_immediate().
    *
    * @par Completion Signature
-   * @code void(asio::error_code, std::size_t) @endcode
+   * @code void(boost::system::error_code, std::size_t) @endcode
    *
    * @note The async_write_some operation may not transmit all of the data to
    * the peer. Consider using the @ref async_write function if you need to
@@ -757,7 +735,7 @@ public:
    *
    * @par Per-Operation Cancellation
    * This asynchronous operation supports cancellation for the following
-   * asio::cancellation_type values:
+   * boost::asio::cancellation_type values:
    *
    * @li @c cancellation_type::terminal
    *
@@ -767,21 +745,17 @@ public:
    * @c async_write_some operations.
    */
   template <typename ConstBufferSequence,
-      ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
-        std::size_t)) WriteToken
-          ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX(WriteToken,
-      void (asio::error_code, std::size_t))
-  async_write_some(const ConstBufferSequence& buffers,
-      ASIO_MOVE_ARG(WriteToken) token
-        ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
-    ASIO_INITFN_AUTO_RESULT_TYPE_SUFFIX((
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+        std::size_t)) WriteToken = default_completion_token_t<executor_type>>
+  auto async_write_some(const ConstBufferSequence& buffers,
+      WriteToken&& token = default_completion_token_t<executor_type>())
+    -> decltype(
       async_initiate<WriteToken,
-        void (asio::error_code, std::size_t)>(
-          declval<initiate_async_write_some>(), token, buffers)))
+        void (boost::system::error_code, std::size_t)>(
+          declval<initiate_async_write_some>(), token, buffers))
   {
     return async_initiate<WriteToken,
-      void (asio::error_code, std::size_t)>(
+      void (boost::system::error_code, std::size_t)>(
         initiate_async_write_some(this), token, buffers);
   }
 
@@ -795,7 +769,7 @@ public:
    *
    * @returns The number of bytes read.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    *
    * @note The read_some operation may not read all of the requested number of
    * bytes. Consider using the @ref read function if you need to ensure that the
@@ -804,9 +778,9 @@ public:
   template <typename MutableBufferSequence>
   std::size_t read_some(const MutableBufferSequence& buffers)
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     std::size_t n = read_some(buffers, ec);
-    asio::detail::throw_error(ec, "read_some");
+    boost::asio::detail::throw_error(ec, "read_some");
     return n;
   }
 
@@ -828,7 +802,7 @@ public:
    */
   template <typename MutableBufferSequence>
   std::size_t read_some(const MutableBufferSequence& buffers,
-      asio::error_code& ec)
+      boost::system::error_code& ec)
   {
     return detail::io(next_layer_, core_,
         detail::read_op<MutableBufferSequence>(buffers), ec);
@@ -851,16 +825,16 @@ public:
    * @ref yield_context, or a function object with the correct completion
    * signature. The function signature of the completion handler must be:
    * @code void handler(
-   *   const asio::error_code& error, // Result of operation.
+   *   const boost::system::error_code& error, // Result of operation.
    *   std::size_t bytes_transferred // Number of bytes read.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using boost::asio::async_immediate().
    *
    * @par Completion Signature
-   * @code void(asio::error_code, std::size_t) @endcode
+   * @code void(boost::system::error_code, std::size_t) @endcode
    *
    * @note The async_read_some operation may not read all of the requested
    * number of bytes. Consider using the @ref async_read function if you need to
@@ -869,7 +843,7 @@ public:
    *
    * @par Per-Operation Cancellation
    * This asynchronous operation supports cancellation for the following
-   * asio::cancellation_type values:
+   * boost::asio::cancellation_type values:
    *
    * @li @c cancellation_type::terminal
    *
@@ -879,21 +853,17 @@ public:
    * @c async_write_some operations.
    */
   template <typename MutableBufferSequence,
-      ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
-        std::size_t)) ReadToken
-          ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX(ReadToken,
-      void (asio::error_code, std::size_t))
-  async_read_some(const MutableBufferSequence& buffers,
-      ASIO_MOVE_ARG(ReadToken) token
-        ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
-    ASIO_INITFN_AUTO_RESULT_TYPE_SUFFIX((
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+        std::size_t)) ReadToken = default_completion_token_t<executor_type>>
+  auto async_read_some(const MutableBufferSequence& buffers,
+      ReadToken&& token = default_completion_token_t<executor_type>())
+    -> decltype(
       async_initiate<ReadToken,
-        void (asio::error_code, std::size_t)>(
-          declval<initiate_async_read_some>(), token, buffers)))
+        void (boost::system::error_code, std::size_t)>(
+          declval<initiate_async_read_some>(), token, buffers))
   {
     return async_initiate<ReadToken,
-      void (asio::error_code, std::size_t)>(
+      void (boost::system::error_code, std::size_t)>(
         initiate_async_read_some(this), token, buffers);
   }
 
@@ -908,20 +878,20 @@ private:
     {
     }
 
-    executor_type get_executor() const ASIO_NOEXCEPT
+    executor_type get_executor() const noexcept
     {
       return self_->get_executor();
     }
 
     template <typename HandshakeHandler>
-    void operator()(ASIO_MOVE_ARG(HandshakeHandler) handler,
+    void operator()(HandshakeHandler&& handler,
         handshake_type type) const
     {
       // If you get an error on the following line it means that your handler
       // does not meet the documented type requirements for a HandshakeHandler.
-      ASIO_HANDSHAKE_HANDLER_CHECK(HandshakeHandler, handler) type_check;
+      BOOST_ASIO_HANDSHAKE_HANDLER_CHECK(HandshakeHandler, handler) type_check;
 
-      asio::detail::non_const_lvalue<HandshakeHandler> handler2(handler);
+      boost::asio::detail::non_const_lvalue<HandshakeHandler> handler2(handler);
       detail::async_io(self_->next_layer_, self_->core_,
           detail::handshake_op(type), handler2.value);
     }
@@ -940,22 +910,22 @@ private:
     {
     }
 
-    executor_type get_executor() const ASIO_NOEXCEPT
+    executor_type get_executor() const noexcept
     {
       return self_->get_executor();
     }
 
     template <typename BufferedHandshakeHandler, typename ConstBufferSequence>
-    void operator()(ASIO_MOVE_ARG(BufferedHandshakeHandler) handler,
+    void operator()(BufferedHandshakeHandler&& handler,
         handshake_type type, const ConstBufferSequence& buffers) const
     {
       // If you get an error on the following line it means that your
       // handler does not meet the documented type requirements for a
       // BufferedHandshakeHandler.
-      ASIO_BUFFERED_HANDSHAKE_HANDLER_CHECK(
+      BOOST_ASIO_BUFFERED_HANDSHAKE_HANDLER_CHECK(
           BufferedHandshakeHandler, handler) type_check;
 
-      asio::detail::non_const_lvalue<
+      boost::asio::detail::non_const_lvalue<
           BufferedHandshakeHandler> handler2(handler);
       detail::async_io(self_->next_layer_, self_->core_,
           detail::buffered_handshake_op<ConstBufferSequence>(type, buffers),
@@ -976,19 +946,19 @@ private:
     {
     }
 
-    executor_type get_executor() const ASIO_NOEXCEPT
+    executor_type get_executor() const noexcept
     {
       return self_->get_executor();
     }
 
     template <typename ShutdownHandler>
-    void operator()(ASIO_MOVE_ARG(ShutdownHandler) handler) const
+    void operator()(ShutdownHandler&& handler) const
     {
       // If you get an error on the following line it means that your handler
       // does not meet the documented type requirements for a ShutdownHandler.
-      ASIO_HANDSHAKE_HANDLER_CHECK(ShutdownHandler, handler) type_check;
+      BOOST_ASIO_HANDSHAKE_HANDLER_CHECK(ShutdownHandler, handler) type_check;
 
-      asio::detail::non_const_lvalue<ShutdownHandler> handler2(handler);
+      boost::asio::detail::non_const_lvalue<ShutdownHandler> handler2(handler);
       detail::async_io(self_->next_layer_, self_->core_,
           detail::shutdown_op(), handler2.value);
     }
@@ -1007,20 +977,20 @@ private:
     {
     }
 
-    executor_type get_executor() const ASIO_NOEXCEPT
+    executor_type get_executor() const noexcept
     {
       return self_->get_executor();
     }
 
     template <typename WriteHandler, typename ConstBufferSequence>
-    void operator()(ASIO_MOVE_ARG(WriteHandler) handler,
+    void operator()(WriteHandler&& handler,
         const ConstBufferSequence& buffers) const
     {
       // If you get an error on the following line it means that your handler
       // does not meet the documented type requirements for a WriteHandler.
-      ASIO_WRITE_HANDLER_CHECK(WriteHandler, handler) type_check;
+      BOOST_ASIO_WRITE_HANDLER_CHECK(WriteHandler, handler) type_check;
 
-      asio::detail::non_const_lvalue<WriteHandler> handler2(handler);
+      boost::asio::detail::non_const_lvalue<WriteHandler> handler2(handler);
       detail::async_io(self_->next_layer_, self_->core_,
           detail::write_op<ConstBufferSequence>(buffers), handler2.value);
     }
@@ -1039,20 +1009,20 @@ private:
     {
     }
 
-    executor_type get_executor() const ASIO_NOEXCEPT
+    executor_type get_executor() const noexcept
     {
       return self_->get_executor();
     }
 
     template <typename ReadHandler, typename MutableBufferSequence>
-    void operator()(ASIO_MOVE_ARG(ReadHandler) handler,
+    void operator()(ReadHandler&& handler,
         const MutableBufferSequence& buffers) const
     {
       // If you get an error on the following line it means that your handler
       // does not meet the documented type requirements for a ReadHandler.
-      ASIO_READ_HANDLER_CHECK(ReadHandler, handler) type_check;
+      BOOST_ASIO_READ_HANDLER_CHECK(ReadHandler, handler) type_check;
 
-      asio::detail::non_const_lvalue<ReadHandler> handler2(handler);
+      boost::asio::detail::non_const_lvalue<ReadHandler> handler2(handler);
       detail::async_io(self_->next_layer_, self_->core_,
           detail::read_op<MutableBufferSequence>(buffers), handler2.value);
     }
@@ -1067,7 +1037,8 @@ private:
 
 } // namespace ssl
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_SSL_STREAM_HPP
+#endif // BOOST_ASIO_SSL_STREAM_HPP

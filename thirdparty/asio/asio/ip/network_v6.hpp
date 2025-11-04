@@ -2,34 +2,35 @@
 // ip/network_v6.hpp
 // ~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Copyright (c) 2014 Oliver Kowalke (oliver dot kowalke at gmail dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_IP_NETWORK_V6_HPP
-#define ASIO_IP_NETWORK_V6_HPP
+#ifndef BOOST_ASIO_IP_NETWORK_V6_HPP
+#define BOOST_ASIO_IP_NETWORK_V6_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 #include <string>
-#include "asio/detail/string_view.hpp"
-#include "asio/error_code.hpp"
-#include "asio/ip/address_v6_range.hpp"
+#include <boost/asio/detail/string_view.hpp>
+#include <boost/system/error_code.hpp>
+#include <boost/asio/ip/address_v6_range.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace ip {
 
 /// Represents an IPv6 network.
 /**
- * The asio::ip::network_v6 class provides the ability to use and
+ * The boost::asio::ip::network_v6 class provides the ability to use and
  * manipulate IP version 6 networks.
  *
  * @par Thread Safety
@@ -40,89 +41,85 @@ class network_v6
 {
 public:
   /// Default constructor.
-  network_v6() ASIO_NOEXCEPT
+  network_v6() noexcept
     : address_(),
       prefix_length_(0)
   {
   }
 
   /// Construct a network based on the specified address and prefix length.
-  ASIO_DECL network_v6(const address_v6& addr,
+  BOOST_ASIO_DECL network_v6(const address_v6& addr,
       unsigned short prefix_len);
 
   /// Copy constructor.
-  network_v6(const network_v6& other) ASIO_NOEXCEPT
+  network_v6(const network_v6& other) noexcept
     : address_(other.address_),
       prefix_length_(other.prefix_length_)
   {
   }
 
-#if defined(ASIO_HAS_MOVE)
   /// Move constructor.
-  network_v6(network_v6&& other) ASIO_NOEXCEPT
-    : address_(ASIO_MOVE_CAST(address_v6)(other.address_)),
+  network_v6(network_v6&& other) noexcept
+    : address_(static_cast<address_v6&&>(other.address_)),
       prefix_length_(other.prefix_length_)
   {
   }
-#endif // defined(ASIO_HAS_MOVE)
 
   /// Assign from another network.
-  network_v6& operator=(const network_v6& other) ASIO_NOEXCEPT
+  network_v6& operator=(const network_v6& other) noexcept
   {
     address_ = other.address_;
     prefix_length_ = other.prefix_length_;
     return *this;
   }
 
-#if defined(ASIO_HAS_MOVE)
   /// Move-assign from another network.
-  network_v6& operator=(network_v6&& other) ASIO_NOEXCEPT
+  network_v6& operator=(network_v6&& other) noexcept
   {
-    address_ = ASIO_MOVE_CAST(address_v6)(other.address_);
+    address_ = static_cast<address_v6&&>(other.address_);
     prefix_length_ = other.prefix_length_;
     return *this;
   }
-#endif // defined(ASIO_HAS_MOVE)
 
   /// Obtain the address object specified when the network object was created.
-  address_v6 address() const ASIO_NOEXCEPT
+  address_v6 address() const noexcept
   {
     return address_;
   }
 
   /// Obtain the prefix length that was specified when the network object was
   /// created.
-  unsigned short prefix_length() const ASIO_NOEXCEPT
+  unsigned short prefix_length() const noexcept
   {
     return prefix_length_;
   }
 
   /// Obtain an address object that represents the network address.
-  ASIO_DECL address_v6 network() const ASIO_NOEXCEPT;
+  BOOST_ASIO_DECL address_v6 network() const noexcept;
 
   /// Obtain an address range corresponding to the hosts in the network.
-  ASIO_DECL address_v6_range hosts() const ASIO_NOEXCEPT;
+  BOOST_ASIO_DECL address_v6_range hosts() const noexcept;
 
   /// Obtain the true network address, omitting any host bits.
-  network_v6 canonical() const ASIO_NOEXCEPT
+  network_v6 canonical() const noexcept
   {
     return network_v6(network(), prefix_length());
   }
 
   /// Test if network is a valid host address.
-  bool is_host() const ASIO_NOEXCEPT
+  bool is_host() const noexcept
   {
     return prefix_length_ == 128;
   }
 
   /// Test if a network is a real subnet of another network.
-  ASIO_DECL bool is_subnet_of(const network_v6& other) const;
+  BOOST_ASIO_DECL bool is_subnet_of(const network_v6& other) const;
 
   /// Get the network as an address in dotted decimal format.
-  ASIO_DECL std::string to_string() const;
+  BOOST_ASIO_DECL std::string to_string() const;
 
   /// Get the network as an address in dotted decimal format.
-  ASIO_DECL std::string to_string(asio::error_code& ec) const;
+  BOOST_ASIO_DECL std::string to_string(boost::system::error_code& ec) const;
 
   /// Compare two networks for equality.
   friend bool operator==(const network_v6& a, const network_v6& b)
@@ -156,32 +153,32 @@ inline network_v6 make_network_v6(
 /**
  * @relates network_v6
  */
-ASIO_DECL network_v6 make_network_v6(const char* str);
+BOOST_ASIO_DECL network_v6 make_network_v6(const char* str);
 
 /// Create an IPv6 network from a string containing IP address and prefix
 /// length.
 /**
  * @relates network_v6
  */
-ASIO_DECL network_v6 make_network_v6(
-    const char* str, asio::error_code& ec);
+BOOST_ASIO_DECL network_v6 make_network_v6(
+    const char* str, boost::system::error_code& ec);
 
 /// Create an IPv6 network from a string containing IP address and prefix
 /// length.
 /**
  * @relates network_v6
  */
-ASIO_DECL network_v6 make_network_v6(const std::string& str);
+BOOST_ASIO_DECL network_v6 make_network_v6(const std::string& str);
 
 /// Create an IPv6 network from a string containing IP address and prefix
 /// length.
 /**
  * @relates network_v6
  */
-ASIO_DECL network_v6 make_network_v6(
-    const std::string& str, asio::error_code& ec);
+BOOST_ASIO_DECL network_v6 make_network_v6(
+    const std::string& str, boost::system::error_code& ec);
 
-#if defined(ASIO_HAS_STRING_VIEW) \
+#if defined(BOOST_ASIO_HAS_STRING_VIEW) \
   || defined(GENERATING_DOCUMENTATION)
 
 /// Create an IPv6 network from a string containing IP address and prefix
@@ -189,20 +186,20 @@ ASIO_DECL network_v6 make_network_v6(
 /**
  * @relates network_v6
  */
-ASIO_DECL network_v6 make_network_v6(string_view str);
+BOOST_ASIO_DECL network_v6 make_network_v6(string_view str);
 
 /// Create an IPv6 network from a string containing IP address and prefix
 /// length.
 /**
  * @relates network_v6
  */
-ASIO_DECL network_v6 make_network_v6(
-    string_view str, asio::error_code& ec);
+BOOST_ASIO_DECL network_v6 make_network_v6(
+    string_view str, boost::system::error_code& ec);
 
-#endif // defined(ASIO_HAS_STRING_VIEW)
+#endif // defined(BOOST_ASIO_HAS_STRING_VIEW)
        //  || defined(GENERATING_DOCUMENTATION)
 
-#if !defined(ASIO_NO_IOSTREAM)
+#if !defined(BOOST_ASIO_NO_IOSTREAM)
 
 /// Output a network as a string.
 /**
@@ -214,22 +211,23 @@ ASIO_DECL network_v6 make_network_v6(
  *
  * @return The output stream.
  *
- * @relates asio::ip::address_v6
+ * @relates boost::asio::ip::address_v6
  */
 template <typename Elem, typename Traits>
 std::basic_ostream<Elem, Traits>& operator<<(
     std::basic_ostream<Elem, Traits>& os, const network_v6& net);
 
-#endif // !defined(ASIO_NO_IOSTREAM)
+#endif // !defined(BOOST_ASIO_NO_IOSTREAM)
 
 } // namespace ip
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#include "asio/ip/impl/network_v6.hpp"
-#if defined(ASIO_HEADER_ONLY)
-# include "asio/ip/impl/network_v6.ipp"
-#endif // defined(ASIO_HEADER_ONLY)
+#include <boost/asio/ip/impl/network_v6.hpp>
+#if defined(BOOST_ASIO_HEADER_ONLY)
+# include <boost/asio/ip/impl/network_v6.ipp>
+#endif // defined(BOOST_ASIO_HEADER_ONLY)
 
-#endif // ASIO_IP_NETWORK_V6_HPP
+#endif // BOOST_ASIO_IP_NETWORK_V6_HPP

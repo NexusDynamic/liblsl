@@ -2,39 +2,37 @@
 // windows/basic_object_handle.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Copyright (c) 2011 Boris Schaeling (boris@highscore.de)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_WINDOWS_BASIC_OBJECT_HANDLE_HPP
-#define ASIO_WINDOWS_BASIC_OBJECT_HANDLE_HPP
+#ifndef BOOST_ASIO_WINDOWS_BASIC_OBJECT_HANDLE_HPP
+#define BOOST_ASIO_WINDOWS_BASIC_OBJECT_HANDLE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 
-#if defined(ASIO_HAS_WINDOWS_OBJECT_HANDLE) \
+#if defined(BOOST_ASIO_HAS_WINDOWS_OBJECT_HANDLE) \
   || defined(GENERATING_DOCUMENTATION)
 
-#include "asio/any_io_executor.hpp"
-#include "asio/async_result.hpp"
-#include "asio/detail/io_object_impl.hpp"
-#include "asio/detail/throw_error.hpp"
-#include "asio/detail/win_object_handle_service.hpp"
-#include "asio/error.hpp"
-#include "asio/execution_context.hpp"
+#include <utility>
+#include <boost/asio/any_io_executor.hpp>
+#include <boost/asio/async_result.hpp>
+#include <boost/asio/detail/io_object_impl.hpp>
+#include <boost/asio/detail/throw_error.hpp>
+#include <boost/asio/detail/win_object_handle_service.hpp>
+#include <boost/asio/error.hpp>
+#include <boost/asio/execution_context.hpp>
 
-#if defined(ASIO_HAS_MOVE)
-# include <utility>
-#endif // defined(ASIO_HAS_MOVE)
+#include <boost/asio/detail/push_options.hpp>
 
-#include "asio/detail/push_options.hpp"
-
+namespace boost {
 namespace asio {
 namespace windows {
 
@@ -69,7 +67,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined native_handle_type;
 #else
-  typedef asio::detail::win_object_handle_service::native_handle_type
+  typedef boost::asio::detail::win_object_handle_service::native_handle_type
     native_handle_type;
 #endif
 
@@ -99,10 +97,10 @@ public:
    */
   template <typename ExecutionContext>
   explicit basic_object_handle(ExecutionContext& context,
-      typename constraint<
+      constraint_t<
         is_convertible<ExecutionContext&, execution_context&>::value,
         defaulted_constraint
-      >::type = defaulted_constraint())
+      > = defaulted_constraint())
     : impl_(0, 0, context)
   {
   }
@@ -118,15 +116,15 @@ public:
    *
    * @param native_handle The new underlying handle implementation.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    */
   basic_object_handle(const executor_type& ex,
       const native_handle_type& native_handle)
     : impl_(0, ex)
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(), native_handle, ec);
-    asio::detail::throw_error(ec, "assign");
+    boost::asio::detail::throw_error(ec, "assign");
   }
 
   /// Construct an object handle on an existing native handle.
@@ -140,22 +138,21 @@ public:
    *
    * @param native_handle The new underlying handle implementation.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    */
   template <typename ExecutionContext>
   basic_object_handle(ExecutionContext& context,
       const native_handle_type& native_handle,
-      typename constraint<
+      constraint_t<
         is_convertible<ExecutionContext&, execution_context&>::value
-      >::type = 0)
+      > = 0)
     : impl_(0, 0, context)
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(), native_handle, ec);
-    asio::detail::throw_error(ec, "assign");
+    boost::asio::detail::throw_error(ec, "assign");
   }
 
-#if defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
   /// Move-construct an object handle from another.
   /**
    * This constructor moves an object handle from one object to another.
@@ -206,10 +203,10 @@ public:
    */
   template<typename Executor1>
   basic_object_handle(basic_object_handle<Executor1>&& other,
-      typename constraint<
+      constraint_t<
         is_convertible<Executor1, Executor>::value,
         defaulted_constraint
-      >::type = defaulted_constraint())
+      > = defaulted_constraint())
     : impl_(std::move(other.impl_))
   {
   }
@@ -226,18 +223,17 @@ public:
    * constructor.
    */
   template<typename Executor1>
-  typename constraint<
+  constraint_t<
     is_convertible<Executor1, Executor>::value,
     basic_object_handle&
-  >::type operator=(basic_object_handle<Executor1>&& other)
+  > operator=(basic_object_handle<Executor1>&& other)
   {
     impl_ = std::move(other.impl_);
     return *this;
   }
-#endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
 
   /// Get the executor associated with the object.
-  const executor_type& get_executor() ASIO_NOEXCEPT
+  const executor_type& get_executor() noexcept
   {
     return impl_.get_executor();
   }
@@ -276,13 +272,13 @@ public:
    *
    * @param handle A native handle.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    */
   void assign(const native_handle_type& handle)
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(), handle, ec);
-    asio::detail::throw_error(ec, "assign");
+    boost::asio::detail::throw_error(ec, "assign");
   }
 
   /// Assign an existing native handle to the handle.
@@ -293,11 +289,11 @@ public:
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  ASIO_SYNC_OP_VOID assign(const native_handle_type& handle,
-      asio::error_code& ec)
+  BOOST_ASIO_SYNC_OP_VOID assign(const native_handle_type& handle,
+      boost::system::error_code& ec)
   {
     impl_.get_service().assign(impl_.get_implementation(), handle, ec);
-    ASIO_SYNC_OP_VOID_RETURN(ec);
+    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Determine whether the handle is open.
@@ -310,29 +306,29 @@ public:
   /**
    * This function is used to close the handle. Any asynchronous read or write
    * operations will be cancelled immediately, and will complete with the
-   * asio::error::operation_aborted error.
+   * boost::asio::error::operation_aborted error.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    */
   void close()
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     impl_.get_service().close(impl_.get_implementation(), ec);
-    asio::detail::throw_error(ec, "close");
+    boost::asio::detail::throw_error(ec, "close");
   }
 
   /// Close the handle.
   /**
    * This function is used to close the handle. Any asynchronous read or write
    * operations will be cancelled immediately, and will complete with the
-   * asio::error::operation_aborted error.
+   * boost::asio::error::operation_aborted error.
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  ASIO_SYNC_OP_VOID close(asio::error_code& ec)
+  BOOST_ASIO_SYNC_OP_VOID close(boost::system::error_code& ec)
   {
     impl_.get_service().close(impl_.get_implementation(), ec);
-    ASIO_SYNC_OP_VOID_RETURN(ec);
+    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Get the native handle representation.
@@ -350,29 +346,29 @@ public:
   /**
    * This function causes all outstanding asynchronous read or write operations
    * to finish immediately, and the handlers for cancelled operations will be
-   * passed the asio::error::operation_aborted error.
+   * passed the boost::asio::error::operation_aborted error.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    */
   void cancel()
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     impl_.get_service().cancel(impl_.get_implementation(), ec);
-    asio::detail::throw_error(ec, "cancel");
+    boost::asio::detail::throw_error(ec, "cancel");
   }
 
   /// Cancel all asynchronous operations associated with the handle.
   /**
    * This function causes all outstanding asynchronous read or write operations
    * to finish immediately, and the handlers for cancelled operations will be
-   * passed the asio::error::operation_aborted error.
+   * passed the boost::asio::error::operation_aborted error.
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  ASIO_SYNC_OP_VOID cancel(asio::error_code& ec)
+  BOOST_ASIO_SYNC_OP_VOID cancel(boost::system::error_code& ec)
   {
     impl_.get_service().cancel(impl_.get_implementation(), ec);
-    ASIO_SYNC_OP_VOID_RETURN(ec);
+    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Perform a blocking wait on the object handle.
@@ -381,13 +377,13 @@ public:
    * signalled state. This function blocks and does not return until the object
    * handle has been set to the signalled state.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    */
   void wait()
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     impl_.get_service().wait(impl_.get_implementation(), ec);
-    asio::detail::throw_error(ec, "wait");
+    boost::asio::detail::throw_error(ec, "wait");
   }
 
   /// Perform a blocking wait on the object handle.
@@ -398,7 +394,7 @@ public:
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  void wait(asio::error_code& ec)
+  void wait(boost::system::error_code& ec)
   {
     impl_.get_service().wait(impl_.get_implementation(), ec);
   }
@@ -415,36 +411,33 @@ public:
    * @ref yield_context, or a function object with the correct completion
    * signature. The function signature of the completion handler must be:
    * @code void handler(
-   *   const asio::error_code& error // Result of operation.
+   *   const boost::system::error_code& error // Result of operation.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using boost::asio::async_immediate().
    *
    * @par Completion Signature
-   * @code void(asio::error_code) @endcode
+   * @code void(boost::system::error_code) @endcode
    */
   template <
-      ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code))
-        WaitToken ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX(WaitToken,
-      void (asio::error_code))
-  async_wait(
-      ASIO_MOVE_ARG(WaitToken) token
-        ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
-    ASIO_INITFN_AUTO_RESULT_TYPE_SUFFIX((
-      async_initiate<WaitToken, void (asio::error_code)>(
-          declval<initiate_async_wait>(), token)))
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code))
+        WaitToken = default_completion_token_t<executor_type>>
+  auto async_wait(
+      WaitToken&& token = default_completion_token_t<executor_type>())
+    -> decltype(
+      async_initiate<WaitToken, void (boost::system::error_code)>(
+        declval<initiate_async_wait>(), token))
   {
-    return async_initiate<WaitToken, void (asio::error_code)>(
+    return async_initiate<WaitToken, void (boost::system::error_code)>(
         initiate_async_wait(this), token);
   }
 
 private:
   // Disallow copying and assignment.
-  basic_object_handle(const basic_object_handle&) ASIO_DELETED;
-  basic_object_handle& operator=(const basic_object_handle&) ASIO_DELETED;
+  basic_object_handle(const basic_object_handle&) = delete;
+  basic_object_handle& operator=(const basic_object_handle&) = delete;
 
   class initiate_async_wait
   {
@@ -456,17 +449,17 @@ private:
     {
     }
 
-    const executor_type& get_executor() const ASIO_NOEXCEPT
+    const executor_type& get_executor() const noexcept
     {
       return self_->get_executor();
     }
 
     template <typename WaitHandler>
-    void operator()(ASIO_MOVE_ARG(WaitHandler) handler) const
+    void operator()(WaitHandler&& handler) const
     {
       // If you get an error on the following line it means that your handler
       // does not meet the documented type requirements for a WaitHandler.
-      ASIO_WAIT_HANDLER_CHECK(WaitHandler, handler) type_check;
+      BOOST_ASIO_WAIT_HANDLER_CHECK(WaitHandler, handler) type_check;
 
       detail::non_const_lvalue<WaitHandler> handler2(handler);
       self_->impl_.get_service().async_wait(
@@ -478,16 +471,17 @@ private:
     basic_object_handle* self_;
   };
 
-  asio::detail::io_object_impl<
-    asio::detail::win_object_handle_service, Executor> impl_;
+  boost::asio::detail::io_object_impl<
+    boost::asio::detail::win_object_handle_service, Executor> impl_;
 };
 
 } // namespace windows
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // defined(ASIO_HAS_WINDOWS_OBJECT_HANDLE)
+#endif // defined(BOOST_ASIO_HAS_WINDOWS_OBJECT_HANDLE)
        //   || defined(GENERATING_DOCUMENTATION)
 
-#endif // ASIO_WINDOWS_BASIC_OBJECT_HANDLE_HPP
+#endif // BOOST_ASIO_WINDOWS_BASIC_OBJECT_HANDLE_HPP

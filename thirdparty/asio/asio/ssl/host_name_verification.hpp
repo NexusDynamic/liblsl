@@ -2,27 +2,28 @@
 // ssl/host_name_verification.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_SSL_HOST_NAME_VERIFICATION_HPP
-#define ASIO_SSL_HOST_NAME_VERIFICATION_HPP
+#ifndef BOOST_ASIO_SSL_HOST_NAME_VERIFICATION_HPP
+#define BOOST_ASIO_SSL_HOST_NAME_VERIFICATION_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 
 #include <string>
-#include "asio/ssl/detail/openssl_types.hpp"
-#include "asio/ssl/verify_context.hpp"
+#include <boost/asio/ssl/detail/openssl_types.hpp>
+#include <boost/asio/ssl/verify_context.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace ssl {
 
@@ -33,8 +34,8 @@ namespace ssl {
  * The following example shows how to synchronously open a secure connection to
  * a given host name:
  * @code
- * using asio::ip::tcp;
- * namespace ssl = asio::ssl;
+ * using boost::asio::ip::tcp;
+ * namespace ssl = boost::asio::ssl;
  * typedef ssl::stream<tcp::socket> ssl_socket;
  *
  * // Create a context that uses the default paths for finding CA certificates.
@@ -42,11 +43,11 @@ namespace ssl {
  * ctx.set_default_verify_paths();
  *
  * // Open a socket and connect it to the remote host.
- * asio::io_context io_context;
+ * boost::asio::io_context io_context;
  * ssl_socket sock(io_context, ctx);
  * tcp::resolver resolver(io_context);
  * tcp::resolver::query query("host.name", "https");
- * asio::connect(sock.lowest_layer(), resolver.resolve(query));
+ * boost::asio::connect(sock.lowest_layer(), resolver.resolve(query));
  * sock.lowest_layer().set_option(tcp::no_delay(true));
  *
  * // Perform SSL handshake and verify the remote host's certificate.
@@ -70,7 +71,7 @@ public:
   }
 
   /// Perform certificate verification.
-  ASIO_DECL bool operator()(bool preverified, verify_context& ctx) const;
+  BOOST_ASIO_DECL bool operator()(bool preverified, verify_context& ctx) const;
 
 private:
   // Helper function to check a host name against an IPv4 address
@@ -80,11 +81,12 @@ private:
 
 } // namespace ssl
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#if defined(ASIO_HEADER_ONLY)
-# include "asio/ssl/impl/host_name_verification.ipp"
-#endif // defined(ASIO_HEADER_ONLY)
+#if defined(BOOST_ASIO_HEADER_ONLY)
+# include <boost/asio/ssl/impl/host_name_verification.ipp>
+#endif // defined(BOOST_ASIO_HEADER_ONLY)
 
-#endif // ASIO_SSL_HOST_NAME_VERIFICATION_HPP
+#endif // BOOST_ASIO_SSL_HOST_NAME_VERIFICATION_HPP

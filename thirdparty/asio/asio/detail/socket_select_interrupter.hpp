@@ -2,31 +2,32 @@
 // detail/socket_select_interrupter.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_DETAIL_SOCKET_SELECT_INTERRUPTER_HPP
-#define ASIO_DETAIL_SOCKET_SELECT_INTERRUPTER_HPP
+#ifndef BOOST_ASIO_DETAIL_SOCKET_SELECT_INTERRUPTER_HPP
+#define BOOST_ASIO_DETAIL_SOCKET_SELECT_INTERRUPTER_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 
-#if !defined(ASIO_WINDOWS_RUNTIME)
+#if !defined(BOOST_ASIO_WINDOWS_RUNTIME)
 
-#if defined(ASIO_WINDOWS) \
+#if defined(BOOST_ASIO_WINDOWS) \
   || defined(__CYGWIN__) \
   || defined(__SYMBIAN32__)
 
-#include "asio/detail/socket_types.hpp"
+#include <boost/asio/detail/socket_types.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -34,19 +35,19 @@ class socket_select_interrupter
 {
 public:
   // Constructor.
-  ASIO_DECL socket_select_interrupter();
+  BOOST_ASIO_DECL socket_select_interrupter();
 
   // Destructor.
-  ASIO_DECL ~socket_select_interrupter();
+  BOOST_ASIO_DECL ~socket_select_interrupter();
 
   // Recreate the interrupter's descriptors. Used after a fork.
-  ASIO_DECL void recreate();
+  BOOST_ASIO_DECL void recreate();
 
   // Interrupt the select call.
-  ASIO_DECL void interrupt();
+  BOOST_ASIO_DECL void interrupt();
 
   // Reset the select interrupter. Returns true if the reset was successful.
-  ASIO_DECL bool reset();
+  BOOST_ASIO_DECL bool reset();
 
   // Get the read descriptor to be passed to select.
   socket_type read_descriptor() const
@@ -56,10 +57,10 @@ public:
 
 private:
   // Open the descriptors. Throws on error.
-  ASIO_DECL void open_descriptors();
+  BOOST_ASIO_DECL void open_descriptors();
 
   // Close the descriptors.
-  ASIO_DECL void close_descriptors();
+  BOOST_ASIO_DECL void close_descriptors();
 
   // The read end of a connection used to interrupt the select call. This file
   // descriptor is passed to select such that when it is time to stop, a single
@@ -75,17 +76,18 @@ private:
 
 } // namespace detail
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#if defined(ASIO_HEADER_ONLY)
-# include "asio/detail/impl/socket_select_interrupter.ipp"
-#endif // defined(ASIO_HEADER_ONLY)
+#if defined(BOOST_ASIO_HEADER_ONLY)
+# include <boost/asio/detail/impl/socket_select_interrupter.ipp>
+#endif // defined(BOOST_ASIO_HEADER_ONLY)
 
-#endif // defined(ASIO_WINDOWS)
+#endif // defined(BOOST_ASIO_WINDOWS)
        // || defined(__CYGWIN__)
        // || defined(__SYMBIAN32__)
 
-#endif // !defined(ASIO_WINDOWS_RUNTIME)
+#endif // !defined(BOOST_ASIO_WINDOWS_RUNTIME)
 
-#endif // ASIO_DETAIL_SOCKET_SELECT_INTERRUPTER_HPP
+#endif // BOOST_ASIO_DETAIL_SOCKET_SELECT_INTERRUPTER_HPP

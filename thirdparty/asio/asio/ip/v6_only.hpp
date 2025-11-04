@@ -2,24 +2,25 @@
 // ip/v6_only.hpp
 // ~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_IP_V6_ONLY_HPP
-#define ASIO_IP_V6_ONLY_HPP
+#ifndef BOOST_ASIO_IP_V6_ONLY_HPP
+#define BOOST_ASIO_IP_V6_ONLY_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/detail/socket_option.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <boost/asio/detail/socket_option.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace ip {
 
@@ -31,18 +32,18 @@ namespace ip {
  * @par Examples
  * Setting the option:
  * @code
- * asio::ip::tcp::socket socket(my_context);
+ * boost::asio::ip::tcp::socket socket(my_context);
  * ...
- * asio::ip::v6_only option(true);
+ * boost::asio::ip::v6_only option(true);
  * socket.set_option(option);
  * @endcode
  *
  * @par
  * Getting the current option value:
  * @code
- * asio::ip::tcp::socket socket(my_context);
+ * boost::asio::ip::tcp::socket socket(my_context);
  * ...
- * asio::ip::v6_only option;
+ * boost::asio::ip::v6_only option;
  * socket.get_option(option);
  * bool v6_only = option.value();
  * @endcode
@@ -53,17 +54,18 @@ namespace ip {
 #if defined(GENERATING_DOCUMENTATION)
 typedef implementation_defined v6_only;
 #elif defined(IPV6_V6ONLY)
-typedef asio::detail::socket_option::boolean<
+typedef boost::asio::detail::socket_option::boolean<
     IPPROTO_IPV6, IPV6_V6ONLY> v6_only;
 #else
-typedef asio::detail::socket_option::boolean<
-    asio::detail::custom_socket_option_level,
-    asio::detail::always_fail_option> v6_only;
+typedef boost::asio::detail::socket_option::boolean<
+    boost::asio::detail::custom_socket_option_level,
+    boost::asio::detail::always_fail_option> v6_only;
 #endif
 
 } // namespace ip
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_IP_V6_ONLY_HPP
+#endif // BOOST_ASIO_IP_V6_ONLY_HPP

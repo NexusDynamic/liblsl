@@ -2,28 +2,29 @@
 // buffers_iterator.hpp
 // ~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_BUFFERS_ITERATOR_HPP
-#define ASIO_BUFFERS_ITERATOR_HPP
+#ifndef BOOST_ASIO_BUFFERS_ITERATOR_HPP
+#define BOOST_ASIO_BUFFERS_ITERATOR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 #include <cstddef>
 #include <iterator>
-#include "asio/buffer.hpp"
-#include "asio/detail/assert.hpp"
-#include "asio/detail/type_traits.hpp"
+#include <boost/asio/buffer.hpp>
+#include <boost/asio/detail/assert.hpp>
+#include <boost/asio/detail/type_traits.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 
 namespace detail
@@ -38,7 +39,7 @@ namespace detail
     template <typename ByteType>
     struct byte_type
     {
-      typedef typename add_const<ByteType>::type type;
+      typedef add_const_t<ByteType> type;
     };
   };
 
@@ -80,30 +81,10 @@ namespace detail
   struct buffers_iterator_types<const_buffer, ByteType>
   {
     typedef const_buffer buffer_type;
-    typedef typename add_const<ByteType>::type byte_type;
+    typedef add_const_t<ByteType> byte_type;
     typedef const const_buffer* const_iterator;
   };
-
-#if !defined(ASIO_NO_DEPRECATED)
-
-  template <typename ByteType>
-  struct buffers_iterator_types<mutable_buffers_1, ByteType>
-  {
-    typedef mutable_buffer buffer_type;
-    typedef ByteType byte_type;
-    typedef const mutable_buffer* const_iterator;
-  };
-
-  template <typename ByteType>
-  struct buffers_iterator_types<const_buffers_1, ByteType>
-  {
-    typedef const_buffer buffer_type;
-    typedef typename add_const<ByteType>::type byte_type;
-    typedef const const_buffer* const_iterator;
-  };
-
-#endif // !defined(ASIO_NO_DEPRECATED)
-}
+} // namespace detail
 
 /// A random access iterator over the bytes in a buffer sequence.
 template <typename BufferSequence, typename ByteType = char>
@@ -170,9 +151,9 @@ public:
 #endif // defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 3)
   {
     buffers_iterator new_iter;
-    new_iter.begin_ = asio::buffer_sequence_begin(buffers);
-    new_iter.current_ = asio::buffer_sequence_begin(buffers);
-    new_iter.end_ = asio::buffer_sequence_end(buffers);
+    new_iter.begin_ = boost::asio::buffer_sequence_begin(buffers);
+    new_iter.current_ = boost::asio::buffer_sequence_begin(buffers);
+    new_iter.end_ = boost::asio::buffer_sequence_end(buffers);
     while (new_iter.current_ != new_iter.end_)
     {
       new_iter.current_buffer_ = *new_iter.current_;
@@ -190,9 +171,9 @@ public:
 #endif // defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 3)
   {
     buffers_iterator new_iter;
-    new_iter.begin_ = asio::buffer_sequence_begin(buffers);
-    new_iter.current_ = asio::buffer_sequence_begin(buffers);
-    new_iter.end_ = asio::buffer_sequence_end(buffers);
+    new_iter.begin_ = boost::asio::buffer_sequence_begin(buffers);
+    new_iter.current_ = boost::asio::buffer_sequence_begin(buffers);
+    new_iter.end_ = boost::asio::buffer_sequence_end(buffers);
     while (new_iter.current_ != new_iter.end_)
     {
       buffer_type buffer = *new_iter.current_;
@@ -353,7 +334,7 @@ private:
   // Increment the iterator.
   void increment()
   {
-    ASIO_ASSERT(current_ != end_ && "iterator out of bounds");
+    BOOST_ASIO_ASSERT(current_ != end_ && "iterator out of bounds");
     ++position_;
 
     // Check if the increment can be satisfied by the current buffer.
@@ -376,7 +357,7 @@ private:
   // Decrement the iterator.
   void decrement()
   {
-    ASIO_ASSERT(position_ > 0 && "iterator out of bounds");
+    BOOST_ASIO_ASSERT(position_ > 0 && "iterator out of bounds");
     --position_;
 
     // Check if the decrement can be satisfied by the current buffer.
@@ -408,7 +389,7 @@ private:
   {
     if (n > 0)
     {
-      ASIO_ASSERT(current_ != end_ && "iterator out of bounds");
+      BOOST_ASIO_ASSERT(current_ != end_ && "iterator out of bounds");
       for (;;)
       {
         std::ptrdiff_t current_buffer_balance
@@ -430,7 +411,7 @@ private:
         // next iteration of this loop.
         if (++current_ == end_)
         {
-          ASIO_ASSERT(n == 0 && "iterator out of bounds");
+          BOOST_ASIO_ASSERT(n == 0 && "iterator out of bounds");
           current_buffer_ = buffer_type();
           current_buffer_position_ = 0;
           return;
@@ -442,7 +423,7 @@ private:
     else if (n < 0)
     {
       std::size_t abs_n = -n;
-      ASIO_ASSERT(position_ >= abs_n && "iterator out of bounds");
+      BOOST_ASIO_ASSERT(position_ >= abs_n && "iterator out of bounds");
       for (;;)
       {
         // Check if the advance can be satisfied by the current buffer.
@@ -460,7 +441,7 @@ private:
         // Check if we've reached the beginning of the buffers.
         if (current_ == begin_)
         {
-          ASIO_ASSERT(abs_n == 0 && "iterator out of bounds");
+          BOOST_ASIO_ASSERT(abs_n == 0 && "iterator out of bounds");
           current_buffer_position_ = 0;
           return;
         }
@@ -515,7 +496,8 @@ inline buffers_iterator<BufferSequence> buffers_end(
 }
 
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_BUFFERS_ITERATOR_HPP
+#endif // BOOST_ASIO_BUFFERS_ITERATOR_HPP

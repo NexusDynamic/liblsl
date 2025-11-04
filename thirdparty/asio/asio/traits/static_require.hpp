@@ -2,31 +2,28 @@
 // traits/static_require.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_TRAITS_STATIC_REQUIRE_HPP
-#define ASIO_TRAITS_STATIC_REQUIRE_HPP
+#ifndef BOOST_ASIO_TRAITS_STATIC_REQUIRE_HPP
+#define BOOST_ASIO_TRAITS_STATIC_REQUIRE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/detail/type_traits.hpp"
-#include "asio/traits/static_query.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <boost/asio/detail/type_traits.hpp>
+#include <boost/asio/traits/static_query.hpp>
 
-#if defined(ASIO_HAS_DECLTYPE) \
-  && defined(ASIO_HAS_NOEXCEPT)
-# define ASIO_HAS_DEDUCED_STATIC_REQUIRE_TRAIT 1
-#endif // defined(ASIO_HAS_DECLTYPE)
-       //   && defined(ASIO_HAS_NOEXCEPT)
+#define BOOST_ASIO_HAS_DEDUCED_STATIC_REQUIRE_TRAIT 1
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace traits {
 
@@ -41,66 +38,62 @@ namespace detail {
 
 struct no_static_require
 {
-  ASIO_STATIC_CONSTEXPR(bool, is_valid = false);
+  static constexpr bool is_valid = false;
 };
 
 template <typename T, typename Property, typename = void>
 struct static_require_trait :
-  conditional<
-    is_same<T, typename decay<T>::type>::value
-      && is_same<Property, typename decay<Property>::type>::value,
+  conditional_t<
+    is_same<T, decay_t<T>>::value
+      && is_same<Property, decay_t<Property>>::value,
     no_static_require,
     traits::static_require<
-      typename decay<T>::type,
-      typename decay<Property>::type>
-  >::type
+      decay_t<T>,
+      decay_t<Property>>
+  >
 {
 };
 
-#if defined(ASIO_HAS_DEDUCED_STATIC_REQUIRE_TRAIT)
-
-#if defined(ASIO_HAS_WORKING_EXPRESSION_SFINAE)
+#if defined(BOOST_ASIO_HAS_WORKING_EXPRESSION_SFINAE)
 
 template <typename T, typename Property>
 struct static_require_trait<T, Property,
-  typename enable_if<
-    decay<Property>::type::value() == traits::static_query<T, Property>::value()
-  >::type>
+  enable_if_t<
+    decay_t<Property>::value() == traits::static_query<T, Property>::value()
+  >>
 {
-  ASIO_STATIC_CONSTEXPR(bool, is_valid = true);
+  static constexpr bool is_valid = true;
 };
 
-#else // defined(ASIO_HAS_WORKING_EXPRESSION_SFINAE)
+#else // defined(BOOST_ASIO_HAS_WORKING_EXPRESSION_SFINAE)
 
 false_type static_require_test(...);
 
 template <typename T, typename Property>
 true_type static_require_test(T*, Property*,
-    typename enable_if<
+    enable_if_t<
       Property::value() == traits::static_query<T, Property>::value()
-    >::type* = 0);
+    >* = 0);
 
 template <typename T, typename Property>
 struct has_static_require
 {
-  ASIO_STATIC_CONSTEXPR(bool, value =
+  static constexpr bool value =
     decltype((static_require_test)(
-      static_cast<T*>(0), static_cast<Property*>(0)))::value);
+      static_cast<T*>(0), static_cast<Property*>(0)))::value;
 };
 
 template <typename T, typename Property>
 struct static_require_trait<T, Property,
-  typename enable_if<
-    has_static_require<typename decay<T>::type,
-      typename decay<Property>::type>::value
-  >::type>
+  enable_if_t<
+    has_static_require<decay_t<T>,
+      decay_t<Property>>::value
+  >>
 {
-  ASIO_STATIC_CONSTEXPR(bool, is_valid = true);
+  static constexpr bool is_valid = true;
 };
 
-#endif // defined(ASIO_HAS_WORKING_EXPRESSION_SFINAE)
-
-#endif // defined(ASIO_HAS_DEDUCED_STATIC_REQUIRE_TRAIT)
+#endif // defined(BOOST_ASIO_HAS_WORKING_EXPRESSION_SFINAE)
 
 } // namespace detail
 namespace traits {
@@ -117,7 +110,8 @@ struct static_require : static_require_default<T, Property>
 
 } // namespace traits
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_TRAITS_STATIC_REQUIRE_HPP
+#endif // BOOST_ASIO_TRAITS_STATIC_REQUIRE_HPP

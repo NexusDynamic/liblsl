@@ -2,29 +2,30 @@
 // posix/descriptor_base.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_POSIX_DESCRIPTOR_BASE_HPP
-#define ASIO_POSIX_DESCRIPTOR_BASE_HPP
+#ifndef BOOST_ASIO_POSIX_DESCRIPTOR_BASE_HPP
+#define BOOST_ASIO_POSIX_DESCRIPTOR_BASE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 
-#if defined(ASIO_HAS_POSIX_STREAM_DESCRIPTOR) \
+#if defined(BOOST_ASIO_HAS_POSIX_STREAM_DESCRIPTOR) \
   || defined(GENERATING_DOCUMENTATION)
 
-#include "asio/detail/io_control.hpp"
-#include "asio/detail/socket_option.hpp"
+#include <boost/asio/detail/io_control.hpp>
+#include <boost/asio/detail/socket_option.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace posix {
 
@@ -56,9 +57,9 @@ public:
    *
    * @par Example
    * @code
-   * asio::posix::stream_descriptor descriptor(my_context);
+   * boost::asio::posix::stream_descriptor descriptor(my_context);
    * ...
-   * asio::descriptor_base::bytes_readable command(true);
+   * boost::asio::descriptor_base::bytes_readable command(true);
    * descriptor.io_control(command);
    * std::size_t bytes_readable = command.get();
    * @endcode
@@ -69,7 +70,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined bytes_readable;
 #else
-  typedef asio::detail::io_control::bytes_readable bytes_readable;
+  typedef boost::asio::detail::io_control::bytes_readable bytes_readable;
 #endif
 
 protected:
@@ -81,10 +82,11 @@ protected:
 
 } // namespace posix
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // defined(ASIO_HAS_POSIX_STREAM_DESCRIPTOR)
+#endif // defined(BOOST_ASIO_HAS_POSIX_STREAM_DESCRIPTOR)
        //   || defined(GENERATING_DOCUMENTATION)
 
-#endif // ASIO_POSIX_DESCRIPTOR_BASE_HPP
+#endif // BOOST_ASIO_POSIX_DESCRIPTOR_BASE_HPP

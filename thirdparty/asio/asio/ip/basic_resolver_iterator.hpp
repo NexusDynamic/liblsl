@@ -2,42 +2,43 @@
 // ip/basic_resolver_iterator.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_IP_BASIC_RESOLVER_ITERATOR_HPP
-#define ASIO_IP_BASIC_RESOLVER_ITERATOR_HPP
+#ifndef BOOST_ASIO_IP_BASIC_RESOLVER_ITERATOR_HPP
+#define BOOST_ASIO_IP_BASIC_RESOLVER_ITERATOR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 #include <cstddef>
 #include <cstring>
 #include <iterator>
 #include <string>
 #include <vector>
-#include "asio/detail/memory.hpp"
-#include "asio/detail/socket_ops.hpp"
-#include "asio/detail/socket_types.hpp"
-#include "asio/ip/basic_resolver_entry.hpp"
+#include <boost/asio/detail/memory.hpp>
+#include <boost/asio/detail/socket_ops.hpp>
+#include <boost/asio/detail/socket_types.hpp>
+#include <boost/asio/ip/basic_resolver_entry.hpp>
 
-#if defined(ASIO_WINDOWS_RUNTIME)
-# include "asio/detail/winrt_utils.hpp"
-#endif // defined(ASIO_WINDOWS_RUNTIME)
+#if defined(BOOST_ASIO_WINDOWS_RUNTIME)
+# include <boost/asio/detail/winrt_utils.hpp>
+#endif // defined(BOOST_ASIO_WINDOWS_RUNTIME)
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace ip {
 
 /// An iterator over the entries produced by a resolver.
 /**
- * The asio::ip::basic_resolver_iterator class template is used to define
+ * The boost::asio::ip::basic_resolver_iterator class template is used to define
  * iterators over the results returned by a resolver.
  *
  * The iterator's value_type, obtained when the iterator is dereferenced, is:
@@ -79,15 +80,13 @@ public:
   {
   }
 
-#if defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
   /// Move constructor.
   basic_resolver_iterator(basic_resolver_iterator&& other)
-    : values_(ASIO_MOVE_CAST(values_ptr_type)(other.values_)),
+    : values_(static_cast<values_ptr_type&&>(other.values_)),
       index_(other.index_)
   {
     other.index_ = 0;
   }
-#endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
 
   /// Assignment operator.
   basic_resolver_iterator& operator=(const basic_resolver_iterator& other)
@@ -97,20 +96,18 @@ public:
     return *this;
   }
 
-#if defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
   /// Move-assignment operator.
   basic_resolver_iterator& operator=(basic_resolver_iterator&& other)
   {
     if (this != &other)
     {
-      values_ = ASIO_MOVE_CAST(values_ptr_type)(other.values_);
+      values_ = static_cast<values_ptr_type&&>(other.values_);
       index_ = other.index_;
       other.index_ = 0;
     }
 
     return *this;
   }
-#endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
 
   /// Dereference an iterator.
   const basic_resolver_entry<InternetProtocol>& operator*() const
@@ -178,15 +175,16 @@ protected:
     return (*values_)[index_];
   }
 
-  typedef std::vector<basic_resolver_entry<InternetProtocol> > values_type;
-  typedef asio::detail::shared_ptr<values_type> values_ptr_type;
+  typedef std::vector<basic_resolver_entry<InternetProtocol>> values_type;
+  typedef boost::asio::detail::shared_ptr<values_type> values_ptr_type;
   values_ptr_type values_;
   std::size_t index_;
 };
 
 } // namespace ip
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_IP_BASIC_RESOLVER_ITERATOR_HPP
+#endif // BOOST_ASIO_IP_BASIC_RESOLVER_ITERATOR_HPP

@@ -2,42 +2,43 @@
 // query.hpp
 // ~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_QUERY_HPP
-#define ASIO_QUERY_HPP
+#ifndef BOOST_ASIO_QUERY_HPP
+#define BOOST_ASIO_QUERY_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/detail/type_traits.hpp"
-#include "asio/is_applicable_property.hpp"
-#include "asio/traits/query_member.hpp"
-#include "asio/traits/query_free.hpp"
-#include "asio/traits/static_query.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <boost/asio/detail/type_traits.hpp>
+#include <boost/asio/is_applicable_property.hpp>
+#include <boost/asio/traits/query_member.hpp>
+#include <boost/asio/traits/query_free.hpp>
+#include <boost/asio/traits/static_query.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
 #if defined(GENERATING_DOCUMENTATION)
 
+namespace boost {
 namespace asio {
 
 /// A customisation point that queries the value of a property.
 /**
  * The name <tt>query</tt> denotes a customization point object. The
- * expression <tt>asio::query(E, P)</tt> for some
+ * expression <tt>boost::asio::query(E, P)</tt> for some
  * subexpressions <tt>E</tt> and <tt>P</tt> (with types <tt>T =
  * decay_t<decltype(E)></tt> and <tt>Prop = decay_t<decltype(P)></tt>) is
  * expression-equivalent to:
  *
  * @li If <tt>is_applicable_property_v<T, Prop></tt> is not a well-formed
- *   constant expression with value <tt>true</tt>, <tt>asio::query(E,
+ *   constant expression with value <tt>true</tt>, <tt>boost::asio::query(E,
  *   P)</tt> is ill-formed.
  *
  * @li Otherwise, <tt>Prop::template static_query_v<T></tt> if the expression
@@ -52,14 +53,14 @@ namespace asio {
  *   resolution performed in a context that does not include the declaration
  *   of the <tt>query</tt> customization point object.
  *
- * @li Otherwise, <tt>asio::query(E, P)</tt> is ill-formed.
+ * @li Otherwise, <tt>boost::asio::query(E, P)</tt> is ill-formed.
  */
 inline constexpr unspecified query = unspecified;
 
 /// A type trait that determines whether a @c query expression is well-formed.
 /**
  * Class template @c can_query is a trait that is derived from
- * @c true_type if the expression <tt>asio::query(std::declval<T>(),
+ * @c true_type if the expression <tt>boost::asio::query(std::declval<T>(),
  * std::declval<Property>())</tt> is well formed; otherwise @c false_type.
  */
 template <typename T, typename Property>
@@ -72,7 +73,7 @@ struct can_query :
 /// not throw.
 /**
  * Class template @c is_nothrow_query is a trait that is derived from
- * @c true_type if the expression <tt>asio::query(std::declval<T>(),
+ * @c true_type if the expression <tt>boost::asio::query(std::declval<T>(),
  * std::declval<Property>())</tt> is @c noexcept; otherwise @c false_type.
  */
 template <typename T, typename Property>
@@ -84,7 +85,7 @@ struct is_nothrow_query :
 /// A type trait that determines the result type of a @c query expression.
 /**
  * Class template @c query_result is a trait that determines the result
- * type of the expression <tt>asio::query(std::declval<T>(),
+ * type of the expression <tt>boost::asio::query(std::declval<T>(),
  * std::declval<Property>())</tt>.
  */
 template <typename T, typename Property>
@@ -95,19 +96,20 @@ struct query_result
 };
 
 } // namespace asio
+} // namespace boost
 
 #else // defined(GENERATING_DOCUMENTATION)
 
-namespace asio_query_fn {
+namespace boost_asio_query_fn {
 
-using asio::conditional;
-using asio::decay;
-using asio::declval;
-using asio::enable_if;
-using asio::is_applicable_property;
-using asio::traits::query_free;
-using asio::traits::query_member;
-using asio::traits::static_query;
+using boost::asio::conditional_t;
+using boost::asio::decay_t;
+using boost::asio::declval;
+using boost::asio::enable_if_t;
+using boost::asio::is_applicable_property;
+using boost::asio::traits::query_free;
+using boost::asio::traits::query_member;
+using boost::asio::traits::static_query;
 
 void query();
 
@@ -123,66 +125,66 @@ template <typename Impl, typename T, typename Properties,
     typename = void, typename = void, typename = void, typename = void>
 struct call_traits
 {
-  ASIO_STATIC_CONSTEXPR(overload_type, overload = ill_formed);
-  ASIO_STATIC_CONSTEXPR(bool, is_noexcept = false);
+  static constexpr overload_type overload = ill_formed;
+  static constexpr bool is_noexcept = false;
   typedef void result_type;
 };
 
 template <typename Impl, typename T, typename Property>
 struct call_traits<Impl, T, void(Property),
-  typename enable_if<
+  enable_if_t<
     is_applicable_property<
-      typename decay<T>::type,
-      typename decay<Property>::type
+      decay_t<T>,
+      decay_t<Property>
     >::value
-  >::type,
-  typename enable_if<
+  >,
+  enable_if_t<
     static_query<T, Property>::is_valid
-  >::type> :
+  >> :
   static_query<T, Property>
 {
-  ASIO_STATIC_CONSTEXPR(overload_type, overload = static_value);
+  static constexpr overload_type overload = static_value;
 };
 
 template <typename Impl, typename T, typename Property>
 struct call_traits<Impl, T, void(Property),
-  typename enable_if<
+  enable_if_t<
     is_applicable_property<
-      typename decay<T>::type,
-      typename decay<Property>::type
+      decay_t<T>,
+      decay_t<Property>
     >::value
-  >::type,
-  typename enable_if<
+  >,
+  enable_if_t<
     !static_query<T, Property>::is_valid
-  >::type,
-  typename enable_if<
+  >,
+  enable_if_t<
     query_member<typename Impl::template proxy<T>::type, Property>::is_valid
-  >::type> :
+  >> :
   query_member<typename Impl::template proxy<T>::type, Property>
 {
-  ASIO_STATIC_CONSTEXPR(overload_type, overload = call_member);
+  static constexpr overload_type overload = call_member;
 };
 
 template <typename Impl, typename T, typename Property>
 struct call_traits<Impl, T, void(Property),
-  typename enable_if<
+  enable_if_t<
     is_applicable_property<
-      typename decay<T>::type,
-      typename decay<Property>::type
+      decay_t<T>,
+      decay_t<Property>
     >::value
-  >::type,
-  typename enable_if<
+  >,
+  enable_if_t<
     !static_query<T, Property>::is_valid
-  >::type,
-  typename enable_if<
+  >,
+  enable_if_t<
     !query_member<typename Impl::template proxy<T>::type, Property>::is_valid
-  >::type,
-  typename enable_if<
+  >,
+  enable_if_t<
     query_free<T, Property>::is_valid
-  >::type> :
+  >> :
   query_free<T, Property>
 {
-  ASIO_STATIC_CONSTEXPR(overload_type, overload = call_free);
+  static constexpr overload_type overload = call_free;
 };
 
 struct impl
@@ -190,70 +192,56 @@ struct impl
   template <typename T>
   struct proxy
   {
-#if defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#if defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
     struct type
     {
       template <typename P>
-      auto query(ASIO_MOVE_ARG(P) p)
+      auto query(P&& p)
         noexcept(
           noexcept(
-            declval<typename conditional<true, T, P>::type>().query(
-              ASIO_MOVE_CAST(P)(p))
+            declval<conditional_t<true, T, P>>().query(static_cast<P&&>(p))
           )
         )
         -> decltype(
-          declval<typename conditional<true, T, P>::type>().query(
-            ASIO_MOVE_CAST(P)(p))
+          declval<conditional_t<true, T, P>>().query(static_cast<P&&>(p))
         );
     };
-#else // defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#else // defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
     typedef T type;
-#endif // defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#endif // defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
   };
 
   template <typename T, typename Property>
-  ASIO_NODISCARD ASIO_CONSTEXPR typename enable_if<
+  BOOST_ASIO_NODISCARD constexpr enable_if_t<
     call_traits<impl, T, void(Property)>::overload == static_value,
     typename call_traits<impl, T, void(Property)>::result_type
-  >::type
-  operator()(
-      ASIO_MOVE_ARG(T),
-      ASIO_MOVE_ARG(Property)) const
-    ASIO_NOEXCEPT_IF((
-      call_traits<impl, T, void(Property)>::is_noexcept))
+  >
+  operator()(T&&, Property&&) const
+    noexcept(call_traits<impl, T, void(Property)>::is_noexcept)
   {
-    return static_query<
-      typename decay<T>::type,
-      typename decay<Property>::type
-    >::value();
+    return static_query<decay_t<T>, decay_t<Property>>::value();
   }
 
   template <typename T, typename Property>
-  ASIO_NODISCARD ASIO_CONSTEXPR typename enable_if<
+  BOOST_ASIO_NODISCARD constexpr enable_if_t<
     call_traits<impl, T, void(Property)>::overload == call_member,
     typename call_traits<impl, T, void(Property)>::result_type
-  >::type
-  operator()(
-      ASIO_MOVE_ARG(T) t,
-      ASIO_MOVE_ARG(Property) p) const
-    ASIO_NOEXCEPT_IF((
-      call_traits<impl, T, void(Property)>::is_noexcept))
+  >
+  operator()(T&& t, Property&& p) const
+    noexcept(call_traits<impl, T, void(Property)>::is_noexcept)
   {
-    return ASIO_MOVE_CAST(T)(t).query(ASIO_MOVE_CAST(Property)(p));
+    return static_cast<T&&>(t).query(static_cast<Property&&>(p));
   }
 
   template <typename T, typename Property>
-  ASIO_NODISCARD ASIO_CONSTEXPR typename enable_if<
+  BOOST_ASIO_NODISCARD constexpr enable_if_t<
     call_traits<impl, T, void(Property)>::overload == call_free,
     typename call_traits<impl, T, void(Property)>::result_type
-  >::type
-  operator()(
-      ASIO_MOVE_ARG(T) t,
-      ASIO_MOVE_ARG(Property) p) const
-    ASIO_NOEXCEPT_IF((
-      call_traits<impl, T, void(Property)>::is_noexcept))
+  >
+  operator()(T&& t, Property&& p) const
+    noexcept(call_traits<impl, T, void(Property)>::is_noexcept)
   {
-    return query(ASIO_MOVE_CAST(T)(t), ASIO_MOVE_CAST(Property)(p));
+    return query(static_cast<T&&>(t), static_cast<Property&&>(p));
   }
 };
 
@@ -266,59 +254,62 @@ struct static_instance
 template <typename T>
 const T static_instance<T>::instance = {};
 
-} // namespace asio_query_fn
+} // namespace boost_asio_query_fn
+namespace boost {
 namespace asio {
 namespace {
 
-static ASIO_CONSTEXPR const asio_query_fn::impl&
-  query = asio_query_fn::static_instance<>::instance;
+static constexpr const boost_asio_query_fn::impl&
+  query = boost_asio_query_fn::static_instance<>::instance;
 
 } // namespace
 
-typedef asio_query_fn::impl query_t;
+typedef boost_asio_query_fn::impl query_t;
 
 template <typename T, typename Property>
 struct can_query :
   integral_constant<bool,
-    asio_query_fn::call_traits<query_t, T, void(Property)>::overload !=
-      asio_query_fn::ill_formed>
+    boost_asio_query_fn::call_traits<query_t, T, void(Property)>::overload !=
+      boost_asio_query_fn::ill_formed>
 {
 };
 
-#if defined(ASIO_HAS_VARIABLE_TEMPLATES)
+#if defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
 
 template <typename T, typename Property>
-constexpr bool can_query_v
-  = can_query<T, Property>::value;
+constexpr bool can_query_v = can_query<T, Property>::value;
 
-#endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
 
 template <typename T, typename Property>
 struct is_nothrow_query :
   integral_constant<bool,
-    asio_query_fn::call_traits<query_t, T, void(Property)>::is_noexcept>
+    boost_asio_query_fn::call_traits<query_t, T, void(Property)>::is_noexcept>
 {
 };
 
-#if defined(ASIO_HAS_VARIABLE_TEMPLATES)
+#if defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
 
 template <typename T, typename Property>
-constexpr bool is_nothrow_query_v
-  = is_nothrow_query<T, Property>::value;
+constexpr bool is_nothrow_query_v = is_nothrow_query<T, Property>::value;
 
-#endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
+#endif // defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
 
 template <typename T, typename Property>
 struct query_result
 {
-  typedef typename asio_query_fn::call_traits<
+  typedef typename boost_asio_query_fn::call_traits<
       query_t, T, void(Property)>::result_type type;
 };
 
+template <typename T, typename Property>
+using query_result_t = typename query_result<T, Property>::type;
+
 } // namespace asio
+} // namespace boost
 
 #endif // defined(GENERATING_DOCUMENTATION)
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_QUERY_HPP
+#endif // BOOST_ASIO_QUERY_HPP

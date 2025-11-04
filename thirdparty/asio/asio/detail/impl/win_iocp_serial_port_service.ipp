@@ -2,29 +2,30 @@
 // detail/impl/win_iocp_serial_port_service.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Copyright (c) 2008 Rep Invariant Systems, Inc. (info@repinvariant.com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_DETAIL_IMPL_WIN_IOCP_SERIAL_PORT_SERVICE_IPP
-#define ASIO_DETAIL_IMPL_WIN_IOCP_SERIAL_PORT_SERVICE_IPP
+#ifndef BOOST_ASIO_DETAIL_IMPL_WIN_IOCP_SERIAL_PORT_SERVICE_IPP
+#define BOOST_ASIO_DETAIL_IMPL_WIN_IOCP_SERIAL_PORT_SERVICE_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 
-#if defined(ASIO_HAS_IOCP) && defined(ASIO_HAS_SERIAL_PORT)
+#if defined(BOOST_ASIO_HAS_IOCP) && defined(BOOST_ASIO_HAS_SERIAL_PORT)
 
 #include <cstring>
-#include "asio/detail/win_iocp_serial_port_service.hpp"
+#include <boost/asio/detail/win_iocp_serial_port_service.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -39,14 +40,14 @@ void win_iocp_serial_port_service::shutdown()
 {
 }
 
-asio::error_code win_iocp_serial_port_service::open(
+boost::system::error_code win_iocp_serial_port_service::open(
     win_iocp_serial_port_service::implementation_type& impl,
-    const std::string& device, asio::error_code& ec)
+    const std::string& device, boost::system::error_code& ec)
 {
   if (is_open(impl))
   {
-    ec = asio::error::already_open;
-    ASIO_ERROR_LOCATION(ec);
+    ec = boost::asio::error::already_open;
+    BOOST_ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -60,9 +61,9 @@ asio::error_code win_iocp_serial_port_service::open(
   if (handle == INVALID_HANDLE_VALUE)
   {
     DWORD last_error = ::GetLastError();
-    ec = asio::error_code(last_error,
-        asio::error::get_system_category());
-    ASIO_ERROR_LOCATION(ec);
+    ec = boost::system::error_code(last_error,
+        boost::asio::error::get_system_category());
+    BOOST_ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -75,9 +76,9 @@ asio::error_code win_iocp_serial_port_service::open(
   {
     DWORD last_error = ::GetLastError();
     ::CloseHandle(handle);
-    ec = asio::error_code(last_error,
-        asio::error::get_system_category());
-    ASIO_ERROR_LOCATION(ec);
+    ec = boost::system::error_code(last_error,
+        boost::asio::error::get_system_category());
+    BOOST_ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -102,9 +103,9 @@ asio::error_code win_iocp_serial_port_service::open(
   {
     DWORD last_error = ::GetLastError();
     ::CloseHandle(handle);
-    ec = asio::error_code(last_error,
-        asio::error::get_system_category());
-    ASIO_ERROR_LOCATION(ec);
+    ec = boost::system::error_code(last_error,
+        boost::asio::error::get_system_category());
+    BOOST_ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -121,9 +122,9 @@ asio::error_code win_iocp_serial_port_service::open(
   {
     DWORD last_error = ::GetLastError();
     ::CloseHandle(handle);
-    ec = asio::error_code(last_error,
-        asio::error::get_system_category());
-    ASIO_ERROR_LOCATION(ec);
+    ec = boost::system::error_code(last_error,
+        boost::asio::error::get_system_category());
+    BOOST_ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -133,10 +134,10 @@ asio::error_code win_iocp_serial_port_service::open(
   return ec;
 }
 
-asio::error_code win_iocp_serial_port_service::do_set_option(
+boost::system::error_code win_iocp_serial_port_service::do_set_option(
     win_iocp_serial_port_service::implementation_type& impl,
     win_iocp_serial_port_service::store_function_type store,
-    const void* option, asio::error_code& ec)
+    const void* option, boost::system::error_code& ec)
 {
   using namespace std; // For memcpy.
 
@@ -146,9 +147,9 @@ asio::error_code win_iocp_serial_port_service::do_set_option(
   if (!::GetCommState(handle_service_.native_handle(impl), &dcb))
   {
     DWORD last_error = ::GetLastError();
-    ec = asio::error_code(last_error,
-        asio::error::get_system_category());
-    ASIO_ERROR_LOCATION(ec);
+    ec = boost::system::error_code(last_error,
+        boost::asio::error::get_system_category());
+    BOOST_ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -158,20 +159,20 @@ asio::error_code win_iocp_serial_port_service::do_set_option(
   if (!::SetCommState(handle_service_.native_handle(impl), &dcb))
   {
     DWORD last_error = ::GetLastError();
-    ec = asio::error_code(last_error,
-        asio::error::get_system_category());
-    ASIO_ERROR_LOCATION(ec);
+    ec = boost::system::error_code(last_error,
+        boost::asio::error::get_system_category());
+    BOOST_ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
-  ec = asio::error_code();
+  ec = boost::system::error_code();
   return ec;
 }
 
-asio::error_code win_iocp_serial_port_service::do_get_option(
+boost::system::error_code win_iocp_serial_port_service::do_get_option(
     const win_iocp_serial_port_service::implementation_type& impl,
     win_iocp_serial_port_service::load_function_type load,
-    void* option, asio::error_code& ec) const
+    void* option, boost::system::error_code& ec) const
 {
   using namespace std; // For memset.
 
@@ -181,9 +182,9 @@ asio::error_code win_iocp_serial_port_service::do_get_option(
   if (!::GetCommState(handle_service_.native_handle(impl), &dcb))
   {
     DWORD last_error = ::GetLastError();
-    ec = asio::error_code(last_error,
-        asio::error::get_system_category());
-    ASIO_ERROR_LOCATION(ec);
+    ec = boost::system::error_code(last_error,
+        boost::asio::error::get_system_category());
+    BOOST_ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -192,9 +193,10 @@ asio::error_code win_iocp_serial_port_service::do_get_option(
 
 } // namespace detail
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // defined(ASIO_HAS_IOCP) && defined(ASIO_HAS_SERIAL_PORT)
+#endif // defined(BOOST_ASIO_HAS_IOCP) && defined(BOOST_ASIO_HAS_SERIAL_PORT)
 
-#endif // ASIO_DETAIL_IMPL_WIN_IOCP_SERIAL_PORT_SERVICE_IPP
+#endif // BOOST_ASIO_DETAIL_IMPL_WIN_IOCP_SERIAL_PORT_SERVICE_IPP

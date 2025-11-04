@@ -2,25 +2,26 @@
 // detail/socket_holder.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_DETAIL_SOCKET_HOLDER_HPP
-#define ASIO_DETAIL_SOCKET_HOLDER_HPP
+#ifndef BOOST_ASIO_DETAIL_SOCKET_HOLDER_HPP
+#define BOOST_ASIO_DETAIL_SOCKET_HOLDER_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/detail/noncopyable.hpp"
-#include "asio/detail/socket_ops.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <boost/asio/detail/noncopyable.hpp>
+#include <boost/asio/detail/socket_ops.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -46,7 +47,7 @@ public:
   {
     if (socket_ != invalid_socket)
     {
-      asio::error_code ec;
+      boost::system::error_code ec;
       socket_ops::state_type state = 0;
       socket_ops::close(socket_, state, true, ec);
     }
@@ -63,7 +64,7 @@ public:
   {
     if (socket_ != invalid_socket)
     {
-      asio::error_code ec;
+      boost::system::error_code ec;
       socket_ops::state_type state = 0;
       socket_ops::close(socket_, state, true, ec);
       socket_ = invalid_socket;
@@ -92,7 +93,8 @@ private:
 
 } // namespace detail
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_DETAIL_SOCKET_HOLDER_HPP
+#endif // BOOST_ASIO_DETAIL_SOCKET_HOLDER_HPP

@@ -2,65 +2,73 @@
 // detail/impl/kqueue_reactor.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Copyright (c) 2005 Stefan Arentz (stefan at soze dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_DETAIL_IMPL_KQUEUE_REACTOR_IPP
-#define ASIO_DETAIL_IMPL_KQUEUE_REACTOR_IPP
+#ifndef BOOST_ASIO_DETAIL_IMPL_KQUEUE_REACTOR_IPP
+#define BOOST_ASIO_DETAIL_IMPL_KQUEUE_REACTOR_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 
-#if defined(ASIO_HAS_KQUEUE)
+#if defined(BOOST_ASIO_HAS_KQUEUE)
 
-#include "asio/detail/kqueue_reactor.hpp"
-#include "asio/detail/scheduler.hpp"
-#include "asio/detail/throw_error.hpp"
-#include "asio/error.hpp"
+#include <boost/asio/config.hpp>
+#include <boost/asio/detail/kqueue_reactor.hpp>
+#include <boost/asio/detail/scheduler.hpp>
+#include <boost/asio/detail/throw_error.hpp>
+#include <boost/asio/error.hpp>
 
 #if defined(__NetBSD__)
 # include <sys/param.h>
 #endif
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
 #if defined(__NetBSD__) && __NetBSD_Version__ < 999001500
-# define ASIO_KQUEUE_EV_SET(ev, ident, filt, flags, fflags, data, udata) \
+# define BOOST_ASIO_KQUEUE_EV_SET(ev, ident, filt, flags, fflags, data, udata) \
     EV_SET(ev, ident, filt, flags, fflags, data, \
       reinterpret_cast<intptr_t>(static_cast<void*>(udata)))
 #else
-# define ASIO_KQUEUE_EV_SET(ev, ident, filt, flags, fflags, data, udata) \
+# define BOOST_ASIO_KQUEUE_EV_SET(ev, ident, filt, flags, fflags, data, udata) \
     EV_SET(ev, ident, filt, flags, fflags, data, udata)
 #endif
 
+namespace boost {
 namespace asio {
 namespace detail {
 
-kqueue_reactor::kqueue_reactor(asio::execution_context& ctx)
+kqueue_reactor::kqueue_reactor(boost::asio::execution_context& ctx)
   : execution_context_service_base<kqueue_reactor>(ctx),
     scheduler_(use_service<scheduler>(ctx)),
-    mutex_(ASIO_CONCURRENCY_HINT_IS_LOCKING(
-          REACTOR_REGISTRATION, scheduler_.concurrency_hint())),
+    mutex_(config(ctx).get("reactor", "registration_locking", true),
+        config(ctx).get("reactor", "registration_locking_spin_count", 0)),
     kqueue_fd_(do_kqueue_create()),
     interrupter_(),
     shutdown_(false),
-    registered_descriptors_mutex_(mutex_.enabled())
+    io_locking_(config(ctx).get("reactor", "io_locking", true)),
+    io_locking_spin_count_(
+        config(ctx).get("reactor", "io_locking_spin_count", 0)),
+    registered_descriptors_mutex_(mutex_.enabled()),
+    registered_descriptors_(execution_context::allocator<void>(ctx),
+        config(ctx).get("reactor", "preallocated_io_objects", 0U),
+        io_locking_, io_locking_spin_count_)
 {
   struct kevent events[1];
-  ASIO_KQUEUE_EV_SET(&events[0], interrupter_.read_descriptor(),
+  BOOST_ASIO_KQUEUE_EV_SET(&events[0], interrupter_.read_descriptor(),
       EVFILT_READ, EV_ADD, 0, 0, &interrupter_);
   if (::kevent(kqueue_fd_, events, 1, 0, 0, 0) == -1)
   {
-    asio::error_code error(errno,
-        asio::error::get_system_category());
-    asio::detail::throw_error(error);
+    boost::system::error_code error(errno,
+        boost::asio::error::get_system_category());
+    boost::asio::detail::throw_error(error);
   }
 }
 
@@ -91,9 +99,9 @@ void kqueue_reactor::shutdown()
 }
 
 void kqueue_reactor::notify_fork(
-    asio::execution_context::fork_event fork_ev)
+    boost::asio::execution_context::fork_event fork_ev)
 {
-  if (fork_ev == asio::execution_context::fork_child)
+  if (fork_ev == boost::asio::execution_context::fork_child)
   {
     // The kqueue descriptor is automatically closed in the child.
     kqueue_fd_ = -1;
@@ -102,13 +110,13 @@ void kqueue_reactor::notify_fork(
     interrupter_.recreate();
 
     struct kevent events[2];
-    ASIO_KQUEUE_EV_SET(&events[0], interrupter_.read_descriptor(),
+    BOOST_ASIO_KQUEUE_EV_SET(&events[0], interrupter_.read_descriptor(),
         EVFILT_READ, EV_ADD, 0, 0, &interrupter_);
     if (::kevent(kqueue_fd_, events, 1, 0, 0, 0) == -1)
     {
-      asio::error_code ec(errno,
-          asio::error::get_system_category());
-      asio::detail::throw_error(ec, "kqueue interrupter registration");
+      boost::system::error_code ec(errno,
+          boost::asio::error::get_system_category());
+      boost::asio::detail::throw_error(ec, "kqueue interrupter registration");
     }
 
     // Re-register all descriptors with kqueue.
@@ -118,15 +126,15 @@ void kqueue_reactor::notify_fork(
     {
       if (state->num_kevents_ > 0)
       {
-        ASIO_KQUEUE_EV_SET(&events[0], state->descriptor_,
+        BOOST_ASIO_KQUEUE_EV_SET(&events[0], state->descriptor_,
             EVFILT_READ, EV_ADD | EV_CLEAR, 0, 0, state);
-        ASIO_KQUEUE_EV_SET(&events[1], state->descriptor_,
+        BOOST_ASIO_KQUEUE_EV_SET(&events[1], state->descriptor_,
             EVFILT_WRITE, EV_ADD | EV_CLEAR, 0, 0, state);
         if (::kevent(kqueue_fd_, events, state->num_kevents_, 0, 0, 0) == -1)
         {
-          asio::error_code ec(errno,
-              asio::error::get_system_category());
-          asio::detail::throw_error(ec, "kqueue re-registration");
+          boost::system::error_code ec(errno,
+              boost::asio::error::get_system_category());
+          boost::asio::detail::throw_error(ec, "kqueue re-registration");
         }
       }
     }
@@ -143,7 +151,7 @@ int kqueue_reactor::register_descriptor(socket_type descriptor,
 {
   descriptor_data = allocate_descriptor_state();
 
-  ASIO_HANDLER_REACTOR_REGISTRATION((
+  BOOST_ASIO_HANDLER_REACTOR_REGISTRATION((
         context(), static_cast<uintmax_t>(descriptor),
         reinterpret_cast<uintmax_t>(descriptor_data)));
 
@@ -162,7 +170,7 @@ int kqueue_reactor::register_internal_descriptor(
 {
   descriptor_data = allocate_descriptor_state();
 
-  ASIO_HANDLER_REACTOR_REGISTRATION((
+  BOOST_ASIO_HANDLER_REACTOR_REGISTRATION((
         context(), static_cast<uintmax_t>(descriptor),
         reinterpret_cast<uintmax_t>(descriptor_data)));
 
@@ -174,7 +182,7 @@ int kqueue_reactor::register_internal_descriptor(
   descriptor_data->op_queue_[op_type].push(op);
 
   struct kevent events[1];
-  ASIO_KQUEUE_EV_SET(&events[0], descriptor, EVFILT_READ,
+  BOOST_ASIO_KQUEUE_EV_SET(&events[0], descriptor, EVFILT_READ,
       EV_ADD | EV_CLEAR, 0, 0, descriptor_data);
   if (::kevent(kqueue_fd_, events, 1, 0, 0, 0) == -1)
     return errno;
@@ -205,7 +213,7 @@ void kqueue_reactor::start_op(int op_type, socket_type descriptor,
 {
   if (!descriptor_data)
   {
-    op->ec_ = asio::error::bad_descriptor;
+    op->ec_ = boost::asio::error::bad_descriptor;
     on_immediate(op, is_continuation, immediate_arg);
     return;
   }
@@ -236,9 +244,9 @@ void kqueue_reactor::start_op(int op_type, socket_type descriptor,
       if (descriptor_data->num_kevents_ < num_kevents[op_type])
       {
         struct kevent events[2];
-        ASIO_KQUEUE_EV_SET(&events[0], descriptor, EVFILT_READ,
+        BOOST_ASIO_KQUEUE_EV_SET(&events[0], descriptor, EVFILT_READ,
             EV_ADD | EV_CLEAR, 0, 0, descriptor_data);
-        ASIO_KQUEUE_EV_SET(&events[1], descriptor, EVFILT_WRITE,
+        BOOST_ASIO_KQUEUE_EV_SET(&events[1], descriptor, EVFILT_WRITE,
             EV_ADD | EV_CLEAR, 0, 0, descriptor_data);
         if (::kevent(kqueue_fd_, events, num_kevents[op_type], 0, 0, 0) != -1)
         {
@@ -246,8 +254,8 @@ void kqueue_reactor::start_op(int op_type, socket_type descriptor,
         }
         else
         {
-          op->ec_ = asio::error_code(errno,
-              asio::error::get_system_category());
+          op->ec_ = boost::system::error_code(errno,
+              boost::asio::error::get_system_category());
           on_immediate(op, is_continuation, immediate_arg);
           return;
         }
@@ -259,9 +267,9 @@ void kqueue_reactor::start_op(int op_type, socket_type descriptor,
         descriptor_data->num_kevents_ = num_kevents[op_type];
 
       struct kevent events[2];
-      ASIO_KQUEUE_EV_SET(&events[0], descriptor, EVFILT_READ,
+      BOOST_ASIO_KQUEUE_EV_SET(&events[0], descriptor, EVFILT_READ,
           EV_ADD | EV_CLEAR, 0, 0, descriptor_data);
-      ASIO_KQUEUE_EV_SET(&events[1], descriptor, EVFILT_WRITE,
+      BOOST_ASIO_KQUEUE_EV_SET(&events[1], descriptor, EVFILT_WRITE,
           EV_ADD | EV_CLEAR, 0, 0, descriptor_data);
       ::kevent(kqueue_fd_, events, descriptor_data->num_kevents_, 0, 0, 0);
     }
@@ -284,7 +292,7 @@ void kqueue_reactor::cancel_ops(socket_type,
   {
     while (reactor_op* op = descriptor_data->op_queue_[i].front())
     {
-      op->ec_ = asio::error::operation_aborted;
+      op->ec_ = boost::asio::error::operation_aborted;
       descriptor_data->op_queue_[i].pop();
       ops.push(op);
     }
@@ -311,7 +319,7 @@ void kqueue_reactor::cancel_ops_by_key(socket_type,
     descriptor_data->op_queue_[op_type].pop();
     if (op->cancellation_key_ == cancellation_key)
     {
-      op->ec_ = asio::error::operation_aborted;
+      op->ec_ = boost::asio::error::operation_aborted;
       ops.push(op);
     }
     else
@@ -342,9 +350,9 @@ void kqueue_reactor::deregister_descriptor(socket_type descriptor,
     else
     {
       struct kevent events[2];
-      ASIO_KQUEUE_EV_SET(&events[0], descriptor,
+      BOOST_ASIO_KQUEUE_EV_SET(&events[0], descriptor,
           EVFILT_READ, EV_DELETE, 0, 0, 0);
-      ASIO_KQUEUE_EV_SET(&events[1], descriptor,
+      BOOST_ASIO_KQUEUE_EV_SET(&events[1], descriptor,
           EVFILT_WRITE, EV_DELETE, 0, 0, 0);
       ::kevent(kqueue_fd_, events, descriptor_data->num_kevents_, 0, 0, 0);
     }
@@ -354,7 +362,7 @@ void kqueue_reactor::deregister_descriptor(socket_type descriptor,
     {
       while (reactor_op* op = descriptor_data->op_queue_[i].front())
       {
-        op->ec_ = asio::error::operation_aborted;
+        op->ec_ = boost::asio::error::operation_aborted;
         descriptor_data->op_queue_[i].pop();
         ops.push(op);
       }
@@ -365,7 +373,7 @@ void kqueue_reactor::deregister_descriptor(socket_type descriptor,
 
     descriptor_lock.unlock();
 
-    ASIO_HANDLER_REACTOR_DEREGISTRATION((
+    BOOST_ASIO_HANDLER_REACTOR_DEREGISTRATION((
           context(), static_cast<uintmax_t>(descriptor),
           reinterpret_cast<uintmax_t>(descriptor_data)));
 
@@ -393,9 +401,9 @@ void kqueue_reactor::deregister_internal_descriptor(socket_type descriptor,
   if (!descriptor_data->shutdown_)
   {
     struct kevent events[2];
-    ASIO_KQUEUE_EV_SET(&events[0], descriptor,
+    BOOST_ASIO_KQUEUE_EV_SET(&events[0], descriptor,
         EVFILT_READ, EV_DELETE, 0, 0, 0);
-    ASIO_KQUEUE_EV_SET(&events[1], descriptor,
+    BOOST_ASIO_KQUEUE_EV_SET(&events[1], descriptor,
         EVFILT_WRITE, EV_DELETE, 0, 0, 0);
     ::kevent(kqueue_fd_, events, descriptor_data->num_kevents_, 0, 0, 0);
 
@@ -408,7 +416,7 @@ void kqueue_reactor::deregister_internal_descriptor(socket_type descriptor,
 
     descriptor_lock.unlock();
 
-    ASIO_HANDLER_REACTOR_DEREGISTRATION((
+    BOOST_ASIO_HANDLER_REACTOR_DEREGISTRATION((
           context(), static_cast<uintmax_t>(descriptor),
           reinterpret_cast<uintmax_t>(descriptor_data)));
 
@@ -447,7 +455,7 @@ void kqueue_reactor::run(long usec, op_queue<operation>& ops)
   struct kevent events[128];
   int num_events = kevent(kqueue_fd_, 0, 0, events, 128, timeout);
 
-#if defined(ASIO_ENABLE_HANDLER_TRACKING)
+#if defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
   // Trace the waiting events.
   for (int i = 0; i < num_events; ++i)
   {
@@ -458,19 +466,19 @@ void kqueue_reactor::run(long usec, op_queue<operation>& ops)
       switch (events[i].filter)
       {
       case EVFILT_READ:
-        event_mask |= ASIO_HANDLER_REACTOR_READ_EVENT;
+        event_mask |= BOOST_ASIO_HANDLER_REACTOR_READ_EVENT;
         break;
       case EVFILT_WRITE:
-        event_mask |= ASIO_HANDLER_REACTOR_WRITE_EVENT;
+        event_mask |= BOOST_ASIO_HANDLER_REACTOR_WRITE_EVENT;
         break;
       }
       if ((events[i].flags & (EV_ERROR | EV_OOBAND)) != 0)
-        event_mask |= ASIO_HANDLER_REACTOR_ERROR_EVENT;
-      ASIO_HANDLER_REACTOR_EVENTS((context(),
+        event_mask |= BOOST_ASIO_HANDLER_REACTOR_ERROR_EVENT;
+      BOOST_ASIO_HANDLER_REACTOR_EVENTS((context(),
             reinterpret_cast<uintmax_t>(ptr), event_mask));
     }
   }
-#endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
+#endif // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
 
   // Dispatch the waiting events.
   for (int i = 0; i < num_events; ++i)
@@ -494,7 +502,7 @@ void kqueue_reactor::run(long usec, op_queue<operation>& ops)
         // operations we'll remove the EVFILT_WRITE registration here so that
         // we don't end up in a tight spin.
         struct kevent delete_events[1];
-        ASIO_KQUEUE_EV_SET(&delete_events[0],
+        BOOST_ASIO_KQUEUE_EV_SET(&delete_events[0],
             descriptor_data->descriptor_, EVFILT_WRITE, EV_DELETE, 0, 0, 0);
         ::kevent(kqueue_fd_, delete_events, 1, 0, 0, 0);
         descriptor_data->num_kevents_ = 1;
@@ -518,9 +526,9 @@ void kqueue_reactor::run(long usec, op_queue<operation>& ops)
             {
               if (events[i].flags & EV_ERROR)
               {
-                op->ec_ = asio::error_code(
+                op->ec_ = boost::system::error_code(
                     static_cast<int>(events[i].data),
-                    asio::error::get_system_category());
+                    boost::asio::error::get_system_category());
                 descriptor_data->op_queue_[j].pop();
                 ops.push(op);
               }
@@ -552,9 +560,9 @@ int kqueue_reactor::do_kqueue_create()
   int fd = ::kqueue();
   if (fd == -1)
   {
-    asio::error_code ec(errno,
-        asio::error::get_system_category());
-    asio::detail::throw_error(ec, "kqueue");
+    boost::system::error_code ec(errno,
+        boost::asio::error::get_system_category());
+    boost::asio::detail::throw_error(ec, "kqueue");
   }
   return fd;
 }
@@ -562,8 +570,7 @@ int kqueue_reactor::do_kqueue_create()
 kqueue_reactor::descriptor_state* kqueue_reactor::allocate_descriptor_state()
 {
   mutex::scoped_lock descriptors_lock(registered_descriptors_mutex_);
-  return registered_descriptors_.alloc(ASIO_CONCURRENCY_HINT_IS_LOCKING(
-        REACTOR_IO, scheduler_.concurrency_hint()));
+  return registered_descriptors_.alloc(io_locking_, io_locking_spin_count_);
 }
 
 void kqueue_reactor::free_descriptor_state(kqueue_reactor::descriptor_state* s)
@@ -598,11 +605,12 @@ timespec* kqueue_reactor::get_timeout(long usec, timespec& ts)
 
 } // namespace detail
 } // namespace asio
+} // namespace boost
 
-#undef ASIO_KQUEUE_EV_SET
+#undef BOOST_ASIO_KQUEUE_EV_SET
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // defined(ASIO_HAS_KQUEUE)
+#endif // defined(BOOST_ASIO_HAS_KQUEUE)
 
-#endif // ASIO_DETAIL_IMPL_KQUEUE_REACTOR_IPP
+#endif // BOOST_ASIO_DETAIL_IMPL_KQUEUE_REACTOR_IPP

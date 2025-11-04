@@ -9,21 +9,22 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 //
-#ifndef ASIO_EXPERIMENTAL_IMPL_CORO_HPP
-#define ASIO_EXPERIMENTAL_IMPL_CORO_HPP
+#ifndef BOOST_ASIO_EXPERIMENTAL_IMPL_CORO_HPP
+#define BOOST_ASIO_EXPERIMENTAL_IMPL_CORO_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/append.hpp"
-#include "asio/associated_cancellation_slot.hpp"
-#include "asio/bind_allocator.hpp"
-#include "asio/deferred.hpp"
-#include "asio/experimental/detail/coro_completion_handler.hpp"
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <boost/asio/append.hpp>
+#include <boost/asio/associated_cancellation_slot.hpp>
+#include <boost/asio/bind_allocator.hpp>
+#include <boost/asio/deferred.hpp>
+#include <boost/asio/experimental/detail/coro_completion_handler.hpp>
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace experimental {
 
@@ -45,18 +46,18 @@ struct coro_cancellation_source
   }
 
   template <typename Filter>
-  void reset_cancellation_state(ASIO_MOVE_ARG(Filter) filter)
+  void reset_cancellation_state(Filter&& filter)
   {
-    state = cancellation_state(slot, ASIO_MOVE_CAST(Filter)(filter));
+    state = cancellation_state(slot, static_cast<Filter&&>(filter));
   }
 
   template <typename InFilter, typename OutFilter>
-  void reset_cancellation_state(ASIO_MOVE_ARG(InFilter) in_filter,
-      ASIO_MOVE_ARG(OutFilter) out_filter)
+  void reset_cancellation_state(InFilter&& in_filter,
+      OutFilter&& out_filter)
   {
     state = cancellation_state(slot,
-        ASIO_MOVE_CAST(InFilter)(in_filter),
-        ASIO_MOVE_CAST(OutFilter)(out_filter));
+        static_cast<InFilter&&>(in_filter),
+        static_cast<OutFilter&&>(out_filter));
   }
 
   bool throw_if_cancelled() const
@@ -96,26 +97,26 @@ template <typename T>
 struct coro_error;
 
 template <>
-struct coro_error<asio::error_code>
+struct coro_error<boost::system::error_code>
 {
-  static asio::error_code invalid()
+  static boost::system::error_code invalid()
   {
-    return asio::error::fault;
+    return boost::asio::error::fault;
   }
 
-  static asio::error_code cancelled()
+  static boost::system::error_code cancelled()
   {
-    return asio::error::operation_aborted;
+    return boost::asio::error::operation_aborted;
   }
 
-  static asio::error_code interrupted()
+  static boost::system::error_code interrupted()
   {
-    return asio::error::interrupted;
+    return boost::asio::error::interrupted;
   }
 
-  static asio::error_code done()
+  static boost::system::error_code done()
   {
-    return asio::error::broken_pipe;
+    return boost::asio::error::broken_pipe;
   }
 };
 
@@ -125,29 +126,29 @@ struct coro_error<std::exception_ptr>
   static std::exception_ptr invalid()
   {
     return std::make_exception_ptr(
-        asio::system_error(
-          coro_error<asio::error_code>::invalid()));
+        boost::system::system_error(
+          coro_error<boost::system::error_code>::invalid()));
   }
 
   static std::exception_ptr cancelled()
   {
     return std::make_exception_ptr(
-        asio::system_error(
-          coro_error<asio::error_code>::cancelled()));
+        boost::system::system_error(
+          coro_error<boost::system::error_code>::cancelled()));
   }
 
   static std::exception_ptr interrupted()
   {
     return std::make_exception_ptr(
-        asio::system_error(
-          coro_error<asio::error_code>::interrupted()));
+        boost::system::system_error(
+          coro_error<boost::system::error_code>::interrupted()));
   }
 
   static std::exception_ptr done()
   {
     return std::make_exception_ptr(
-        asio::system_error(
-          coro_error<asio::error_code>::done()));
+        boost::system::system_error(
+          coro_error<boost::system::error_code>::done()));
   }
 };
 
@@ -176,8 +177,8 @@ struct coro_with_arg
         if ((hp.cancel->state.cancelled() != cancellation_type::none)
             && hp.cancel->throw_if_cancelled_)
         {
-          asio::detail::throw_error(
-              asio::error::operation_aborted, "coro-cancelled");
+          boost::asio::detail::throw_error(
+              boost::asio::error::operation_aborted, "coro-cancelled");
         }
       }
 
@@ -193,7 +194,7 @@ struct coro_with_arg
       {
         coro.coro_->awaited_from =
           dispatch_coroutine(
-              asio::prefer(hp.get_executor(),
+              boost::asio::prefer(hp.get_executor(),
                 execution::outstanding_work.tracked),
                 [h]() mutable { h.resume(); }).handle;
 
@@ -218,7 +219,7 @@ struct coro_with_arg
 
           void operator()(cancellation_type ct)
           {
-            asio::dispatch(e, [ct, st = st]() mutable
+            boost::asio::dispatch(e, [ct, st = st]() mutable
             {
               auto & [sig, state] = *st;
               sig.emit(ct);
@@ -596,11 +597,11 @@ struct coro_promise final :
   std::optional<coro_cancellation_source> cancel_source;
   coro_cancellation_source * cancel;
 
-  using cancellation_slot_type = asio::cancellation_slot;
+  using cancellation_slot_type = boost::asio::cancellation_slot;
 
   cancellation_slot_type get_cancellation_slot() const noexcept
   {
-    return cancel ? cancel->slot : cancellation_slot_type{};
+    return cancel ? cancel->state.slot() : cancellation_slot_type{};
   }
 
   using allocator_type =
@@ -700,7 +701,7 @@ struct coro_promise final :
   {
     struct exec_helper
     {
-      const asio::cancellation_state& value;
+      const boost::asio::cancellation_state& value;
 
       constexpr static bool await_ready() noexcept
       {
@@ -711,7 +712,7 @@ struct coro_promise final :
       {
       }
 
-      asio::cancellation_state await_resume() const noexcept
+      boost::asio::cancellation_state await_resume() const noexcept
       {
         return value;
       }
@@ -767,11 +768,11 @@ struct coro_promise final :
       auto await_resume()
       {
         return src_->reset_cancellation_state(
-            ASIO_MOVE_CAST(Filter)(filter_));
+            static_cast<Filter&&>(filter_));
       }
     };
 
-    return result{cancel, ASIO_MOVE_CAST(Filter)(reset.filter)};
+    return result{cancel, static_cast<Filter&&>(reset.filter)};
   }
 
   // This await transformation resets the associated cancellation state.
@@ -798,14 +799,14 @@ struct coro_promise final :
       auto await_resume()
       {
         return src_->reset_cancellation_state(
-            ASIO_MOVE_CAST(InFilter)(in_filter_),
-            ASIO_MOVE_CAST(OutFilter)(out_filter_));
+            static_cast<InFilter&&>(in_filter_),
+            static_cast<OutFilter&&>(out_filter_));
       }
     };
 
     return result{cancel,
-        ASIO_MOVE_CAST(InFilter)(reset.in_filter),
-        ASIO_MOVE_CAST(OutFilter)(reset.out_filter)};
+        static_cast<InFilter&&>(reset.in_filter),
+        static_cast<OutFilter&&>(reset.out_filter)};
   }
 
   // This await transformation determines whether cancellation is propagated as
@@ -894,15 +895,15 @@ struct coro_promise final :
 
   template <typename Op>
   auto await_transform(Op&& op,
-      typename constraint<is_async_operation<Op>::value>::type = 0)
+      constraint_t<is_async_operation<Op>::value> = 0)
   {
     if ((cancel->state.cancelled() != cancellation_type::none)
         && cancel->throw_if_cancelled_)
     {
-      asio::detail::throw_error(
-          asio::error::operation_aborted, "coro-cancelled");
+      boost::asio::detail::throw_error(
+          boost::asio::error::operation_aborted, "coro-cancelled");
     }
-    using signature = typename completion_signature_of<Op>::type;
+    using signature = completion_signature_of_t<Op>;
     using result_type = detail::coro_completion_handler_type_t<signature>;
     using handler_type =
       typename detail::coro_completion_handler_type<signature>::template
@@ -965,8 +966,8 @@ struct coro<Yield, Return, Executor, Allocator>::awaitable_t
       if ((hp.cancel->state.cancelled() != cancellation_type::none)
           && hp.cancel->throw_if_cancelled_)
       {
-        asio::detail::throw_error(
-            asio::error::operation_aborted, "coro-cancelled");
+        boost::asio::detail::throw_error(
+            boost::asio::error::operation_aborted, "coro-cancelled");
       }
     }
 
@@ -981,7 +982,7 @@ struct coro<Yield, Return, Executor, Allocator>::awaitable_t
     else
     {
       coro_.coro_->awaited_from = detail::dispatch_coroutine(
-          asio::prefer(hp.get_executor(),
+          boost::asio::prefer(hp.get_executor(),
             execution::outstanding_work.tracked),
           [h]() mutable
           {
@@ -1007,7 +1008,7 @@ struct coro<Yield, Return, Executor, Allocator>::awaitable_t
 
         void operator()(cancellation_type ct)
         {
-          asio::dispatch(e,
+          boost::asio::dispatch(e,
               [ct, st = st]() mutable
               {
                 auto & [sig, state] = *st;
@@ -1047,7 +1048,7 @@ struct coro<Yield, Return, Executor, Allocator>::initiate_async_resume
 {
   typedef Executor executor_type;
   typedef Allocator allocator_type;
-  typedef asio::cancellation_slot cancellation_slot_type;
+  typedef boost::asio::cancellation_slot cancellation_slot_type;
 
   explicit initiate_async_resume(coro* self)
     : coro_(self->coro_)
@@ -1069,17 +1070,17 @@ struct coro<Yield, Return, Executor, Allocator>::initiate_async_resume
       std::true_type /* error is noexcept */,
       std::true_type /* result is void */)  //noexcept
   {
-    return [this, coro = coro_,
+    return [this, the_coro = coro_,
         h = std::forward<WaitHandler>(handler),
         exec = std::move(exec)]() mutable
     {
-      assert(coro);
+      assert(the_coro);
 
-      auto ch = detail::coroutine_handle<promise_type>::from_promise(*coro);
+      auto ch = detail::coroutine_handle<promise_type>::from_promise(*the_coro);
       assert(ch && !ch.done());
 
-      coro->awaited_from = post_coroutine(std::move(exec), std::move(h));
-      coro->reset_error();
+      the_coro->awaited_from = post_coroutine(std::move(exec), std::move(h));
+      the_coro->reset_error();
       ch.resume();
     };
   }
@@ -1090,18 +1091,18 @@ struct coro<Yield, Return, Executor, Allocator>::initiate_async_resume
       std::true_type /* error is noexcept */,
       std::false_type  /* result is void */)  //noexcept
   {
-    return [coro = coro_,
+    return [the_coro = coro_,
         h = std::forward<WaitHandler>(handler),
         exec = std::move(exec)]() mutable
     {
-      assert(coro);
+      assert(the_coro);
 
-      auto ch = detail::coroutine_handle<promise_type>::from_promise(*coro);
+      auto ch = detail::coroutine_handle<promise_type>::from_promise(*the_coro);
       assert(ch && !ch.done());
 
-      coro->awaited_from = detail::post_coroutine(
-          exec, std::move(h), coro->result_).handle;
-      coro->reset_error();
+      the_coro->awaited_from = detail::post_coroutine(
+          exec, std::move(h), the_coro->result_).handle;
+      the_coro->reset_error();
       ch.resume();
     };
   }
@@ -1111,29 +1112,29 @@ struct coro<Yield, Return, Executor, Allocator>::initiate_async_resume
       std::false_type /* error is noexcept */,
       std::true_type /* result is void */)
   {
-    return [coro = coro_,
+    return [the_coro = coro_,
         h = std::forward<WaitHandler>(handler),
         exec = std::move(exec)]() mutable
     {
-      if (!coro)
-        return asio::post(exec,
-            asio::append(std::move(h),
+      if (!the_coro)
+        return boost::asio::post(exec,
+            boost::asio::append(std::move(h),
               detail::coro_error<error_type>::invalid()));
 
-      auto ch = detail::coroutine_handle<promise_type>::from_promise(*coro);
+      auto ch = detail::coroutine_handle<promise_type>::from_promise(*the_coro);
       if (!ch)
-        return asio::post(exec,
-            asio::append(std::move(h),
+        return boost::asio::post(exec,
+            boost::asio::append(std::move(h),
               detail::coro_error<error_type>::invalid()));
       else if (ch.done())
-        return asio::post(exec,
-            asio::append(std::move(h),
+        return boost::asio::post(exec,
+            boost::asio::append(std::move(h),
               detail::coro_error<error_type>::done()));
       else
       {
-        coro->awaited_from = detail::post_coroutine(
-            exec, std::move(h), coro->error_).handle;
-        coro->reset_error();
+        the_coro->awaited_from = detail::post_coroutine(
+            exec, std::move(h), the_coro->error_).handle;
+        the_coro->reset_error();
         ch.resume();
       }
     };
@@ -1144,30 +1145,30 @@ struct coro<Yield, Return, Executor, Allocator>::initiate_async_resume
       std::false_type /* error is noexcept */,
       std::false_type  /* result is void */)
   {
-    return [coro = coro_,
+    return [the_coro = coro_,
         h = std::forward<WaitHandler>(handler),
         exec = std::move(exec)]() mutable
     {
-      if (!coro)
-        return asio::post(exec,
-            asio::append(std::move(h),
+      if (!the_coro)
+        return boost::asio::post(exec,
+            boost::asio::append(std::move(h),
               detail::coro_error<error_type>::invalid(), result_type{}));
 
       auto ch =
-        detail::coroutine_handle<promise_type>::from_promise(*coro);
+        detail::coroutine_handle<promise_type>::from_promise(*the_coro);
       if (!ch)
-        return asio::post(exec,
-            asio::append(std::move(h),
+        return boost::asio::post(exec,
+            boost::asio::append(std::move(h),
               detail::coro_error<error_type>::invalid(), result_type{}));
       else if (ch.done())
-        return asio::post(exec,
-            asio::append(std::move(h),
+        return boost::asio::post(exec,
+            boost::asio::append(std::move(h),
               detail::coro_error<error_type>::done(), result_type{}));
       else
       {
-        coro->awaited_from = detail::post_coroutine(
-            exec, std::move(h), coro->error_, coro->result_).handle;
-        coro->reset_error();
+        the_coro->awaited_from = detail::post_coroutine(
+            exec, std::move(h), the_coro->error_, the_coro->result_).handle;
+        the_coro->reset_error();
         ch.resume();
       }
     };
@@ -1176,14 +1177,14 @@ struct coro<Yield, Return, Executor, Allocator>::initiate_async_resume
   template <typename WaitHandler>
   void operator()(WaitHandler&& handler)
   {
-    const auto exec = asio::prefer(
+    const auto exec = boost::asio::prefer(
         get_associated_executor(handler, get_executor()),
         execution::outstanding_work.tracked);
 
     coro_->cancel = &coro_->cancel_source.emplace();
     coro_->cancel->state = cancellation_state(
         coro_->cancel->slot = get_associated_cancellation_slot(handler));
-    asio::dispatch(get_executor(),
+    boost::asio::dispatch(get_executor(),
         handle(exec, std::forward<WaitHandler>(handler),
           std::integral_constant<bool, is_noexcept>{},
           std::is_void<result_type>{}));
@@ -1192,20 +1193,20 @@ struct coro<Yield, Return, Executor, Allocator>::initiate_async_resume
   template <typename WaitHandler, typename Input>
   void operator()(WaitHandler&& handler, Input&& input)
   {
-    const auto exec = asio::prefer(
+    const auto exec = boost::asio::prefer(
         get_associated_executor(handler, get_executor()),
         execution::outstanding_work.tracked);
 
     coro_->cancel = &coro_->cancel_source.emplace();
     coro_->cancel->state = cancellation_state(
         coro_->cancel->slot = get_associated_cancellation_slot(handler));
-    asio::dispatch(get_executor(),
+    boost::asio::dispatch(get_executor(),
         [h = handle(exec, std::forward<WaitHandler>(handler),
             std::integral_constant<bool, is_noexcept>{},
             std::is_void<result_type>{}),
-            in = std::forward<Input>(input), coro = coro_]() mutable
+            in = std::forward<Input>(input), the_coro = coro_]() mutable
         {
-          coro->input_ = std::move(in);
+          the_coro->input_ = std::move(in);
           std::move(h)();
         });
   }
@@ -1216,7 +1217,8 @@ private:
 
 } // namespace experimental
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_EXPERIMENTAL_IMPL_CORO_HPP
+#endif // BOOST_ASIO_EXPERIMENTAL_IMPL_CORO_HPP

@@ -2,31 +2,32 @@
 // ip/basic_resolver_entry.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_IP_BASIC_RESOLVER_ENTRY_HPP
-#define ASIO_IP_BASIC_RESOLVER_ENTRY_HPP
+#ifndef BOOST_ASIO_IP_BASIC_RESOLVER_ENTRY_HPP
+#define BOOST_ASIO_IP_BASIC_RESOLVER_ENTRY_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 #include <string>
-#include "asio/detail/string_view.hpp"
+#include <boost/asio/detail/string_view.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace ip {
 
 /// An entry produced by a resolver.
 /**
- * The asio::ip::basic_resolver_entry class template describes an entry
+ * The boost::asio::ip::basic_resolver_entry class template describes an entry
  * as returned by a resolver.
  *
  * @par Thread Safety
@@ -50,7 +51,7 @@ public:
 
   /// Construct with specified endpoint, host name and service name.
   basic_resolver_entry(const endpoint_type& ep,
-      ASIO_STRING_VIEW_PARAM host, ASIO_STRING_VIEW_PARAM service)
+      BOOST_ASIO_STRING_VIEW_PARAM host, BOOST_ASIO_STRING_VIEW_PARAM service)
     : endpoint_(ep),
       host_name_(static_cast<std::string>(host)),
       service_name_(static_cast<std::string>(service))
@@ -107,7 +108,8 @@ private:
 
 } // namespace ip
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_IP_BASIC_RESOLVER_ENTRY_HPP
+#endif // BOOST_ASIO_IP_BASIC_RESOLVER_ENTRY_HPP

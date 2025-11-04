@@ -2,24 +2,25 @@
 // detail/is_buffer_sequence.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_DETAIL_IS_BUFFER_SEQUENCE_HPP
-#define ASIO_DETAIL_IS_BUFFER_SEQUENCE_HPP
+#ifndef BOOST_ASIO_DETAIL_IS_BUFFER_SEQUENCE_HPP
+#define BOOST_ASIO_DETAIL_IS_BUFFER_SEQUENCE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/detail/type_traits.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <boost/asio/detail/type_traits.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 
 class mutable_buffer;
@@ -55,53 +56,23 @@ struct buffer_sequence_memfns_check
 {
 };
 
-#if defined(ASIO_HAS_DECLTYPE)
-
 template <typename>
 char buffer_sequence_begin_helper(...);
 
 template <typename T>
 char (&buffer_sequence_begin_helper(T* t,
-    typename enable_if<!is_same<
-      decltype(asio::buffer_sequence_begin(*t)),
-        void>::value>::type*))[2];
-
-#else // defined(ASIO_HAS_DECLTYPE)
-
-template <typename>
-char (&buffer_sequence_begin_helper(...))[2];
-
-template <typename T>
-char buffer_sequence_begin_helper(T* t,
-    buffer_sequence_memfns_check<
-      void (buffer_sequence_memfns_base::*)(),
-      &buffer_sequence_memfns_derived<T>::begin>*);
-
-#endif // defined(ASIO_HAS_DECLTYPE)
-
-#if defined(ASIO_HAS_DECLTYPE)
+    enable_if_t<!is_same<
+      decltype(boost::asio::buffer_sequence_begin(*t)),
+        void>::value>*))[2];
 
 template <typename>
 char buffer_sequence_end_helper(...);
 
 template <typename T>
 char (&buffer_sequence_end_helper(T* t,
-    typename enable_if<!is_same<
-      decltype(asio::buffer_sequence_end(*t)),
-        void>::value>::type*))[2];
-
-#else // defined(ASIO_HAS_DECLTYPE)
-
-template <typename>
-char (&buffer_sequence_end_helper(...))[2];
-
-template <typename T>
-char buffer_sequence_end_helper(T* t,
-    buffer_sequence_memfns_check<
-      void (buffer_sequence_memfns_base::*)(),
-      &buffer_sequence_memfns_derived<T>::end>*);
-
-#endif // defined(ASIO_HAS_DECLTYPE)
+    enable_if_t<!is_same<
+      decltype(boost::asio::buffer_sequence_end(*t)),
+        void>::value>*))[2];
 
 template <typename>
 char (&size_memfn_helper(...))[2];
@@ -187,23 +158,11 @@ char shrink_memfn_helper(
 template <typename, typename>
 char (&buffer_sequence_element_type_helper(...))[2];
 
-#if defined(ASIO_HAS_DECLTYPE)
-
 template <typename T, typename Buffer>
 char buffer_sequence_element_type_helper(T* t,
-    typename enable_if<is_convertible<
-      decltype(*asio::buffer_sequence_begin(*t)),
-        Buffer>::value>::type*);
-
-#else // defined(ASIO_HAS_DECLTYPE)
-
-template <typename T, typename Buffer>
-char buffer_sequence_element_type_helper(
-    typename T::const_iterator*,
-    typename enable_if<is_convertible<
-      typename T::value_type, Buffer>::value>::type*);
-
-#endif // defined(ASIO_HAS_DECLTYPE)
+    enable_if_t<is_convertible<
+      decltype(*boost::asio::buffer_sequence_begin(*t)),
+        Buffer>::value>*);
 
 template <typename>
 char (&const_buffers_type_typedef_helper(...))[2];
@@ -332,7 +291,8 @@ struct is_dynamic_buffer_v2
 
 } // namespace detail
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_DETAIL_IS_BUFFER_SEQUENCE_HPP
+#endif // BOOST_ASIO_DETAIL_IS_BUFFER_SEQUENCE_HPP

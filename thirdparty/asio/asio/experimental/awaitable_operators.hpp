@@ -2,34 +2,35 @@
 // experimental/awaitable_operators.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_EXPERIMENTAL_AWAITABLE_OPERATORS_HPP
-#define ASIO_EXPERIMENTAL_AWAITABLE_OPERATORS_HPP
+#ifndef BOOST_ASIO_EXPERIMENTAL_AWAITABLE_OPERATORS_HPP
+#define BOOST_ASIO_EXPERIMENTAL_AWAITABLE_OPERATORS_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 #include <optional>
 #include <stdexcept>
 #include <tuple>
 #include <variant>
-#include "asio/awaitable.hpp"
-#include "asio/co_spawn.hpp"
-#include "asio/detail/type_traits.hpp"
-#include "asio/experimental/deferred.hpp"
-#include "asio/experimental/parallel_group.hpp"
-#include "asio/multiple_exceptions.hpp"
-#include "asio/this_coro.hpp"
+#include <boost/asio/awaitable.hpp>
+#include <boost/asio/co_spawn.hpp>
+#include <boost/asio/deferred.hpp>
+#include <boost/asio/detail/type_traits.hpp>
+#include <boost/asio/experimental/parallel_group.hpp>
+#include <boost/asio/multiple_exceptions.hpp>
+#include <boost/asio/this_coro.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace experimental {
 namespace awaitable_operators {
@@ -37,28 +38,28 @@ namespace detail {
 
 template <typename T, typename Executor>
 awaitable<T, Executor> awaitable_wrap(awaitable<T, Executor> a,
-    typename constraint<is_constructible<T>::value>::type* = 0)
+    constraint_t<is_constructible<T>::value>* = 0)
 {
   return a;
 }
 
 template <typename T, typename Executor>
 awaitable<std::optional<T>, Executor> awaitable_wrap(awaitable<T, Executor> a,
-    typename constraint<!is_constructible<T>::value>::type* = 0)
+    constraint_t<!is_constructible<T>::value>* = 0)
 {
   co_return std::optional<T>(co_await std::move(a));
 }
 
 template <typename T>
-T& awaitable_unwrap(typename conditional<true, T, void>::type& r,
-    typename constraint<is_constructible<T>::value>::type* = 0)
+T& awaitable_unwrap(conditional_t<true, T, void>& r,
+    constraint_t<is_constructible<T>::value>* = 0)
 {
   return r;
 }
 
 template <typename T>
-T& awaitable_unwrap(std::optional<typename conditional<true, T, void>::type>& r,
-    typename constraint<!is_constructible<T>::value>::type* = 0)
+T& awaitable_unwrap(std::optional<conditional_t<true, T, void>>& r,
+    constraint_t<!is_constructible<T>::value>* = 0)
 {
   return *r;
 }
@@ -530,7 +531,8 @@ awaitable<std::variant<T..., U>, Executor> operator||(
 } // namespace awaitable_operators
 } // namespace experimental
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_EXPERIMENTAL_AWAITABLE_OPERATORS_HPP
+#endif // BOOST_ASIO_EXPERIMENTAL_AWAITABLE_OPERATORS_HPP

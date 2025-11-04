@@ -2,30 +2,27 @@
 // traits/equality_comparable.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_TRAITS_EQUALITY_COMPARABLE_HPP
-#define ASIO_TRAITS_EQUALITY_COMPARABLE_HPP
+#ifndef BOOST_ASIO_TRAITS_EQUALITY_COMPARABLE_HPP
+#define BOOST_ASIO_TRAITS_EQUALITY_COMPARABLE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/detail/type_traits.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <boost/asio/detail/type_traits.hpp>
 
-#if defined(ASIO_HAS_DECLTYPE) \
-  && defined(ASIO_HAS_NOEXCEPT) \
-  && defined(ASIO_HAS_WORKING_EXPRESSION_SFINAE)
-# define ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT 1
-#endif // defined(ASIO_HAS_DECLTYPE)
-       //   && defined(ASIO_HAS_NOEXCEPT)
-       //   && defined(ASIO_HAS_WORKING_EXPRESSION_SFINAE)
+#if defined(BOOST_ASIO_HAS_WORKING_EXPRESSION_SFINAE)
+# define BOOST_ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT 1
+#endif // defined(BOOST_ASIO_HAS_WORKING_EXPRESSION_SFINAE)
 
+namespace boost {
 namespace asio {
 namespace traits {
 
@@ -40,11 +37,11 @@ namespace detail {
 
 struct no_equality_comparable
 {
-  ASIO_STATIC_CONSTEXPR(bool, is_valid = false);
-  ASIO_STATIC_CONSTEXPR(bool, is_noexcept = false);
+  static constexpr bool is_valid = false;
+  static constexpr bool is_noexcept = false;
 };
 
-#if defined(ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
+#if defined(BOOST_ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
 
 template <typename T, typename = void>
 struct equality_comparable_trait : no_equality_comparable
@@ -53,7 +50,7 @@ struct equality_comparable_trait : no_equality_comparable
 
 template <typename T>
 struct equality_comparable_trait<T,
-  typename void_type<
+  void_t<
     decltype(
       static_cast<void>(
         static_cast<bool>(declval<const T>() == declval<const T>())
@@ -62,28 +59,28 @@ struct equality_comparable_trait<T,
         static_cast<bool>(declval<const T>() != declval<const T>())
       )
     )
-  >::type>
+  >>
 {
-  ASIO_STATIC_CONSTEXPR(bool, is_valid = true);
+  static constexpr bool is_valid = true;
 
-  ASIO_STATIC_CONSTEXPR(bool, is_noexcept =
+  static constexpr bool is_noexcept =
     noexcept(declval<const T>() == declval<const T>())
-      && noexcept(declval<const T>() != declval<const T>()));
+      && noexcept(declval<const T>() != declval<const T>());
 };
 
-#else // defined(ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
+#else // defined(BOOST_ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
 
 template <typename T, typename = void>
 struct equality_comparable_trait :
-  conditional<
-    is_same<T, typename decay<T>::type>::value,
+  conditional_t<
+    is_same<T, decay_t<T>>::value,
     no_equality_comparable,
-    traits::equality_comparable<typename decay<T>::type>
-  >::type
+    traits::equality_comparable<decay_t<T>>
+  >
 {
 };
 
-#endif // defined(ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
+#endif // defined(BOOST_ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
 
 } // namespace detail
 namespace traits {
@@ -100,5 +97,6 @@ struct equality_comparable : equality_comparable_default<T>
 
 } // namespace traits
 } // namespace asio
+} // namespace boost
 
-#endif // ASIO_TRAITS_EQUALITY_COMPARABLE_HPP
+#endif // BOOST_ASIO_TRAITS_EQUALITY_COMPARABLE_HPP

@@ -2,27 +2,28 @@
 // detail/null_tss_ptr.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_DETAIL_NULL_TSS_PTR_HPP
-#define ASIO_DETAIL_NULL_TSS_PTR_HPP
+#ifndef BOOST_ASIO_DETAIL_NULL_TSS_PTR_HPP
+#define BOOST_ASIO_DETAIL_NULL_TSS_PTR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 
-#if !defined(ASIO_HAS_THREADS)
+#if !defined(BOOST_ASIO_HAS_THREADS)
 
-#include "asio/detail/noncopyable.hpp"
+#include <boost/asio/detail/noncopyable.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -60,9 +61,10 @@ private:
 
 } // namespace detail
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // !defined(ASIO_HAS_THREADS)
+#endif // !defined(BOOST_ASIO_HAS_THREADS)
 
-#endif // ASIO_DETAIL_NULL_TSS_PTR_HPP
+#endif // BOOST_ASIO_DETAIL_NULL_TSS_PTR_HPP

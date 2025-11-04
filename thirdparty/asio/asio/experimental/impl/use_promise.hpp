@@ -9,19 +9,20 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_EXPERIMENTAL_IMPL_USE_PROMISE_HPP
-#define ASIO_EXPERIMENTAL_IMPL_USE_PROMISE_HPP
+#ifndef BOOST_ASIO_EXPERIMENTAL_IMPL_USE_PROMISE_HPP
+#define BOOST_ASIO_EXPERIMENTAL_IMPL_USE_PROMISE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 #include <memory>
-#include "asio/async_result.hpp"
+#include <boost/asio/async_result.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace experimental {
 
@@ -44,12 +45,12 @@ struct async_result<experimental::use_promise_t<Allocator>, R(Args...)>
   template <typename Initiation, typename... InitArgs>
   static auto initiate(Initiation initiation,
       experimental::use_promise_t<Allocator> up, InitArgs... args)
-    -> experimental::promise<void(typename decay<Args>::type...),
-      asio::associated_executor_t<Initiation>, Allocator>
+    -> experimental::promise<void(decay_t<Args>...),
+      boost::asio::associated_executor_t<Initiation>, Allocator>
   {
     using handler_type = experimental::detail::promise_handler<
-      void(typename decay<Args>::type...),
-      asio::associated_executor_t<Initiation>, Allocator>;
+      void(decay_t<Args>...),
+      boost::asio::associated_executor_t<Initiation>, Allocator>;
 
     handler_type ht{up.get_allocator(), get_associated_executor(initiation)};
     std::move(initiation)(ht, std::move(args)...);
@@ -60,7 +61,8 @@ struct async_result<experimental::use_promise_t<Allocator>, R(Args...)>
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_EXPERIMENTAL_IMPL_USE_PROMISE_HPP
+#endif // BOOST_ASIO_EXPERIMENTAL_IMPL_USE_PROMISE_HPP

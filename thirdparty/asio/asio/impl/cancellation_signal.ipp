@@ -2,26 +2,27 @@
 // impl/cancellation_signal.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_IMPL_CANCELLATION_SIGNAL_IPP
-#define ASIO_IMPL_CANCELLATION_SIGNAL_IPP
+#ifndef BOOST_ASIO_IMPL_CANCELLATION_SIGNAL_IPP
+#define BOOST_ASIO_IMPL_CANCELLATION_SIGNAL_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/cancellation_signal.hpp"
-#include "asio/detail/thread_context.hpp"
-#include "asio/detail/thread_info_base.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <boost/asio/cancellation_signal.hpp>
+#include <boost/asio/detail/thread_context.hpp>
+#include <boost/asio/detail/thread_info_base.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 
 cancellation_signal::~cancellation_signal()
@@ -90,7 +91,8 @@ cancellation_slot::auto_delete_helper::~auto_delete_helper()
 }
 
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_IMPL_CANCELLATION_SIGNAL_IPP
+#endif // BOOST_ASIO_IMPL_CANCELLATION_SIGNAL_IPP

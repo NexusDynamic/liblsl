@@ -2,35 +2,36 @@
 // ip/icmp.hpp
 // ~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_IP_ICMP_HPP
-#define ASIO_IP_ICMP_HPP
+#ifndef BOOST_ASIO_IP_ICMP_HPP
+#define BOOST_ASIO_IP_ICMP_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/detail/socket_types.hpp"
-#include "asio/basic_raw_socket.hpp"
-#include "asio/ip/basic_endpoint.hpp"
-#include "asio/ip/basic_resolver.hpp"
-#include "asio/ip/basic_resolver_iterator.hpp"
-#include "asio/ip/basic_resolver_query.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <boost/asio/detail/socket_types.hpp>
+#include <boost/asio/basic_raw_socket.hpp>
+#include <boost/asio/ip/basic_endpoint.hpp>
+#include <boost/asio/ip/basic_resolver.hpp>
+#include <boost/asio/ip/basic_resolver_iterator.hpp>
+#include <boost/asio/ip/basic_resolver_query.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace ip {
 
 /// Encapsulates the flags needed for ICMP.
 /**
- * The asio::ip::icmp class contains flags necessary for ICMP sockets.
+ * The boost::asio::ip::icmp class contains flags necessary for ICMP sockets.
  *
  * @par Thread Safety
  * @e Distinct @e objects: Safe.@n
@@ -46,33 +47,33 @@ public:
   typedef basic_endpoint<icmp> endpoint;
 
   /// Construct to represent the IPv4 ICMP protocol.
-  static icmp v4() ASIO_NOEXCEPT
+  static icmp v4() noexcept
   {
-    return icmp(ASIO_OS_DEF(IPPROTO_ICMP),
-        ASIO_OS_DEF(AF_INET));
+    return icmp(BOOST_ASIO_OS_DEF(IPPROTO_ICMP),
+        BOOST_ASIO_OS_DEF(AF_INET));
   }
 
   /// Construct to represent the IPv6 ICMP protocol.
-  static icmp v6() ASIO_NOEXCEPT
+  static icmp v6() noexcept
   {
-    return icmp(ASIO_OS_DEF(IPPROTO_ICMPV6),
-        ASIO_OS_DEF(AF_INET6));
+    return icmp(BOOST_ASIO_OS_DEF(IPPROTO_ICMPV6),
+        BOOST_ASIO_OS_DEF(AF_INET6));
   }
 
   /// Obtain an identifier for the type of the protocol.
-  int type() const ASIO_NOEXCEPT
+  int type() const noexcept
   {
-    return ASIO_OS_DEF(SOCK_RAW);
+    return BOOST_ASIO_OS_DEF(SOCK_RAW);
   }
 
   /// Obtain an identifier for the protocol.
-  int protocol() const ASIO_NOEXCEPT
+  int protocol() const noexcept
   {
     return protocol_;
   }
 
   /// Obtain an identifier for the protocol family.
-  int family() const ASIO_NOEXCEPT
+  int family() const noexcept
   {
     return family_;
   }
@@ -97,7 +98,7 @@ public:
 
 private:
   // Construct with a specific family.
-  explicit icmp(int protocol_id, int protocol_family) ASIO_NOEXCEPT
+  explicit icmp(int protocol_id, int protocol_family) noexcept
     : protocol_(protocol_id),
       family_(protocol_family)
   {
@@ -109,7 +110,8 @@ private:
 
 } // namespace ip
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_IP_ICMP_HPP
+#endif // BOOST_ASIO_IP_ICMP_HPP

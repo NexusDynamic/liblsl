@@ -9,24 +9,25 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_EXPERIMENTAL_CORO_HPP
-#define ASIO_EXPERIMENTAL_CORO_HPP
+#ifndef BOOST_ASIO_EXPERIMENTAL_CORO_HPP
+#define BOOST_ASIO_EXPERIMENTAL_CORO_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/dispatch.hpp"
-#include "asio/error.hpp"
-#include "asio/error_code.hpp"
-#include "asio/experimental/coro_traits.hpp"
-#include "asio/experimental/detail/coro_promise_allocator.hpp"
-#include "asio/experimental/detail/partial_promise.hpp"
-#include "asio/post.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <boost/asio/dispatch.hpp>
+#include <boost/asio/error.hpp>
+#include <boost/system/error_code.hpp>
+#include <boost/asio/experimental/coro_traits.hpp>
+#include <boost/asio/experimental/detail/coro_promise_allocator.hpp>
+#include <boost/asio/experimental/detail/partial_promise.hpp>
+#include <boost/asio/post.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace experimental {
 namespace detail {
@@ -51,7 +52,7 @@ template <typename Yield = void, typename Return = void,
     typename Allocator = std::allocator<void>>
 struct coro
 {
-  /// The traits of the coroutine. See asio::experimental::coro_traits
+  /// The traits of the coroutine. See boost::asio::experimental::coro_traits
   /// for details.
   using traits = coro_traits<Yield, Return, Executor>;
 
@@ -156,7 +157,7 @@ struct coro
       auto handle =
         detail::coroutine_handle<promise_type>::from_promise(*coro_);
       if (handle)
-        asio::dispatch(coro_->get_executor(), destroyer{handle});
+        boost::asio::dispatch(coro_->get_executor(), destroyer{handle});
     }
   }
 
@@ -274,20 +275,21 @@ private:
 };
 
 /// A generator is a coro that returns void and yields value.
-template<typename T, typename Executor = asio::any_io_executor,
+template<typename T, typename Executor = boost::asio::any_io_executor,
     typename Allocator = std::allocator<void>>
 using generator = coro<T, void, Executor, Allocator>;
 
 /// A task is a coro that does not yield values
-template<typename T, typename Executor = asio::any_io_executor,
+template<typename T, typename Executor = boost::asio::any_io_executor,
     typename Allocator = std::allocator<void>>
 using task = coro<void(), T, Executor, Allocator>;
 
 } // namespace experimental
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#include "asio/experimental/impl/coro.hpp"
+#include <boost/asio/experimental/impl/coro.hpp>
 
-#endif // ASIO_EXPERIMENTAL_CORO_HPP
+#endif // BOOST_ASIO_EXPERIMENTAL_CORO_HPP

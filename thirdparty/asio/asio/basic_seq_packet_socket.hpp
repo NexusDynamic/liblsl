@@ -2,38 +2,39 @@
 // basic_seq_packet_socket.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_BASIC_SEQ_PACKET_SOCKET_HPP
-#define ASIO_BASIC_SEQ_PACKET_SOCKET_HPP
+#ifndef BOOST_ASIO_BASIC_SEQ_PACKET_SOCKET_HPP
+#define BOOST_ASIO_BASIC_SEQ_PACKET_SOCKET_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 #include <cstddef>
-#include "asio/basic_socket.hpp"
-#include "asio/detail/handler_type_requirements.hpp"
-#include "asio/detail/throw_error.hpp"
-#include "asio/error.hpp"
+#include <boost/asio/basic_socket.hpp>
+#include <boost/asio/detail/handler_type_requirements.hpp>
+#include <boost/asio/detail/throw_error.hpp>
+#include <boost/asio/error.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 
-#if !defined(ASIO_BASIC_SEQ_PACKET_SOCKET_FWD_DECL)
-#define ASIO_BASIC_SEQ_PACKET_SOCKET_FWD_DECL
+#if !defined(BOOST_ASIO_BASIC_SEQ_PACKET_SOCKET_FWD_DECL)
+#define BOOST_ASIO_BASIC_SEQ_PACKET_SOCKET_FWD_DECL
 
 // Forward declaration with defaulted arguments.
 template <typename Protocol, typename Executor = any_io_executor>
 class basic_seq_packet_socket;
 
-#endif // !defined(ASIO_BASIC_SEQ_PACKET_SOCKET_FWD_DECL)
+#endif // !defined(BOOST_ASIO_BASIC_SEQ_PACKET_SOCKET_FWD_DECL)
 
 /// Provides sequenced packet socket functionality.
 /**
@@ -111,9 +112,9 @@ public:
    */
   template <typename ExecutionContext>
   explicit basic_seq_packet_socket(ExecutionContext& context,
-      typename constraint<
+      constraint_t<
         is_convertible<ExecutionContext&, execution_context&>::value
-      >::type = 0)
+      > = 0)
     : basic_socket<Protocol, Executor>(context)
   {
   }
@@ -129,7 +130,7 @@ public:
    *
    * @param protocol An object specifying protocol parameters to be used.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    */
   basic_seq_packet_socket(const executor_type& ex,
       const protocol_type& protocol)
@@ -149,15 +150,15 @@ public:
    *
    * @param protocol An object specifying protocol parameters to be used.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    */
   template <typename ExecutionContext>
   basic_seq_packet_socket(ExecutionContext& context,
       const protocol_type& protocol,
-      typename constraint<
+      constraint_t<
         is_convertible<ExecutionContext&, execution_context&>::value,
         defaulted_constraint
-      >::type = defaulted_constraint())
+      > = defaulted_constraint())
     : basic_socket<Protocol, Executor>(context, protocol)
   {
   }
@@ -175,7 +176,7 @@ public:
    * @param endpoint An endpoint on the local machine to which the sequenced
    * packet socket will be bound.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    */
   basic_seq_packet_socket(const executor_type& ex,
       const endpoint_type& endpoint)
@@ -197,14 +198,14 @@ public:
    * @param endpoint An endpoint on the local machine to which the sequenced
    * packet socket will be bound.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    */
   template <typename ExecutionContext>
   basic_seq_packet_socket(ExecutionContext& context,
       const endpoint_type& endpoint,
-      typename constraint<
+      constraint_t<
         is_convertible<ExecutionContext&, execution_context&>::value
-      >::type = 0)
+      > = 0)
     : basic_socket<Protocol, Executor>(context, endpoint)
   {
   }
@@ -221,7 +222,7 @@ public:
    *
    * @param native_socket The new underlying socket implementation.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    */
   basic_seq_packet_socket(const executor_type& ex,
       const protocol_type& protocol, const native_handle_type& native_socket)
@@ -242,19 +243,18 @@ public:
    *
    * @param native_socket The new underlying socket implementation.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    */
   template <typename ExecutionContext>
   basic_seq_packet_socket(ExecutionContext& context,
       const protocol_type& protocol, const native_handle_type& native_socket,
-      typename constraint<
+      constraint_t<
         is_convertible<ExecutionContext&, execution_context&>::value
-      >::type = 0)
+      > = 0)
     : basic_socket<Protocol, Executor>(context, protocol, native_socket)
   {
   }
 
-#if defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
   /// Move-construct a basic_seq_packet_socket from another.
   /**
    * This constructor moves a sequenced packet socket from one object to
@@ -267,7 +267,7 @@ public:
    * constructed using the @c basic_seq_packet_socket(const executor_type&)
    * constructor.
    */
-  basic_seq_packet_socket(basic_seq_packet_socket&& other) ASIO_NOEXCEPT
+  basic_seq_packet_socket(basic_seq_packet_socket&& other) noexcept
     : basic_socket<Protocol, Executor>(std::move(other))
   {
   }
@@ -305,10 +305,10 @@ public:
    */
   template <typename Protocol1, typename Executor1>
   basic_seq_packet_socket(basic_seq_packet_socket<Protocol1, Executor1>&& other,
-      typename constraint<
+      constraint_t<
         is_convertible<Protocol1, Protocol>::value
           && is_convertible<Executor1, Executor>::value
-      >::type = 0)
+      > = 0)
     : basic_socket<Protocol, Executor>(std::move(other))
   {
   }
@@ -327,16 +327,15 @@ public:
    * constructor.
    */
   template <typename Protocol1, typename Executor1>
-  typename constraint<
+  constraint_t<
     is_convertible<Protocol1, Protocol>::value
       && is_convertible<Executor1, Executor>::value,
     basic_seq_packet_socket&
-  >::type operator=(basic_seq_packet_socket<Protocol1, Executor1>&& other)
+  > operator=(basic_seq_packet_socket<Protocol1, Executor1>&& other)
   {
     basic_socket<Protocol, Executor>::operator=(std::move(other));
     return *this;
   }
-#endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
 
   /// Destroys the socket.
   /**
@@ -359,12 +358,12 @@ public:
    *
    * @returns The number of bytes sent.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    *
    * @par Example
    * To send a single data buffer use the @ref buffer function as follows:
    * @code
-   * socket.send(asio::buffer(data, size), 0);
+   * socket.send(boost::asio::buffer(data, size), 0);
    * @endcode
    * See the @ref buffer documentation for information on sending multiple
    * buffers in one go, and how to use it with arrays, boost::array or
@@ -374,10 +373,10 @@ public:
   std::size_t send(const ConstBufferSequence& buffers,
       socket_base::message_flags flags)
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     std::size_t s = this->impl_.get_service().send(
         this->impl_.get_implementation(), buffers, flags, ec);
-    asio::detail::throw_error(ec, "send");
+    boost::asio::detail::throw_error(ec, "send");
     return s;
   }
 
@@ -401,7 +400,7 @@ public:
    */
   template <typename ConstBufferSequence>
   std::size_t send(const ConstBufferSequence& buffers,
-      socket_base::message_flags flags, asio::error_code& ec)
+      socket_base::message_flags flags, boost::system::error_code& ec)
   {
     return this->impl_.get_service().send(
         this->impl_.get_implementation(), buffers, flags, ec);
@@ -426,21 +425,21 @@ public:
    * @ref yield_context, or a function object with the correct completion
    * signature. The function signature of the completion handler must be:
    * @code void handler(
-   *   const asio::error_code& error, // Result of operation.
+   *   const boost::system::error_code& error, // Result of operation.
    *   std::size_t bytes_transferred // Number of bytes sent.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using boost::asio::async_immediate().
    *
    * @par Completion Signature
-   * @code void(asio::error_code, std::size_t) @endcode
+   * @code void(boost::system::error_code, std::size_t) @endcode
    *
    * @par Example
    * To send a single data buffer use the @ref buffer function as follows:
    * @code
-   * socket.async_send(asio::buffer(data, size), 0, handler);
+   * socket.async_send(boost::asio::buffer(data, size), 0, handler);
    * @endcode
    * See the @ref buffer documentation for information on sending multiple
    * buffers in one go, and how to use it with arrays, boost::array or
@@ -448,7 +447,7 @@ public:
    *
    * @par Per-Operation Cancellation
    * On POSIX or Windows operating systems, this asynchronous operation supports
-   * cancellation for the following asio::cancellation_type values:
+   * cancellation for the following boost::asio::cancellation_type values:
    *
    * @li @c cancellation_type::terminal
    *
@@ -457,22 +456,20 @@ public:
    * @li @c cancellation_type::total
    */
   template <typename ConstBufferSequence,
-      ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
         std::size_t)) WriteToken
-          ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX(WriteToken,
-      void (asio::error_code, std::size_t))
-  async_send(const ConstBufferSequence& buffers,
+          = default_completion_token_t<executor_type>>
+  auto async_send(const ConstBufferSequence& buffers,
       socket_base::message_flags flags,
-      ASIO_MOVE_ARG(WriteToken) token
-        ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
-    ASIO_INITFN_AUTO_RESULT_TYPE_SUFFIX((
+      WriteToken&& token
+        = default_completion_token_t<executor_type>())
+    -> decltype(
       async_initiate<WriteToken,
-        void (asio::error_code, std::size_t)>(
-          declval<initiate_async_send>(), token, buffers, flags)))
+        void (boost::system::error_code, std::size_t)>(
+          declval<initiate_async_send>(), token, buffers, flags))
   {
     return async_initiate<WriteToken,
-      void (asio::error_code, std::size_t)>(
+      void (boost::system::error_code, std::size_t)>(
         initiate_async_send(this), token, buffers, flags);
   }
 
@@ -491,15 +488,15 @@ public:
    *
    * @returns The number of bytes received.
    *
-   * @throws asio::system_error Thrown on failure. An error code of
-   * asio::error::eof indicates that the connection was closed by the
+   * @throws boost::system::system_error Thrown on failure. An error code of
+   * boost::asio::error::eof indicates that the connection was closed by the
    * peer.
    *
    * @par Example
    * To receive into a single data buffer use the @ref buffer function as
    * follows:
    * @code
-   * socket.receive(asio::buffer(data, size), out_flags);
+   * socket.receive(boost::asio::buffer(data, size), out_flags);
    * @endcode
    * See the @ref buffer documentation for information on receiving into
    * multiple buffers in one go, and how to use it with arrays, boost::array or
@@ -509,10 +506,10 @@ public:
   std::size_t receive(const MutableBufferSequence& buffers,
       socket_base::message_flags& out_flags)
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     std::size_t s = this->impl_.get_service().receive_with_flags(
         this->impl_.get_implementation(), buffers, 0, out_flags, ec);
-    asio::detail::throw_error(ec, "receive");
+    boost::asio::detail::throw_error(ec, "receive");
     return s;
   }
 
@@ -533,8 +530,8 @@ public:
    *
    * @returns The number of bytes received.
    *
-   * @throws asio::system_error Thrown on failure. An error code of
-   * asio::error::eof indicates that the connection was closed by the
+   * @throws boost::system::system_error Thrown on failure. An error code of
+   * boost::asio::error::eof indicates that the connection was closed by the
    * peer.
    *
    * @note The receive operation may not receive all of the requested number of
@@ -545,7 +542,7 @@ public:
    * To receive into a single data buffer use the @ref buffer function as
    * follows:
    * @code
-   * socket.receive(asio::buffer(data, size), 0, out_flags);
+   * socket.receive(boost::asio::buffer(data, size), 0, out_flags);
    * @endcode
    * See the @ref buffer documentation for information on receiving into
    * multiple buffers in one go, and how to use it with arrays, boost::array or
@@ -556,10 +553,10 @@ public:
       socket_base::message_flags in_flags,
       socket_base::message_flags& out_flags)
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     std::size_t s = this->impl_.get_service().receive_with_flags(
         this->impl_.get_implementation(), buffers, in_flags, out_flags, ec);
-    asio::detail::throw_error(ec, "receive");
+    boost::asio::detail::throw_error(ec, "receive");
     return s;
   }
 
@@ -589,7 +586,7 @@ public:
   template <typename MutableBufferSequence>
   std::size_t receive(const MutableBufferSequence& buffers,
       socket_base::message_flags in_flags,
-      socket_base::message_flags& out_flags, asio::error_code& ec)
+      socket_base::message_flags& out_flags, boost::system::error_code& ec)
   {
     return this->impl_.get_service().receive_with_flags(
         this->impl_.get_implementation(), buffers, in_flags, out_flags, ec);
@@ -618,22 +615,22 @@ public:
    * @ref yield_context, or a function object with the correct completion
    * signature. The function signature of the completion handler must be:
    * @code void handler(
-   *   const asio::error_code& error, // Result of operation.
+   *   const boost::system::error_code& error, // Result of operation.
    *   std::size_t bytes_transferred // Number of bytes received.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using boost::asio::async_immediate().
    *
    * @par Completion Signature
-   * @code void(asio::error_code, std::size_t) @endcode
+   * @code void(boost::system::error_code, std::size_t) @endcode
    *
    * @par Example
    * To receive into a single data buffer use the @ref buffer function as
    * follows:
    * @code
-   * socket.async_receive(asio::buffer(data, size), out_flags, handler);
+   * socket.async_receive(boost::asio::buffer(data, size), out_flags, handler);
    * @endcode
    * See the @ref buffer documentation for information on receiving into
    * multiple buffers in one go, and how to use it with arrays, boost::array or
@@ -641,7 +638,7 @@ public:
    *
    * @par Per-Operation Cancellation
    * On POSIX or Windows operating systems, this asynchronous operation supports
-   * cancellation for the following asio::cancellation_type values:
+   * cancellation for the following boost::asio::cancellation_type values:
    *
    * @li @c cancellation_type::terminal
    *
@@ -650,23 +647,19 @@ public:
    * @li @c cancellation_type::total
    */
   template <typename MutableBufferSequence,
-      ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
-        std::size_t)) ReadToken
-          ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX(ReadToken,
-      void (asio::error_code, std::size_t))
-  async_receive(const MutableBufferSequence& buffers,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+        std::size_t)) ReadToken = default_completion_token_t<executor_type>>
+  auto async_receive(const MutableBufferSequence& buffers,
       socket_base::message_flags& out_flags,
-      ASIO_MOVE_ARG(ReadToken) token
-        ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
-    ASIO_INITFN_AUTO_RESULT_TYPE_SUFFIX((
+      ReadToken&& token = default_completion_token_t<executor_type>())
+    -> decltype(
       async_initiate<ReadToken,
-        void (asio::error_code, std::size_t)>(
+        void (boost::system::error_code, std::size_t)>(
           declval<initiate_async_receive_with_flags>(), token,
-          buffers, socket_base::message_flags(0), &out_flags)))
+          buffers, socket_base::message_flags(0), &out_flags))
   {
     return async_initiate<ReadToken,
-      void (asio::error_code, std::size_t)>(
+      void (boost::system::error_code, std::size_t)>(
         initiate_async_receive_with_flags(this), token,
         buffers, socket_base::message_flags(0), &out_flags);
   }
@@ -696,23 +689,23 @@ public:
    * @ref yield_context, or a function object with the correct completion
    * signature. The function signature of the completion handler must be:
    * @code void handler(
-   *   const asio::error_code& error, // Result of operation.
+   *   const boost::system::error_code& error, // Result of operation.
    *   std::size_t bytes_transferred // Number of bytes received.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using boost::asio::async_immediate().
    *
    * @par Completion Signature
-   * @code void(asio::error_code, std::size_t) @endcode
+   * @code void(boost::system::error_code, std::size_t) @endcode
    *
    * @par Example
    * To receive into a single data buffer use the @ref buffer function as
    * follows:
    * @code
    * socket.async_receive(
-   *     asio::buffer(data, size),
+   *     boost::asio::buffer(data, size),
    *     0, out_flags, handler);
    * @endcode
    * See the @ref buffer documentation for information on receiving into
@@ -721,7 +714,7 @@ public:
    *
    * @par Per-Operation Cancellation
    * On POSIX or Windows operating systems, this asynchronous operation supports
-   * cancellation for the following asio::cancellation_type values:
+   * cancellation for the following boost::asio::cancellation_type values:
    *
    * @li @c cancellation_type::terminal
    *
@@ -730,33 +723,29 @@ public:
    * @li @c cancellation_type::total
    */
   template <typename MutableBufferSequence,
-      ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
-        std::size_t)) ReadToken
-          ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX(ReadToken,
-      void (asio::error_code, std::size_t))
-  async_receive(const MutableBufferSequence& buffers,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+        std::size_t)) ReadToken = default_completion_token_t<executor_type>>
+  auto async_receive(const MutableBufferSequence& buffers,
       socket_base::message_flags in_flags,
       socket_base::message_flags& out_flags,
-      ASIO_MOVE_ARG(ReadToken) token
-        ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
-    ASIO_INITFN_AUTO_RESULT_TYPE_SUFFIX((
+      ReadToken&& token = default_completion_token_t<executor_type>())
+    -> decltype(
       async_initiate<ReadToken,
-        void (asio::error_code, std::size_t)>(
+        void (boost::system::error_code, std::size_t)>(
           declval<initiate_async_receive_with_flags>(),
-          token, buffers, in_flags, &out_flags)))
+          token, buffers, in_flags, &out_flags))
   {
     return async_initiate<ReadToken,
-      void (asio::error_code, std::size_t)>(
+      void (boost::system::error_code, std::size_t)>(
         initiate_async_receive_with_flags(this),
         token, buffers, in_flags, &out_flags);
   }
 
 private:
   // Disallow copying and assignment.
-  basic_seq_packet_socket(const basic_seq_packet_socket&) ASIO_DELETED;
+  basic_seq_packet_socket(const basic_seq_packet_socket&) = delete;
   basic_seq_packet_socket& operator=(
-      const basic_seq_packet_socket&) ASIO_DELETED;
+      const basic_seq_packet_socket&) = delete;
 
   class initiate_async_send
   {
@@ -768,19 +757,19 @@ private:
     {
     }
 
-    const executor_type& get_executor() const ASIO_NOEXCEPT
+    const executor_type& get_executor() const noexcept
     {
       return self_->get_executor();
     }
 
     template <typename WriteHandler, typename ConstBufferSequence>
-    void operator()(ASIO_MOVE_ARG(WriteHandler) handler,
+    void operator()(WriteHandler&& handler,
         const ConstBufferSequence& buffers,
         socket_base::message_flags flags) const
     {
       // If you get an error on the following line it means that your handler
       // does not meet the documented type requirements for a WriteHandler.
-      ASIO_WRITE_HANDLER_CHECK(WriteHandler, handler) type_check;
+      BOOST_ASIO_WRITE_HANDLER_CHECK(WriteHandler, handler) type_check;
 
       detail::non_const_lvalue<WriteHandler> handler2(handler);
       self_->impl_.get_service().async_send(
@@ -802,20 +791,20 @@ private:
     {
     }
 
-    const executor_type& get_executor() const ASIO_NOEXCEPT
+    const executor_type& get_executor() const noexcept
     {
       return self_->get_executor();
     }
 
     template <typename ReadHandler, typename MutableBufferSequence>
-    void operator()(ASIO_MOVE_ARG(ReadHandler) handler,
+    void operator()(ReadHandler&& handler,
         const MutableBufferSequence& buffers,
         socket_base::message_flags in_flags,
         socket_base::message_flags* out_flags) const
     {
       // If you get an error on the following line it means that your handler
       // does not meet the documented type requirements for a ReadHandler.
-      ASIO_READ_HANDLER_CHECK(ReadHandler, handler) type_check;
+      BOOST_ASIO_READ_HANDLER_CHECK(ReadHandler, handler) type_check;
 
       detail::non_const_lvalue<ReadHandler> handler2(handler);
       self_->impl_.get_service().async_receive_with_flags(
@@ -829,7 +818,8 @@ private:
 };
 
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_BASIC_SEQ_PACKET_SOCKET_HPP
+#endif // BOOST_ASIO_BASIC_SEQ_PACKET_SOCKET_HPP

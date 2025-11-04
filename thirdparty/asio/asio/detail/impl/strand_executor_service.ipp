@@ -2,24 +2,25 @@
 // detail/impl/strand_executor_service.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_DETAIL_IMPL_STRAND_EXECUTOR_SERVICE_IPP
-#define ASIO_DETAIL_IMPL_STRAND_EXECUTOR_SERVICE_IPP
+#ifndef BOOST_ASIO_DETAIL_IMPL_STRAND_EXECUTOR_SERVICE_IPP
+#define BOOST_ASIO_DETAIL_IMPL_STRAND_EXECUTOR_SERVICE_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/detail/strand_executor_service.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <boost/asio/detail/strand_executor_service.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -35,7 +36,7 @@ void strand_executor_service::shutdown()
 {
   op_queue<scheduler_operation> ops;
 
-  asio::detail::mutex::scoped_lock lock(mutex_);
+  boost::asio::detail::mutex::scoped_lock lock(mutex_);
 
   strand_impl* impl = impl_list_;
   while (impl)
@@ -52,11 +53,12 @@ void strand_executor_service::shutdown()
 strand_executor_service::implementation_type
 strand_executor_service::create_implementation()
 {
-  implementation_type new_impl(new strand_impl);
+  execution_context::allocator<void> alloc(context());
+  implementation_type new_impl = allocate_shared<strand_impl>(alloc);
   new_impl->locked_ = false;
   new_impl->shutdown_ = false;
 
-  asio::detail::mutex::scoped_lock lock(mutex_);
+  boost::asio::detail::mutex::scoped_lock lock(mutex_);
 
   // Select a mutex from the pool of shared mutexes.
   std::size_t salt = salt_++;
@@ -64,8 +66,8 @@ strand_executor_service::create_implementation()
   mutex_index += (reinterpret_cast<std::size_t>(new_impl.get()) >> 3);
   mutex_index ^= salt + 0x9e3779b9 + (mutex_index << 6) + (mutex_index >> 2);
   mutex_index = mutex_index % num_mutexes;
-  if (!mutexes_[mutex_index].get())
-    mutexes_[mutex_index].reset(new mutex);
+  if (!mutexes_[mutex_index])
+    mutexes_[mutex_index] = allocate_shared<mutex>(alloc);
   new_impl->mutex_ = mutexes_[mutex_index].get();
 
   // Insert implementation into linked list of all implementations.
@@ -81,7 +83,7 @@ strand_executor_service::create_implementation()
 
 strand_executor_service::strand_impl::~strand_impl()
 {
-  asio::detail::mutex::scoped_lock lock(service_->mutex_);
+  boost::asio::detail::mutex::scoped_lock lock(service_->mutex_);
 
   // Remove implementation from linked list of all implementations.
   if (service_->impl_list_ == this)
@@ -142,7 +144,7 @@ void strand_executor_service::run_ready_handlers(implementation_type& impl)
 
   // Run all ready handlers. No lock is required since the ready queue is
   // accessed only within the strand.
-  asio::error_code ec;
+  boost::system::error_code ec;
   while (scheduler_operation* o = impl->ready_queue_.front())
   {
     impl->ready_queue_.pop();
@@ -152,7 +154,8 @@ void strand_executor_service::run_ready_handlers(implementation_type& impl)
 
 } // namespace detail
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_DETAIL_IMPL_STRAND_EXECUTOR_SERVICE_IPP
+#endif // BOOST_ASIO_DETAIL_IMPL_STRAND_EXECUTOR_SERVICE_IPP

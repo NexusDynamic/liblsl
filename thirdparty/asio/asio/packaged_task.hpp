@@ -2,35 +2,32 @@
 // packaged_task.hpp
 // ~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_PACKAGED_TASK_HPP
-#define ASIO_PACKAGED_TASK_HPP
+#ifndef BOOST_ASIO_PACKAGED_TASK_HPP
+#define BOOST_ASIO_PACKAGED_TASK_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/detail/future.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <boost/asio/detail/future.hpp>
 
-#if defined(ASIO_HAS_STD_FUTURE_CLASS) \
+#if defined(BOOST_ASIO_HAS_STD_FUTURE_CLASS) \
   || defined(GENERATING_DOCUMENTATION)
 
-#include "asio/async_result.hpp"
-#include "asio/detail/type_traits.hpp"
-#include "asio/detail/variadic_templates.hpp"
+#include <boost/asio/async_result.hpp>
+#include <boost/asio/detail/type_traits.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
-
-#if defined(ASIO_HAS_VARIADIC_TEMPLATES) \
-  || defined(GENERATING_DOCUMENTATION)
 
 /// Partial specialisation of @c async_result for @c std::packaged_task.
 template <typename Result, typename... Args, typename Signature>
@@ -60,67 +57,12 @@ private:
   return_type future_;
 };
 
-#else // defined(ASIO_HAS_VARIADIC_TEMPLATES)
-      //   || defined(GENERATING_DOCUMENTATION)
-
-template <typename Result, typename Signature>
-struct async_result<std::packaged_task<Result()>, Signature>
-{
-  typedef std::packaged_task<Result()> completion_handler_type;
-  typedef std::future<Result> return_type;
-
-  explicit async_result(completion_handler_type& h)
-    : future_(h.get_future())
-  {
-  }
-
-  return_type get()
-  {
-    return std::move(future_);
-  }
-
-private:
-  return_type future_;
-};
-
-#define ASIO_PRIVATE_ASYNC_RESULT_DEF(n) \
-  template <typename Result, \
-    ASIO_VARIADIC_TPARAMS(n), typename Signature> \
-  class async_result< \
-    std::packaged_task<Result(ASIO_VARIADIC_TARGS(n))>, Signature> \
-  { \
-  public: \
-    typedef std::packaged_task< \
-      Result(ASIO_VARIADIC_TARGS(n))> \
-        completion_handler_type; \
-  \
-    typedef std::future<Result> return_type; \
-  \
-    explicit async_result(completion_handler_type& h) \
-      : future_(h.get_future()) \
-    { \
-    } \
-  \
-    return_type get() \
-    { \
-      return std::move(future_); \
-    } \
-  \
-  private: \
-    return_type future_; \
-  }; \
-  /**/
-  ASIO_VARIADIC_GENERATE(ASIO_PRIVATE_ASYNC_RESULT_DEF)
-#undef ASIO_PRIVATE_ASYNC_RESULT_DEF
-
-#endif // defined(ASIO_HAS_VARIADIC_TEMPLATES)
-       //   || defined(GENERATING_DOCUMENTATION)
-
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // defined(ASIO_HAS_STD_FUTURE_CLASS)
+#endif // defined(BOOST_ASIO_HAS_STD_FUTURE_CLASS)
        //   || defined(GENERATING_DOCUMENTATION)
 
-#endif // ASIO_PACKAGED_TASK_HPP
+#endif // BOOST_ASIO_PACKAGED_TASK_HPP

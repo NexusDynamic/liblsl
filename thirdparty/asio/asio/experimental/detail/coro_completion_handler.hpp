@@ -9,19 +9,20 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_EXPERIMENTAL_DETAIL_CORO_COMPLETION_HANDLER_HPP
-#define ASIO_EXPERIMENTAL_DETAIL_CORO_COMPLETION_HANDLER_HPP
+#ifndef BOOST_ASIO_EXPERIMENTAL_DETAIL_CORO_COMPLETION_HANDLER_HPP
+#define BOOST_ASIO_EXPERIMENTAL_DETAIL_CORO_COMPLETION_HANDLER_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/deferred.hpp"
-#include "asio/experimental/coro.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <boost/asio/deferred.hpp>
+#include <boost/asio/experimental/coro.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace experimental {
 namespace detail {
@@ -110,11 +111,11 @@ auto coro_interpret_result(std::tuple<std::exception_ptr, Args...>&& args)
 
 template <typename... Args>
 auto coro_interpret_result(
-    std::tuple<asio::error_code, Args...>&& args)
+    std::tuple<boost::system::error_code, Args...>&& args)
 {
   if (std::get<0>(args))
-    asio::detail::throw_exception(
-        asio::system_error(std::get<0>(args)));
+    boost::asio::detail::throw_exception(
+        boost::system::system_error(std::get<0>(args)));
 
   return std::apply(
       [](auto, auto&&... rest)
@@ -138,11 +139,11 @@ auto coro_interpret_result(std::tuple<std::exception_ptr, Arg>&& args)
 }
 
 inline auto coro_interpret_result(
-    std::tuple<asio::error_code>&& args)
+    std::tuple<boost::system::error_code>&& args)
 {
   if (std::get<0>(args))
-    asio::detail::throw_exception(
-        asio::system_error(std::get<0>(args)));
+    boost::asio::detail::throw_exception(
+        boost::system::system_error(std::get<0>(args)));
 }
 
 inline auto coro_interpret_result(std::tuple<std::exception_ptr>&& args)
@@ -152,18 +153,19 @@ inline auto coro_interpret_result(std::tuple<std::exception_ptr>&& args)
 }
 
 template <typename Arg>
-auto coro_interpret_result(std::tuple<asio::error_code, Arg>&& args)
+auto coro_interpret_result(std::tuple<boost::system::error_code, Arg>&& args)
 {
   if (std::get<0>(args))
-    asio::detail::throw_exception(
-        asio::system_error(std::get<0>(args)));
+    boost::asio::detail::throw_exception(
+        boost::system::system_error(std::get<0>(args)));
   return std::get<1>(std::move(args));
 }
 
 } // namespace detail
 } // namespace experimental
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_EXPERIMENTAL_DETAIL_CORO_COMPLETION_HANDLER_HPP
+#endif // BOOST_ASIO_EXPERIMENTAL_DETAIL_CORO_COMPLETION_HANDLER_HPP

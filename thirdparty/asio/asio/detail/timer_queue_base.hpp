@@ -2,26 +2,27 @@
 // detail/timer_queue_base.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_DETAIL_TIMER_QUEUE_BASE_HPP
-#define ASIO_DETAIL_TIMER_QUEUE_BASE_HPP
+#ifndef BOOST_ASIO_DETAIL_TIMER_QUEUE_BASE_HPP
+#define BOOST_ASIO_DETAIL_TIMER_QUEUE_BASE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/detail/noncopyable.hpp"
-#include "asio/detail/op_queue.hpp"
-#include "asio/detail/operation.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <boost/asio/detail/noncopyable.hpp>
+#include <boost/asio/detail/op_queue.hpp>
+#include <boost/asio/detail/operation.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -57,12 +58,13 @@ private:
   timer_queue_base* next_;
 };
 
-template <typename Time_Traits>
+template <typename TimeTraits, typename Allocator>
 class timer_queue;
 
 } // namespace detail
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_DETAIL_TIMER_QUEUE_BASE_HPP
+#endif // BOOST_ASIO_DETAIL_TIMER_QUEUE_BASE_HPP

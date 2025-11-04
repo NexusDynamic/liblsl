@@ -9,18 +9,19 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_EXPERIMENTAL_DETAIL_CORO_TRAITS_HPP
-#define ASIO_EXPERIMENTAL_DETAIL_CORO_TRAITS_HPP
+#ifndef BOOST_ASIO_EXPERIMENTAL_DETAIL_CORO_TRAITS_HPP
+#define BOOST_ASIO_EXPERIMENTAL_DETAIL_CORO_TRAITS_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 #include <optional>
 #include <variant>
-#include "asio/any_io_executor.hpp"
+#include <boost/asio/any_io_executor.hpp>
 
+namespace boost {
 namespace asio {
 namespace experimental {
 namespace detail {
@@ -224,5 +225,6 @@ struct coro_traits<void() noexcept, void, Executor>
 
 } // namespace experimental
 } // namespace asio
+} // namespace boost
 
-#endif // ASIO_EXPERIMENTAL_DETAIL_CORO_TRAITS_HPP
+#endif // BOOST_ASIO_EXPERIMENTAL_DETAIL_CORO_TRAITS_HPP

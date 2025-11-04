@@ -2,31 +2,32 @@
 // detail/hash_map.hpp
 // ~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_DETAIL_HASH_MAP_HPP
-#define ASIO_DETAIL_HASH_MAP_HPP
+#ifndef BOOST_ASIO_DETAIL_HASH_MAP_HPP
+#define BOOST_ASIO_DETAIL_HASH_MAP_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 #include <list>
 #include <utility>
-#include "asio/detail/assert.hpp"
-#include "asio/detail/noncopyable.hpp"
+#include <boost/asio/detail/assert.hpp>
+#include <boost/asio/detail/noncopyable.hpp>
 
-#if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
-# include "asio/detail/socket_types.hpp"
-#endif // defined(ASIO_WINDOWS) || defined(__CYGWIN__)
+#if defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
+# include <boost/asio/detail/socket_types.hpp>
+#endif // defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -41,12 +42,12 @@ inline std::size_t calculate_hash_value(void* p)
     + (reinterpret_cast<std::size_t>(p) >> 3);
 }
 
-#if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
+#if defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
 inline std::size_t calculate_hash_value(SOCKET s)
 {
   return static_cast<std::size_t>(s);
 }
-#endif // defined(ASIO_WINDOWS) || defined(__CYGWIN__)
+#endif // defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
 
 // Note: assumes K and V are POD types.
 template <typename K, typename V>
@@ -179,8 +180,8 @@ public:
   // Erase an entry from the map.
   void erase(iterator it)
   {
-    ASIO_ASSERT(it != values_.end());
-    ASIO_ASSERT(num_buckets_ != 0);
+    BOOST_ASIO_ASSERT(it != values_.end());
+    BOOST_ASIO_ASSERT(num_buckets_ != 0);
 
     size_t bucket = calculate_hash_value(it->first) % num_buckets_;
     bool is_first = (it == buckets_[bucket].first);
@@ -223,13 +224,13 @@ private:
   {
     static std::size_t sizes[] =
     {
-#if defined(ASIO_HASH_MAP_BUCKETS)
-      ASIO_HASH_MAP_BUCKETS
-#else // ASIO_HASH_MAP_BUCKETS
+#if defined(BOOST_ASIO_HASH_MAP_BUCKETS)
+      BOOST_ASIO_HASH_MAP_BUCKETS
+#else // BOOST_ASIO_HASH_MAP_BUCKETS
       3, 13, 23, 53, 97, 193, 389, 769, 1543, 3079, 6151, 12289, 24593,
       49157, 98317, 196613, 393241, 786433, 1572869, 3145739, 6291469,
       12582917, 25165843
-#endif // ASIO_HASH_MAP_BUCKETS
+#endif // BOOST_ASIO_HASH_MAP_BUCKETS
     };
     const std::size_t nth_size = sizeof(sizes) / sizeof(std::size_t) - 1;
     for (std::size_t i = 0; i < nth_size; ++i)
@@ -243,7 +244,7 @@ private:
   {
     if (num_buckets == num_buckets_)
       return;
-    ASIO_ASSERT(num_buckets != 0);
+    BOOST_ASIO_ASSERT(num_buckets != 0);
 
     iterator end_iter = values_.end();
 
@@ -325,7 +326,8 @@ private:
 
 } // namespace detail
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_DETAIL_HASH_MAP_HPP
+#endif // BOOST_ASIO_DETAIL_HASH_MAP_HPP

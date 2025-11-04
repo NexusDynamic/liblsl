@@ -2,23 +2,24 @@
 // handler_continuation_hook.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_HANDLER_CONTINUATION_HOOK_HPP
-#define ASIO_HANDLER_CONTINUATION_HOOK_HPP
+#ifndef BOOST_ASIO_HANDLER_CONTINUATION_HOOK_HPP
+#define BOOST_ASIO_HANDLER_CONTINUATION_HOOK_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 
 /// Default continuation function for handlers.
@@ -48,7 +49,8 @@ inline bool asio_handler_is_continuation(...)
 }
 
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_HANDLER_CONTINUATION_HOOK_HPP
+#endif // BOOST_ASIO_HANDLER_CONTINUATION_HOOK_HPP

@@ -2,30 +2,31 @@
 // ssl/detail/engine.hpp
 // ~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_SSL_DETAIL_ENGINE_HPP
-#define ASIO_SSL_DETAIL_ENGINE_HPP
+#ifndef BOOST_ASIO_SSL_DETAIL_ENGINE_HPP
+#define BOOST_ASIO_SSL_DETAIL_ENGINE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 
-#include "asio/buffer.hpp"
-#include "asio/detail/static_mutex.hpp"
-#include "asio/ssl/detail/openssl_types.hpp"
-#include "asio/ssl/detail/verify_callback.hpp"
-#include "asio/ssl/stream_base.hpp"
-#include "asio/ssl/verify_mode.hpp"
+#include <boost/asio/buffer.hpp>
+#include <boost/asio/detail/static_mutex.hpp>
+#include <boost/asio/ssl/detail/openssl_types.hpp>
+#include <boost/asio/ssl/detail/verify_callback.hpp>
+#include <boost/asio/ssl/stream_base.hpp>
+#include <boost/asio/ssl/verify_mode.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace ssl {
 namespace detail {
@@ -56,68 +57,64 @@ public:
   };
 
   // Construct a new engine for the specified context.
-  ASIO_DECL explicit engine(SSL_CTX* context);
+  BOOST_ASIO_DECL explicit engine(SSL_CTX* context);
 
   // Construct a new engine for an existing native SSL implementation.
-  ASIO_DECL explicit engine(SSL* ssl_impl);
+  BOOST_ASIO_DECL explicit engine(SSL* ssl_impl);
 
-#if defined(ASIO_HAS_MOVE)
   // Move construct from another engine.
-  ASIO_DECL engine(engine&& other) ASIO_NOEXCEPT;
-#endif // defined(ASIO_HAS_MOVE)
+  BOOST_ASIO_DECL engine(engine&& other) noexcept;
 
   // Destructor.
-  ASIO_DECL ~engine();
+  BOOST_ASIO_DECL ~engine();
 
-#if defined(ASIO_HAS_MOVE)
   // Move assign from another engine.
-  ASIO_DECL engine& operator=(engine&& other) ASIO_NOEXCEPT;
-#endif // defined(ASIO_HAS_MOVE)
+  BOOST_ASIO_DECL engine& operator=(engine&& other) noexcept;
 
   // Get the underlying implementation in the native type.
-  ASIO_DECL SSL* native_handle();
+  BOOST_ASIO_DECL SSL* native_handle();
 
   // Set the peer verification mode.
-  ASIO_DECL asio::error_code set_verify_mode(
-      verify_mode v, asio::error_code& ec);
+  BOOST_ASIO_DECL boost::system::error_code set_verify_mode(
+      verify_mode v, boost::system::error_code& ec);
 
   // Set the peer verification depth.
-  ASIO_DECL asio::error_code set_verify_depth(
-      int depth, asio::error_code& ec);
+  BOOST_ASIO_DECL boost::system::error_code set_verify_depth(
+      int depth, boost::system::error_code& ec);
 
   // Set a peer certificate verification callback.
-  ASIO_DECL asio::error_code set_verify_callback(
-      verify_callback_base* callback, asio::error_code& ec);
+  BOOST_ASIO_DECL boost::system::error_code set_verify_callback(
+      verify_callback_base* callback, boost::system::error_code& ec);
 
   // Perform an SSL handshake using either SSL_connect (client-side) or
   // SSL_accept (server-side).
-  ASIO_DECL want handshake(
-      stream_base::handshake_type type, asio::error_code& ec);
+  BOOST_ASIO_DECL want handshake(
+      stream_base::handshake_type type, boost::system::error_code& ec);
 
   // Perform a graceful shutdown of the SSL session.
-  ASIO_DECL want shutdown(asio::error_code& ec);
+  BOOST_ASIO_DECL want shutdown(boost::system::error_code& ec);
 
   // Write bytes to the SSL session.
-  ASIO_DECL want write(const asio::const_buffer& data,
-      asio::error_code& ec, std::size_t& bytes_transferred);
+  BOOST_ASIO_DECL want write(const boost::asio::const_buffer& data,
+      boost::system::error_code& ec, std::size_t& bytes_transferred);
 
   // Read bytes from the SSL session.
-  ASIO_DECL want read(const asio::mutable_buffer& data,
-      asio::error_code& ec, std::size_t& bytes_transferred);
+  BOOST_ASIO_DECL want read(const boost::asio::mutable_buffer& data,
+      boost::system::error_code& ec, std::size_t& bytes_transferred);
 
   // Get output data to be written to the transport.
-  ASIO_DECL asio::mutable_buffer get_output(
-      const asio::mutable_buffer& data);
+  BOOST_ASIO_DECL boost::asio::mutable_buffer get_output(
+      const boost::asio::mutable_buffer& data);
 
   // Put input data that was read from the transport.
-  ASIO_DECL asio::const_buffer put_input(
-      const asio::const_buffer& data);
+  BOOST_ASIO_DECL boost::asio::const_buffer put_input(
+      const boost::asio::const_buffer& data);
 
   // Map an error::eof code returned by the underlying transport according to
   // the type and state of the SSL session. Returns a const reference to the
   // error code object, suitable for passing to a completion handler.
-  ASIO_DECL const asio::error_code& map_error_code(
-      asio::error_code& ec) const;
+  BOOST_ASIO_DECL const boost::system::error_code& map_error_code(
+      boost::system::error_code& ec) const;
 
 private:
   // Disallow copying and assignment.
@@ -125,36 +122,36 @@ private:
   engine& operator=(const engine&);
 
   // Callback used when the SSL implementation wants to verify a certificate.
-  ASIO_DECL static int verify_callback_function(
+  BOOST_ASIO_DECL static int verify_callback_function(
       int preverified, X509_STORE_CTX* ctx);
 
 #if (OPENSSL_VERSION_NUMBER < 0x10000000L)
   // The SSL_accept function may not be thread safe. This mutex is used to
   // protect all calls to the SSL_accept function.
-  ASIO_DECL static asio::detail::static_mutex& accept_mutex();
+  BOOST_ASIO_DECL static boost::asio::detail::static_mutex& accept_mutex();
 #endif // (OPENSSL_VERSION_NUMBER < 0x10000000L)
 
   // Perform one operation. Returns >= 0 on success or error, want_read if the
   // operation needs more input, or want_write if it needs to write some output
   // before the operation can complete.
-  ASIO_DECL want perform(int (engine::* op)(void*, std::size_t),
-      void* data, std::size_t length, asio::error_code& ec,
+  BOOST_ASIO_DECL want perform(int (engine::* op)(void*, std::size_t),
+      void* data, std::size_t length, boost::system::error_code& ec,
       std::size_t* bytes_transferred);
 
   // Adapt the SSL_accept function to the signature needed for perform().
-  ASIO_DECL int do_accept(void*, std::size_t);
+  BOOST_ASIO_DECL int do_accept(void*, std::size_t);
 
   // Adapt the SSL_connect function to the signature needed for perform().
-  ASIO_DECL int do_connect(void*, std::size_t);
+  BOOST_ASIO_DECL int do_connect(void*, std::size_t);
 
   // Adapt the SSL_shutdown function to the signature needed for perform().
-  ASIO_DECL int do_shutdown(void*, std::size_t);
+  BOOST_ASIO_DECL int do_shutdown(void*, std::size_t);
 
   // Adapt the SSL_read function to the signature needed for perform().
-  ASIO_DECL int do_read(void* data, std::size_t length);
+  BOOST_ASIO_DECL int do_read(void* data, std::size_t length);
 
   // Adapt the SSL_write function to the signature needed for perform().
-  ASIO_DECL int do_write(void* data, std::size_t length);
+  BOOST_ASIO_DECL int do_write(void* data, std::size_t length);
 
   SSL* ssl_;
   BIO* ext_bio_;
@@ -163,11 +160,12 @@ private:
 } // namespace detail
 } // namespace ssl
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#if defined(ASIO_HEADER_ONLY)
-# include "asio/ssl/detail/impl/engine.ipp"
-#endif // defined(ASIO_HEADER_ONLY)
+#if defined(BOOST_ASIO_HEADER_ONLY)
+# include <boost/asio/ssl/detail/impl/engine.ipp>
+#endif // defined(BOOST_ASIO_HEADER_ONLY)
 
-#endif // ASIO_SSL_DETAIL_ENGINE_HPP
+#endif // BOOST_ASIO_SSL_DETAIL_ENGINE_HPP

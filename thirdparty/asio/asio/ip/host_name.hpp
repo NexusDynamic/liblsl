@@ -2,41 +2,43 @@
 // ip/host_name.hpp
 // ~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_IP_HOST_NAME_HPP
-#define ASIO_IP_HOST_NAME_HPP
+#ifndef BOOST_ASIO_IP_HOST_NAME_HPP
+#define BOOST_ASIO_IP_HOST_NAME_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 #include <string>
-#include "asio/error_code.hpp"
+#include <boost/system/error_code.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace ip {
 
 /// Get the current host name.
-ASIO_DECL std::string host_name();
+BOOST_ASIO_DECL std::string host_name();
 
 /// Get the current host name.
-ASIO_DECL std::string host_name(asio::error_code& ec);
+BOOST_ASIO_DECL std::string host_name(boost::system::error_code& ec);
 
 } // namespace ip
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#if defined(ASIO_HEADER_ONLY)
-# include "asio/ip/impl/host_name.ipp"
-#endif // defined(ASIO_HEADER_ONLY)
+#if defined(BOOST_ASIO_HEADER_ONLY)
+# include <boost/asio/ip/impl/host_name.ipp>
+#endif // defined(BOOST_ASIO_HEADER_ONLY)
 
-#endif // ASIO_IP_HOST_NAME_HPP
+#endif // BOOST_ASIO_IP_HOST_NAME_HPP

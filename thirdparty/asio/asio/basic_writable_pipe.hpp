@@ -2,48 +2,46 @@
 // basic_writable_pipe.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_BASIC_WRITABLE_PIPE_HPP
-#define ASIO_BASIC_WRITABLE_PIPE_HPP
+#ifndef BOOST_ASIO_BASIC_WRITABLE_PIPE_HPP
+#define BOOST_ASIO_BASIC_WRITABLE_PIPE_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 
-#if defined(ASIO_HAS_PIPE) \
+#if defined(BOOST_ASIO_HAS_PIPE) \
   || defined(GENERATING_DOCUMENTATION)
 
 #include <string>
-#include "asio/any_io_executor.hpp"
-#include "asio/async_result.hpp"
-#include "asio/detail/handler_type_requirements.hpp"
-#include "asio/detail/io_object_impl.hpp"
-#include "asio/detail/non_const_lvalue.hpp"
-#include "asio/detail/throw_error.hpp"
-#include "asio/detail/type_traits.hpp"
-#include "asio/error.hpp"
-#include "asio/execution_context.hpp"
-#if defined(ASIO_HAS_IOCP)
-# include "asio/detail/win_iocp_handle_service.hpp"
-#elif defined(ASIO_HAS_IO_URING_AS_DEFAULT)
-# include "asio/detail/io_uring_descriptor_service.hpp"
+#include <utility>
+#include <boost/asio/any_io_executor.hpp>
+#include <boost/asio/async_result.hpp>
+#include <boost/asio/detail/handler_type_requirements.hpp>
+#include <boost/asio/detail/io_object_impl.hpp>
+#include <boost/asio/detail/non_const_lvalue.hpp>
+#include <boost/asio/detail/throw_error.hpp>
+#include <boost/asio/detail/type_traits.hpp>
+#include <boost/asio/error.hpp>
+#include <boost/asio/execution_context.hpp>
+#if defined(BOOST_ASIO_HAS_IOCP)
+# include <boost/asio/detail/win_iocp_handle_service.hpp>
+#elif defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+# include <boost/asio/detail/io_uring_descriptor_service.hpp>
 #else
-# include "asio/detail/reactive_descriptor_service.hpp"
+# include <boost/asio/detail/reactive_descriptor_service.hpp>
 #endif
 
-#if defined(ASIO_HAS_MOVE)
-# include <utility>
-#endif // defined(ASIO_HAS_MOVE)
+#include <boost/asio/detail/push_options.hpp>
 
-#include "asio/detail/push_options.hpp"
-
+namespace boost {
 namespace asio {
 
 /// Provides pipe functionality.
@@ -76,10 +74,10 @@ public:
   /// The native representation of a pipe.
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined native_handle_type;
-#elif defined(ASIO_HAS_IOCP)
+#elif defined(BOOST_ASIO_HAS_IOCP)
   typedef detail::win_iocp_handle_service::native_handle_type
     native_handle_type;
-#elif defined(ASIO_HAS_IO_URING_AS_DEFAULT)
+#elif defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
   typedef detail::io_uring_descriptor_service::native_handle_type
     native_handle_type;
 #else
@@ -112,10 +110,10 @@ public:
    */
   template <typename ExecutionContext>
   explicit basic_writable_pipe(ExecutionContext& context,
-      typename constraint<
+      constraint_t<
         is_convertible<ExecutionContext&, execution_context&>::value,
         defaulted_constraint
-      >::type = defaulted_constraint())
+      > = defaulted_constraint())
     : impl_(0, 0, context)
   {
   }
@@ -131,16 +129,16 @@ public:
    *
    * @param native_pipe A native pipe.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    */
   basic_writable_pipe(const executor_type& ex,
       const native_handle_type& native_pipe)
     : impl_(0, ex)
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(),
         native_pipe, ec);
-    asio::detail::throw_error(ec, "assign");
+    boost::asio::detail::throw_error(ec, "assign");
   }
 
   /// Construct a basic_writable_pipe on an existing native pipe.
@@ -154,23 +152,22 @@ public:
    *
    * @param native_pipe A native pipe.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    */
   template <typename ExecutionContext>
   basic_writable_pipe(ExecutionContext& context,
       const native_handle_type& native_pipe,
-      typename constraint<
+      constraint_t<
         is_convertible<ExecutionContext&, execution_context&>::value
-      >::type = 0)
+      > = 0)
     : impl_(0, 0, context)
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(),
         native_pipe, ec);
-    asio::detail::throw_error(ec, "assign");
+    boost::asio::detail::throw_error(ec, "assign");
   }
 
-#if defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
   /// Move-construct a basic_writable_pipe from another.
   /**
    * This constructor moves a pipe from one object to another.
@@ -221,10 +218,10 @@ public:
    */
   template <typename Executor1>
   basic_writable_pipe(basic_writable_pipe<Executor1>&& other,
-      typename constraint<
+      constraint_t<
         is_convertible<Executor1, Executor>::value,
         defaulted_constraint
-      >::type = defaulted_constraint())
+      > = defaulted_constraint())
     : impl_(std::move(other.impl_))
   {
   }
@@ -241,16 +238,15 @@ public:
    * constructor.
    */
   template <typename Executor1>
-  typename constraint<
+  constraint_t<
     is_convertible<Executor1, Executor>::value,
     basic_writable_pipe&
-  >::type operator=(basic_writable_pipe<Executor1>&& other)
+  > operator=(basic_writable_pipe<Executor1>&& other)
   {
     basic_writable_pipe tmp(std::move(other));
     impl_ = std::move(tmp.impl_);
     return *this;
   }
-#endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
 
   /// Destroys the pipe.
   /**
@@ -263,7 +259,7 @@ public:
   }
 
   /// Get the executor associated with the object.
-  const executor_type& get_executor() ASIO_NOEXCEPT
+  const executor_type& get_executor() noexcept
   {
     return impl_.get_executor();
   }
@@ -302,13 +298,13 @@ public:
    *
    * @param native_pipe A native pipe.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    */
   void assign(const native_handle_type& native_pipe)
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(), native_pipe, ec);
-    asio::detail::throw_error(ec, "assign");
+    boost::asio::detail::throw_error(ec, "assign");
   }
 
   /// Assign an existing native pipe to the pipe.
@@ -319,11 +315,11 @@ public:
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  ASIO_SYNC_OP_VOID assign(const native_handle_type& native_pipe,
-      asio::error_code& ec)
+  BOOST_ASIO_SYNC_OP_VOID assign(const native_handle_type& native_pipe,
+      boost::system::error_code& ec)
   {
     impl_.get_service().assign(impl_.get_implementation(), native_pipe, ec);
-    ASIO_SYNC_OP_VOID_RETURN(ec);
+    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Determine whether the pipe is open.
@@ -336,45 +332,45 @@ public:
   /**
    * This function is used to close the pipe. Any asynchronous write operations
    * will be cancelled immediately, and will complete with the
-   * asio::error::operation_aborted error.
+   * boost::asio::error::operation_aborted error.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    */
   void close()
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     impl_.get_service().close(impl_.get_implementation(), ec);
-    asio::detail::throw_error(ec, "close");
+    boost::asio::detail::throw_error(ec, "close");
   }
 
   /// Close the pipe.
   /**
    * This function is used to close the pipe. Any asynchronous write operations
    * will be cancelled immediately, and will complete with the
-   * asio::error::operation_aborted error.
+   * boost::asio::error::operation_aborted error.
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  ASIO_SYNC_OP_VOID close(asio::error_code& ec)
+  BOOST_ASIO_SYNC_OP_VOID close(boost::system::error_code& ec)
   {
     impl_.get_service().close(impl_.get_implementation(), ec);
-    ASIO_SYNC_OP_VOID_RETURN(ec);
+    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Release ownership of the underlying native pipe.
   /**
    * This function causes all outstanding asynchronous write operations to
    * finish immediately, and the handlers for cancelled operations will be
-   * passed the asio::error::operation_aborted error. Ownership of the
+   * passed the boost::asio::error::operation_aborted error. Ownership of the
    * native pipe is then transferred to the caller.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    *
    * @note This function is unsupported on Windows versions prior to Windows
-   * 8.1, and will fail with asio::error::operation_not_supported on
+   * 8.1, and will fail with boost::asio::error::operation_not_supported on
    * these platforms.
    */
-#if defined(ASIO_MSVC) && (ASIO_MSVC >= 1400) \
+#if defined(BOOST_ASIO_MSVC) && (BOOST_ASIO_MSVC >= 1400) \
   && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0603)
   __declspec(deprecated("This function always fails with "
         "operation_not_supported when used on Windows versions "
@@ -382,10 +378,10 @@ public:
 #endif
   native_handle_type release()
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     native_handle_type s = impl_.get_service().release(
         impl_.get_implementation(), ec);
-    asio::detail::throw_error(ec, "release");
+    boost::asio::detail::throw_error(ec, "release");
     return s;
   }
 
@@ -393,22 +389,22 @@ public:
   /**
    * This function causes all outstanding asynchronous write operations to
    * finish immediately, and the handlers for cancelled operations will be
-   * passed the asio::error::operation_aborted error. Ownership of the
+   * passed the boost::asio::error::operation_aborted error. Ownership of the
    * native pipe is then transferred to the caller.
    *
    * @param ec Set to indicate what error occurred, if any.
    *
    * @note This function is unsupported on Windows versions prior to Windows
-   * 8.1, and will fail with asio::error::operation_not_supported on
+   * 8.1, and will fail with boost::asio::error::operation_not_supported on
    * these platforms.
    */
-#if defined(ASIO_MSVC) && (ASIO_MSVC >= 1400) \
+#if defined(BOOST_ASIO_MSVC) && (BOOST_ASIO_MSVC >= 1400) \
   && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0603)
   __declspec(deprecated("This function always fails with "
         "operation_not_supported when used on Windows versions "
         "prior to Windows 8.1."))
 #endif
-  native_handle_type release(asio::error_code& ec)
+  native_handle_type release(boost::system::error_code& ec)
   {
     return impl_.get_service().release(impl_.get_implementation(), ec);
   }
@@ -428,29 +424,29 @@ public:
   /**
    * This function causes all outstanding asynchronous write operations to
    * finish immediately, and the handlers for cancelled operations will be
-   * passed the asio::error::operation_aborted error.
+   * passed the boost::asio::error::operation_aborted error.
    *
-   * @throws asio::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure.
    */
   void cancel()
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     impl_.get_service().cancel(impl_.get_implementation(), ec);
-    asio::detail::throw_error(ec, "cancel");
+    boost::asio::detail::throw_error(ec, "cancel");
   }
 
   /// Cancel all asynchronous operations associated with the pipe.
   /**
    * This function causes all outstanding asynchronous write operations to
    * finish immediately, and the handlers for cancelled operations will be
-   * passed the asio::error::operation_aborted error.
+   * passed the boost::asio::error::operation_aborted error.
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  ASIO_SYNC_OP_VOID cancel(asio::error_code& ec)
+  BOOST_ASIO_SYNC_OP_VOID cancel(boost::system::error_code& ec)
   {
     impl_.get_service().cancel(impl_.get_implementation(), ec);
-    ASIO_SYNC_OP_VOID_RETURN(ec);
+    BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
   /// Write some data to the pipe.
@@ -463,8 +459,8 @@ public:
    *
    * @returns The number of bytes written.
    *
-   * @throws asio::system_error Thrown on failure. An error code of
-   * asio::error::eof indicates that the connection was closed by the
+   * @throws boost::system::system_error Thrown on failure. An error code of
+   * boost::asio::error::eof indicates that the connection was closed by the
    * peer.
    *
    * @note The write_some operation may not transmit all of the data to the
@@ -474,7 +470,7 @@ public:
    * @par Example
    * To write a single data buffer use the @ref buffer function as follows:
    * @code
-   * pipe.write_some(asio::buffer(data, size));
+   * pipe.write_some(boost::asio::buffer(data, size));
    * @endcode
    * See the @ref buffer documentation for information on writing multiple
    * buffers in one go, and how to use it with arrays, boost::array or
@@ -483,10 +479,10 @@ public:
   template <typename ConstBufferSequence>
   std::size_t write_some(const ConstBufferSequence& buffers)
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     std::size_t s = impl_.get_service().write_some(
         impl_.get_implementation(), buffers, ec);
-    asio::detail::throw_error(ec, "write_some");
+    boost::asio::detail::throw_error(ec, "write_some");
     return s;
   }
 
@@ -508,7 +504,7 @@ public:
    */
   template <typename ConstBufferSequence>
   std::size_t write_some(const ConstBufferSequence& buffers,
-      asio::error_code& ec)
+      boost::system::error_code& ec)
   {
     return impl_.get_service().write_some(
         impl_.get_implementation(), buffers, ec);
@@ -531,16 +527,16 @@ public:
    * @ref yield_context, or a function object with the correct completion
    * signature. The function signature of the completion handler must be:
    * @code void handler(
-   *   const asio::error_code& error, // Result of operation.
+   *   const boost::system::error_code& error, // Result of operation.
    *   std::size_t bytes_transferred // Number of bytes written.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using boost::asio::async_immediate().
    *
    * @par Completion Signature
-   * @code void(asio::error_code, std::size_t) @endcode
+   * @code void(boost::system::error_code, std::size_t) @endcode
    *
    * @note The write operation may not transmit all of the data to the peer.
    * Consider using the @ref async_write function if you need to ensure that all
@@ -549,35 +545,31 @@ public:
    * @par Example
    * To write a single data buffer use the @ref buffer function as follows:
    * @code
-   * pipe.async_write_some(asio::buffer(data, size), handler);
+   * pipe.async_write_some(boost::asio::buffer(data, size), handler);
    * @endcode
    * See the @ref buffer documentation for information on writing multiple
    * buffers in one go, and how to use it with arrays, boost::array or
    * std::vector.
    */
   template <typename ConstBufferSequence,
-      ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
-        std::size_t)) WriteToken
-          ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  ASIO_INITFN_AUTO_RESULT_TYPE_PREFIX(WriteToken,
-      void (asio::error_code, std::size_t))
-  async_write_some(const ConstBufferSequence& buffers,
-      ASIO_MOVE_ARG(WriteToken) token
-        ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
-    ASIO_INITFN_AUTO_RESULT_TYPE_SUFFIX((
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+        std::size_t)) WriteToken = default_completion_token_t<executor_type>>
+  auto async_write_some(const ConstBufferSequence& buffers,
+      WriteToken&& token = default_completion_token_t<executor_type>())
+    -> decltype(
       async_initiate<WriteToken,
-        void (asio::error_code, std::size_t)>(
-          declval<initiate_async_write_some>(), token, buffers)))
+        void (boost::system::error_code, std::size_t)>(
+          declval<initiate_async_write_some>(), token, buffers))
   {
     return async_initiate<WriteToken,
-      void (asio::error_code, std::size_t)>(
+      void (boost::system::error_code, std::size_t)>(
         initiate_async_write_some(this), token, buffers);
   }
 
 private:
   // Disallow copying and assignment.
-  basic_writable_pipe(const basic_writable_pipe&) ASIO_DELETED;
-  basic_writable_pipe& operator=(const basic_writable_pipe&) ASIO_DELETED;
+  basic_writable_pipe(const basic_writable_pipe&) = delete;
+  basic_writable_pipe& operator=(const basic_writable_pipe&) = delete;
 
   class initiate_async_write_some
   {
@@ -589,18 +581,18 @@ private:
     {
     }
 
-    const executor_type& get_executor() const ASIO_NOEXCEPT
+    const executor_type& get_executor() const noexcept
     {
       return self_->get_executor();
     }
 
     template <typename WriteHandler, typename ConstBufferSequence>
-    void operator()(ASIO_MOVE_ARG(WriteHandler) handler,
+    void operator()(WriteHandler&& handler,
         const ConstBufferSequence& buffers) const
     {
       // If you get an error on the following line it means that your handler
       // does not meet the documented type requirements for a WriteHandler.
-      ASIO_WRITE_HANDLER_CHECK(WriteHandler, handler) type_check;
+      BOOST_ASIO_WRITE_HANDLER_CHECK(WriteHandler, handler) type_check;
 
       detail::non_const_lvalue<WriteHandler> handler2(handler);
       self_->impl_.get_service().async_write_some(
@@ -612,9 +604,9 @@ private:
     basic_writable_pipe* self_;
   };
 
-#if defined(ASIO_HAS_IOCP)
+#if defined(BOOST_ASIO_HAS_IOCP)
   detail::io_object_impl<detail::win_iocp_handle_service, Executor> impl_;
-#elif defined(ASIO_HAS_IO_URING_AS_DEFAULT)
+#elif defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
   detail::io_object_impl<detail::io_uring_descriptor_service, Executor> impl_;
 #else
   detail::io_object_impl<detail::reactive_descriptor_service, Executor> impl_;
@@ -622,10 +614,11 @@ private:
 };
 
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // defined(ASIO_HAS_PIPE)
+#endif // defined(BOOST_ASIO_HAS_PIPE)
        //   || defined(GENERATING_DOCUMENTATION)
 
-#endif // ASIO_BASIC_WRITABLE_PIPE_HPP
+#endif // BOOST_ASIO_BASIC_WRITABLE_PIPE_HPP

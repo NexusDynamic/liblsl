@@ -2,33 +2,34 @@
 // detail/io_uring_socket_service_base.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_DETAIL_IMPL_IO_URING_SOCKET_SERVICE_BASE_IPP
-#define ASIO_DETAIL_IMPL_IO_URING_SOCKET_SERVICE_BASE_IPP
+#ifndef BOOST_ASIO_DETAIL_IMPL_IO_URING_SOCKET_SERVICE_BASE_IPP
+#define BOOST_ASIO_DETAIL_IMPL_IO_URING_SOCKET_SERVICE_BASE_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 
-#if defined(ASIO_HAS_IO_URING)
+#if defined(BOOST_ASIO_HAS_IO_URING)
 
-#include "asio/detail/io_uring_socket_service_base.hpp"
+#include <boost/asio/detail/io_uring_socket_service_base.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace detail {
 
 io_uring_socket_service_base::io_uring_socket_service_base(
     execution_context& context)
-  : io_uring_service_(asio::use_service<io_uring_service>(context))
+  : io_uring_service_(boost::asio::use_service<io_uring_service>(context))
 {
   io_uring_service_.init_task();
 }
@@ -48,7 +49,7 @@ void io_uring_socket_service_base::construct(
 void io_uring_socket_service_base::base_move_construct(
     io_uring_socket_service_base::base_implementation_type& impl,
     io_uring_socket_service_base::base_implementation_type& other_impl)
-  ASIO_NOEXCEPT
+  noexcept
 {
   impl.socket_ = other_impl.socket_;
   other_impl.socket_ = invalid_socket;
@@ -82,23 +83,23 @@ void io_uring_socket_service_base::destroy(
 {
   if (impl.socket_ != invalid_socket)
   {
-    ASIO_HANDLER_OPERATION((io_uring_service_.context(),
+    BOOST_ASIO_HANDLER_OPERATION((io_uring_service_.context(),
           "socket", &impl, impl.socket_, "close"));
 
     io_uring_service_.deregister_io_object(impl.io_object_data_);
-    asio::error_code ignored_ec;
+    boost::system::error_code ignored_ec;
     socket_ops::close(impl.socket_, impl.state_, true, ignored_ec);
     io_uring_service_.cleanup_io_object(impl.io_object_data_);
   }
 }
 
-asio::error_code io_uring_socket_service_base::close(
+boost::system::error_code io_uring_socket_service_base::close(
     io_uring_socket_service_base::base_implementation_type& impl,
-    asio::error_code& ec)
+    boost::system::error_code& ec)
 {
   if (is_open(impl))
   {
-    ASIO_HANDLER_OPERATION((io_uring_service_.context(),
+    BOOST_ASIO_HANDLER_OPERATION((io_uring_service_.context(),
           "socket", &impl, impl.socket_, "close"));
 
     io_uring_service_.deregister_io_object(impl.io_object_data_);
@@ -122,15 +123,15 @@ asio::error_code io_uring_socket_service_base::close(
 
 socket_type io_uring_socket_service_base::release(
     io_uring_socket_service_base::base_implementation_type& impl,
-    asio::error_code& ec)
+    boost::system::error_code& ec)
 {
   if (!is_open(impl))
   {
-    ec = asio::error::bad_descriptor;
+    ec = boost::asio::error::bad_descriptor;
     return invalid_socket;
   }
 
-  ASIO_HANDLER_OPERATION((io_uring_service_.context(),
+  BOOST_ASIO_HANDLER_OPERATION((io_uring_service_.context(),
         "socket", &impl, impl.socket_, "release"));
 
   io_uring_service_.deregister_io_object(impl.io_object_data_);
@@ -141,17 +142,17 @@ socket_type io_uring_socket_service_base::release(
   return sock;
 }
 
-asio::error_code io_uring_socket_service_base::cancel(
+boost::system::error_code io_uring_socket_service_base::cancel(
     io_uring_socket_service_base::base_implementation_type& impl,
-    asio::error_code& ec)
+    boost::system::error_code& ec)
 {
   if (!is_open(impl))
   {
-    ec = asio::error::bad_descriptor;
+    ec = boost::asio::error::bad_descriptor;
     return ec;
   }
 
-  ASIO_HANDLER_OPERATION((io_uring_service_.context(),
+  BOOST_ASIO_HANDLER_OPERATION((io_uring_service_.context(),
         "socket", &impl, impl.socket_, "cancel"));
 
   io_uring_service_.cancel_ops(impl.io_object_data_);
@@ -159,13 +160,13 @@ asio::error_code io_uring_socket_service_base::cancel(
   return ec;
 }
 
-asio::error_code io_uring_socket_service_base::do_open(
+boost::system::error_code io_uring_socket_service_base::do_open(
     io_uring_socket_service_base::base_implementation_type& impl,
-    int af, int type, int protocol, asio::error_code& ec)
+    int af, int type, int protocol, boost::system::error_code& ec)
 {
   if (is_open(impl))
   {
-    ec = asio::error::already_open;
+    ec = boost::asio::error::already_open;
     return ec;
   }
 
@@ -186,14 +187,14 @@ asio::error_code io_uring_socket_service_base::do_open(
   return ec;
 }
 
-asio::error_code io_uring_socket_service_base::do_assign(
+boost::system::error_code io_uring_socket_service_base::do_assign(
     io_uring_socket_service_base::base_implementation_type& impl, int type,
     const io_uring_socket_service_base::native_handle_type& native_socket,
-    asio::error_code& ec)
+    boost::system::error_code& ec)
 {
   if (is_open(impl))
   {
-    ec = asio::error::already_open;
+    ec = boost::asio::error::already_open;
     return ec;
   }
 
@@ -234,16 +235,17 @@ void io_uring_socket_service_base::start_accept_op(
     start_op(impl, io_uring_service::read_op, op, is_continuation, false);
   else
   {
-    op->ec_ = asio::error::already_open;
+    op->ec_ = boost::asio::error::already_open;
     io_uring_service_.post_immediate_completion(op, is_continuation);
   }
 }
 
 } // namespace detail
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // defined(ASIO_HAS_IO_URING)
+#endif // defined(BOOST_ASIO_HAS_IO_URING)
 
-#endif // ASIO_DETAIL_IMPL_IO_URING_SOCKET_SERVICE_BASE_IPP
+#endif // BOOST_ASIO_DETAIL_IMPL_IO_URING_SOCKET_SERVICE_BASE_IPP

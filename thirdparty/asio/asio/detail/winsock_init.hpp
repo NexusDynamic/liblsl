@@ -2,25 +2,26 @@
 // detail/winsock_init.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_DETAIL_WINSOCK_INIT_HPP
-#define ASIO_DETAIL_WINSOCK_INIT_HPP
+#ifndef BOOST_ASIO_DETAIL_WINSOCK_INIT_HPP
+#define BOOST_ASIO_DETAIL_WINSOCK_INIT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 
-#if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
+#if defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -35,19 +36,19 @@ protected:
     long result_;
   };
 
-  ASIO_DECL static void startup(data& d,
+  BOOST_ASIO_DECL static void startup(data& d,
       unsigned char major, unsigned char minor);
 
-  ASIO_DECL static void manual_startup(data& d);
+  BOOST_ASIO_DECL static void manual_startup(data& d);
 
-  ASIO_DECL static void cleanup(data& d);
+  BOOST_ASIO_DECL static void cleanup(data& d);
 
-  ASIO_DECL static void manual_cleanup(data& d);
+  BOOST_ASIO_DECL static void manual_cleanup(data& d);
 
-  ASIO_DECL static void throw_on_error(data& d);
+  BOOST_ASIO_DECL static void throw_on_error(data& d);
 };
 
-template <int Major = 2, int Minor = 0>
+template <int Major = 2, int Minor = 2>
 class winsock_init : private winsock_init_base
 {
 public:
@@ -81,7 +82,7 @@ public:
   //   #pragma warning(push)
   //   #pragma warning(disable:4073)
   //   #pragma init_seg(lib)
-  //   asio::detail::winsock_init<>::manual manual_winsock_init;
+  //   boost::asio::detail::winsock_init<>::manual manual_winsock_init;
   //   #pragma warning(pop)
   class manual
   {
@@ -116,13 +117,14 @@ static const winsock_init<>& winsock_init_instance = winsock_init<>(false);
 
 } // namespace detail
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#if defined(ASIO_HEADER_ONLY)
-# include "asio/detail/impl/winsock_init.ipp"
-#endif // defined(ASIO_HEADER_ONLY)
+#if defined(BOOST_ASIO_HEADER_ONLY)
+# include <boost/asio/detail/impl/winsock_init.ipp>
+#endif // defined(BOOST_ASIO_HEADER_ONLY)
 
-#endif // defined(ASIO_WINDOWS) || defined(__CYGWIN__)
+#endif // defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
 
-#endif // ASIO_DETAIL_WINSOCK_INIT_HPP
+#endif // BOOST_ASIO_DETAIL_WINSOCK_INIT_HPP

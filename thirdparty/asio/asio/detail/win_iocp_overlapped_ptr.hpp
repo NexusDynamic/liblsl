@@ -2,33 +2,34 @@
 // detail/win_iocp_overlapped_ptr.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_DETAIL_WIN_IOCP_OVERLAPPED_PTR_HPP
-#define ASIO_DETAIL_WIN_IOCP_OVERLAPPED_PTR_HPP
+#ifndef BOOST_ASIO_DETAIL_WIN_IOCP_OVERLAPPED_PTR_HPP
+#define BOOST_ASIO_DETAIL_WIN_IOCP_OVERLAPPED_PTR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 
-#if defined(ASIO_HAS_IOCP)
+#if defined(BOOST_ASIO_HAS_IOCP)
 
-#include "asio/io_context.hpp"
-#include "asio/query.hpp"
-#include "asio/detail/handler_alloc_helpers.hpp"
-#include "asio/detail/memory.hpp"
-#include "asio/detail/noncopyable.hpp"
-#include "asio/detail/win_iocp_overlapped_op.hpp"
-#include "asio/detail/win_iocp_io_context.hpp"
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/query.hpp>
+#include <boost/asio/detail/handler_alloc_helpers.hpp>
+#include <boost/asio/detail/memory.hpp>
+#include <boost/asio/detail/noncopyable.hpp>
+#include <boost/asio/detail/win_iocp_overlapped_op.hpp>
+#include <boost/asio/detail/win_iocp_io_context.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -47,11 +48,11 @@ public:
   // Construct an win_iocp_overlapped_ptr to contain the specified handler.
   template <typename Executor, typename Handler>
   explicit win_iocp_overlapped_ptr(const Executor& ex,
-      ASIO_MOVE_ARG(Handler) handler)
+      Handler&& handler)
     : ptr_(0),
       iocp_service_(0)
   {
-    this->reset(ex, ASIO_MOVE_CAST(Handler)(handler));
+    this->reset(ex, static_cast<Handler&&>(handler));
   }
 
   // Destructor automatically frees the OVERLAPPED object unless released.
@@ -80,11 +81,11 @@ public:
     win_iocp_io_context* iocp_service = this->get_iocp_service(ex);
 
     typedef win_iocp_overlapped_op<Handler, Executor> op;
-    typename op::ptr p = { asio::detail::addressof(handler),
+    typename op::ptr p = { boost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(handler, ex);
 
-    ASIO_HANDLER_CREATION((ex.context(), *p.p,
+    BOOST_ASIO_HANDLER_CREATION((ex.context(), *p.p,
           "iocp_service", iocp_service, 0, "overlapped"));
 
     iocp_service->work_started();
@@ -119,7 +120,7 @@ public:
   }
 
   // Post completion notification for overlapped operation. Releases ownership.
-  void complete(const asio::error_code& ec,
+  void complete(const boost::system::error_code& ec,
       std::size_t bytes_transferred)
   {
     if (ptr_)
@@ -134,19 +135,19 @@ public:
 private:
   template <typename Executor>
   static win_iocp_io_context* get_iocp_service(const Executor& ex,
-      typename enable_if<
+      enable_if_t<
         can_query<const Executor&, execution::context_t>::value
-      >::type* = 0)
+      >* = 0)
   {
     return &use_service<win_iocp_io_context>(
-        asio::query(ex, execution::context));
+        boost::asio::query(ex, execution::context));
   }
 
   template <typename Executor>
   static win_iocp_io_context* get_iocp_service(const Executor& ex,
-      typename enable_if<
+      enable_if_t<
         !can_query<const Executor&, execution::context_t>::value
-      >::type* = 0)
+      >* = 0)
   {
     return &use_service<win_iocp_io_context>(ex.context());
   }
@@ -154,7 +155,7 @@ private:
   static win_iocp_io_context* get_iocp_service(
       const io_context::executor_type& ex)
   {
-    return &asio::query(ex, execution::context).impl_;
+    return &boost::asio::query(ex, execution::context).impl_;
   }
 
   win_iocp_operation* ptr_;
@@ -163,9 +164,10 @@ private:
 
 } // namespace detail
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // defined(ASIO_HAS_IOCP)
+#endif // defined(BOOST_ASIO_HAS_IOCP)
 
-#endif // ASIO_DETAIL_WIN_IOCP_OVERLAPPED_PTR_HPP
+#endif // BOOST_ASIO_DETAIL_WIN_IOCP_OVERLAPPED_PTR_HPP

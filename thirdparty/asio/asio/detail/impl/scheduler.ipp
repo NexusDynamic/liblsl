@@ -2,36 +2,37 @@
 // detail/impl/scheduler.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_DETAIL_IMPL_SCHEDULER_IPP
-#define ASIO_DETAIL_IMPL_SCHEDULER_IPP
+#ifndef BOOST_ASIO_DETAIL_IMPL_SCHEDULER_IPP
+#define BOOST_ASIO_DETAIL_IMPL_SCHEDULER_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 
-#include "asio/detail/concurrency_hint.hpp"
-#include "asio/detail/event.hpp"
-#include "asio/detail/limits.hpp"
-#include "asio/detail/scheduler.hpp"
-#include "asio/detail/scheduler_thread_info.hpp"
-#include "asio/detail/signal_blocker.hpp"
+#include <boost/asio/config.hpp>
+#include <boost/asio/detail/event.hpp>
+#include <boost/asio/detail/limits.hpp>
+#include <boost/asio/detail/scheduler.hpp>
+#include <boost/asio/detail/scheduler_thread_info.hpp>
+#include <boost/asio/detail/signal_blocker.hpp>
 
-#if defined(ASIO_HAS_IO_URING_AS_DEFAULT)
-# include "asio/detail/io_uring_service.hpp"
-#else // defined(ASIO_HAS_IO_URING_AS_DEFAULT)
-# include "asio/detail/reactor.hpp"
-#endif // defined(ASIO_HAS_IO_URING_AS_DEFAULT)
+#if defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+# include <boost/asio/detail/io_uring_service.hpp>
+#else // defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+# include <boost/asio/detail/reactor.hpp>
+#endif // defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -45,7 +46,7 @@ public:
 
   void operator()()
   {
-    asio::error_code ec;
+    boost::system::error_code ec;
     this_->run(ec);
   }
 
@@ -59,7 +60,7 @@ struct scheduler::task_cleanup
   {
     if (this_thread_->private_outstanding_work > 0)
     {
-      asio::detail::increment(
+      boost::asio::detail::increment(
           scheduler_->outstanding_work_,
           this_thread_->private_outstanding_work);
     }
@@ -84,7 +85,7 @@ struct scheduler::work_cleanup
   {
     if (this_thread_->private_outstanding_work > 1)
     {
-      asio::detail::increment(
+      boost::asio::detail::increment(
           scheduler_->outstanding_work_,
           this_thread_->private_outstanding_work - 1);
     }
@@ -94,13 +95,13 @@ struct scheduler::work_cleanup
     }
     this_thread_->private_outstanding_work = 0;
 
-#if defined(ASIO_HAS_THREADS)
+#if defined(BOOST_ASIO_HAS_THREADS)
     if (!this_thread_->private_op_queue.empty())
     {
       lock_->lock();
       scheduler_->op_queue_.push(this_thread_->private_op_queue);
     }
-#endif // defined(ASIO_HAS_THREADS)
+#endif // defined(BOOST_ASIO_HAS_THREADS)
   }
 
   scheduler* scheduler_;
@@ -108,45 +109,57 @@ struct scheduler::work_cleanup
   thread_info* this_thread_;
 };
 
-scheduler::scheduler(asio::execution_context& ctx,
-    int concurrency_hint, bool own_thread, get_task_func_type get_task)
-  : asio::detail::execution_context_service_base<scheduler>(ctx),
-    one_thread_(concurrency_hint == 1
-        || !ASIO_CONCURRENCY_HINT_IS_LOCKING(
-          SCHEDULER, concurrency_hint)
-        || !ASIO_CONCURRENCY_HINT_IS_LOCKING(
-          REACTOR_IO, concurrency_hint)),
-    mutex_(ASIO_CONCURRENCY_HINT_IS_LOCKING(
-          SCHEDULER, concurrency_hint)),
+scheduler::scheduler(boost::asio::execution_context& ctx,
+    bool own_thread, get_task_func_type get_task)
+  : boost::asio::detail::execution_context_service_base<scheduler>(ctx),
+    one_thread_(config(ctx).get("scheduler", "concurrency_hint", 0) == 1),
+    mutex_(config(ctx).get("scheduler", "locking", true),
+        config(ctx).get("scheduler", "locking_spin_count", 0)),
     task_(0),
     get_task_(get_task),
     task_interrupted_(true),
-    outstanding_work_(0),
     stopped_(false),
     shutdown_(false),
-    concurrency_hint_(concurrency_hint),
-    thread_(0)
+    outstanding_work_(0),
+    task_usec_(config(ctx).get("scheduler", "task_usec", -1L)),
+    wait_usec_(config(ctx).get("scheduler", "wait_usec", -1L)),
+    thread_()
 {
-  ASIO_HANDLER_TRACKING_INIT;
+  BOOST_ASIO_HANDLER_TRACKING_INIT;
 
   if (own_thread)
   {
     ++outstanding_work_;
-    asio::detail::signal_blocker sb;
-    thread_ = new asio::detail::thread(thread_function(this));
+    signal_blocker sb;
+    thread_ = thread(thread_function(this));
   }
+}
+
+scheduler::scheduler(scheduler::internal, boost::asio::execution_context& ctx)
+  : boost::asio::detail::execution_context_service_base<scheduler>(ctx),
+    one_thread_(false),
+    mutex_(true, 0),
+    task_(0),
+    get_task_(&scheduler::get_default_task),
+    task_interrupted_(true),
+    stopped_(false),
+    shutdown_(false),
+    outstanding_work_(0),
+    task_usec_(-1L),
+    wait_usec_(-1L)
+{
+  BOOST_ASIO_HANDLER_TRACKING_INIT;
 }
 
 scheduler::~scheduler()
 {
-  if (thread_)
+  if (thread_.joinable())
   {
     mutex::scoped_lock lock(mutex_);
     shutdown_ = true;
     stop_all_threads(lock);
     lock.unlock();
-    thread_->join();
-    delete thread_;
+    thread_.join();
   }
 }
 
@@ -154,17 +167,12 @@ void scheduler::shutdown()
 {
   mutex::scoped_lock lock(mutex_);
   shutdown_ = true;
-  if (thread_)
+  if (thread_.joinable())
     stop_all_threads(lock);
   lock.unlock();
 
   // Join thread to ensure task operation is returned to queue.
-  if (thread_)
-  {
-    thread_->join();
-    delete thread_;
-    thread_ = 0;
-  }
+  thread_.join();
 
   // Destroy handler objects.
   while (!op_queue_.empty())
@@ -190,9 +198,9 @@ void scheduler::init_task()
   }
 }
 
-std::size_t scheduler::run(asio::error_code& ec)
+std::size_t scheduler::run(boost::system::error_code& ec)
 {
-  ec = asio::error_code();
+  ec = boost::system::error_code();
   if (outstanding_work_ == 0)
   {
     stop();
@@ -212,9 +220,9 @@ std::size_t scheduler::run(asio::error_code& ec)
   return n;
 }
 
-std::size_t scheduler::run_one(asio::error_code& ec)
+std::size_t scheduler::run_one(boost::system::error_code& ec)
 {
-  ec = asio::error_code();
+  ec = boost::system::error_code();
   if (outstanding_work_ == 0)
   {
     stop();
@@ -230,9 +238,9 @@ std::size_t scheduler::run_one(asio::error_code& ec)
   return do_run_one(lock, this_thread, ec);
 }
 
-std::size_t scheduler::wait_one(long usec, asio::error_code& ec)
+std::size_t scheduler::wait_one(long usec, boost::system::error_code& ec)
 {
-  ec = asio::error_code();
+  ec = boost::system::error_code();
   if (outstanding_work_ == 0)
   {
     stop();
@@ -248,9 +256,9 @@ std::size_t scheduler::wait_one(long usec, asio::error_code& ec)
   return do_wait_one(lock, this_thread, usec, ec);
 }
 
-std::size_t scheduler::poll(asio::error_code& ec)
+std::size_t scheduler::poll(boost::system::error_code& ec)
 {
-  ec = asio::error_code();
+  ec = boost::system::error_code();
   if (outstanding_work_ == 0)
   {
     stop();
@@ -263,14 +271,14 @@ std::size_t scheduler::poll(asio::error_code& ec)
 
   mutex::scoped_lock lock(mutex_);
 
-#if defined(ASIO_HAS_THREADS)
+#if defined(BOOST_ASIO_HAS_THREADS)
   // We want to support nested calls to poll() and poll_one(), so any handlers
   // that are already on a thread-private queue need to be put on to the main
   // queue now.
   if (one_thread_)
     if (thread_info* outer_info = static_cast<thread_info*>(ctx.next_by_key()))
       op_queue_.push(outer_info->private_op_queue);
-#endif // defined(ASIO_HAS_THREADS)
+#endif // defined(BOOST_ASIO_HAS_THREADS)
 
   std::size_t n = 0;
   for (; do_poll_one(lock, this_thread, ec); lock.lock())
@@ -279,9 +287,9 @@ std::size_t scheduler::poll(asio::error_code& ec)
   return n;
 }
 
-std::size_t scheduler::poll_one(asio::error_code& ec)
+std::size_t scheduler::poll_one(boost::system::error_code& ec)
 {
-  ec = asio::error_code();
+  ec = boost::system::error_code();
   if (outstanding_work_ == 0)
   {
     stop();
@@ -294,14 +302,14 @@ std::size_t scheduler::poll_one(asio::error_code& ec)
 
   mutex::scoped_lock lock(mutex_);
 
-#if defined(ASIO_HAS_THREADS)
+#if defined(BOOST_ASIO_HAS_THREADS)
   // We want to support nested calls to poll() and poll_one(), so any handlers
   // that are already on a thread-private queue need to be put on to the main
   // queue now.
   if (one_thread_)
     if (thread_info* outer_info = static_cast<thread_info*>(ctx.next_by_key()))
       op_queue_.push(outer_info->private_op_queue);
-#endif // defined(ASIO_HAS_THREADS)
+#endif // defined(BOOST_ASIO_HAS_THREADS)
 
   return do_poll_one(lock, this_thread, ec);
 }
@@ -327,7 +335,7 @@ void scheduler::restart()
 void scheduler::compensating_work_started()
 {
   thread_info_base* this_thread = thread_call_stack::contains(this);
-  ASIO_ASSUME(this_thread != 0); // Only called from inside scheduler.
+  BOOST_ASIO_ASSUME(this_thread != 0); // Only called from inside scheduler.
   ++static_cast<thread_info*>(this_thread)->private_outstanding_work;
 }
 
@@ -345,7 +353,7 @@ void scheduler::capture_current_exception()
 void scheduler::post_immediate_completion(
     scheduler::operation* op, bool is_continuation)
 {
-#if defined(ASIO_HAS_THREADS)
+#if defined(BOOST_ASIO_HAS_THREADS)
   if (one_thread_ || is_continuation)
   {
     if (thread_info_base* this_thread = thread_call_stack::contains(this))
@@ -355,9 +363,9 @@ void scheduler::post_immediate_completion(
       return;
     }
   }
-#else // defined(ASIO_HAS_THREADS)
+#else // defined(BOOST_ASIO_HAS_THREADS)
   (void)is_continuation;
-#endif // defined(ASIO_HAS_THREADS)
+#endif // defined(BOOST_ASIO_HAS_THREADS)
 
   work_started();
   mutex::scoped_lock lock(mutex_);
@@ -368,7 +376,7 @@ void scheduler::post_immediate_completion(
 void scheduler::post_immediate_completions(std::size_t n,
     op_queue<scheduler::operation>& ops, bool is_continuation)
 {
-#if defined(ASIO_HAS_THREADS)
+#if defined(BOOST_ASIO_HAS_THREADS)
   if (one_thread_ || is_continuation)
   {
     if (thread_info_base* this_thread = thread_call_stack::contains(this))
@@ -379,9 +387,9 @@ void scheduler::post_immediate_completions(std::size_t n,
       return;
     }
   }
-#else // defined(ASIO_HAS_THREADS)
+#else // defined(BOOST_ASIO_HAS_THREADS)
   (void)is_continuation;
-#endif // defined(ASIO_HAS_THREADS)
+#endif // defined(BOOST_ASIO_HAS_THREADS)
 
   increment(outstanding_work_, static_cast<long>(n));
   mutex::scoped_lock lock(mutex_);
@@ -391,7 +399,7 @@ void scheduler::post_immediate_completions(std::size_t n,
 
 void scheduler::post_deferred_completion(scheduler::operation* op)
 {
-#if defined(ASIO_HAS_THREADS)
+#if defined(BOOST_ASIO_HAS_THREADS)
   if (one_thread_)
   {
     if (thread_info_base* this_thread = thread_call_stack::contains(this))
@@ -400,7 +408,7 @@ void scheduler::post_deferred_completion(scheduler::operation* op)
       return;
     }
   }
-#endif // defined(ASIO_HAS_THREADS)
+#endif // defined(BOOST_ASIO_HAS_THREADS)
 
   mutex::scoped_lock lock(mutex_);
   op_queue_.push(op);
@@ -412,7 +420,7 @@ void scheduler::post_deferred_completions(
 {
   if (!ops.empty())
   {
-#if defined(ASIO_HAS_THREADS)
+#if defined(BOOST_ASIO_HAS_THREADS)
     if (one_thread_)
     {
       if (thread_info_base* this_thread = thread_call_stack::contains(this))
@@ -421,7 +429,7 @@ void scheduler::post_deferred_completions(
         return;
       }
     }
-#endif // defined(ASIO_HAS_THREADS)
+#endif // defined(BOOST_ASIO_HAS_THREADS)
 
     mutex::scoped_lock lock(mutex_);
     op_queue_.push(ops);
@@ -447,7 +455,7 @@ void scheduler::abandon_operations(
 
 std::size_t scheduler::do_run_one(mutex::scoped_lock& lock,
     scheduler::thread_info& this_thread,
-    const asio::error_code& ec)
+    const boost::system::error_code& ec)
 {
   while (!stopped_)
   {
@@ -460,9 +468,9 @@ std::size_t scheduler::do_run_one(mutex::scoped_lock& lock,
 
       if (o == &task_operation_)
       {
-        task_interrupted_ = more_handlers;
+        task_interrupted_ = more_handlers || task_usec_ == 0;
 
-        if (more_handlers && !one_thread_)
+        if (more_handlers && !one_thread_ && wait_usec_ != 0)
           wakeup_event_.unlock_and_signal_one(lock);
         else
           lock.unlock();
@@ -473,7 +481,8 @@ std::size_t scheduler::do_run_one(mutex::scoped_lock& lock,
         // Run the task. May throw an exception. Only block if the operation
         // queue is empty and we're not polling, otherwise we want to return
         // as soon as possible.
-        task_->run(more_handlers ? 0 : -1, this_thread.private_op_queue);
+        task_->run(more_handlers ? 0 : task_usec_,
+            this_thread.private_op_queue);
       }
       else
       {
@@ -497,8 +506,19 @@ std::size_t scheduler::do_run_one(mutex::scoped_lock& lock,
     }
     else
     {
-      wakeup_event_.clear(lock);
-      wakeup_event_.wait(lock);
+      if (wait_usec_ == 0)
+      {
+        lock.unlock();
+        lock.lock();
+      }
+      else
+      {
+        wakeup_event_.clear(lock);
+        if (wait_usec_ > 0)
+          wakeup_event_.wait_for_usec(lock, wait_usec_);
+        else
+          wakeup_event_.wait(lock);
+      }
     }
   }
 
@@ -507,7 +527,7 @@ std::size_t scheduler::do_run_one(mutex::scoped_lock& lock,
 
 std::size_t scheduler::do_wait_one(mutex::scoped_lock& lock,
     scheduler::thread_info& this_thread, long usec,
-    const asio::error_code& ec)
+    const boost::system::error_code& ec)
 {
   if (stopped_)
     return 0;
@@ -516,6 +536,7 @@ std::size_t scheduler::do_wait_one(mutex::scoped_lock& lock,
   if (o == 0)
   {
     wakeup_event_.clear(lock);
+    usec = (wait_usec_ >= 0 && wait_usec_ < usec) ? wait_usec_ : usec;
     wakeup_event_.wait_for_usec(lock, usec);
     usec = 0; // Wait at most once.
     o = op_queue_.front();
@@ -526,9 +547,10 @@ std::size_t scheduler::do_wait_one(mutex::scoped_lock& lock,
     op_queue_.pop();
     bool more_handlers = (!op_queue_.empty());
 
-    task_interrupted_ = more_handlers;
+    usec = (task_usec_ >= 0 && task_usec_ < usec) ? task_usec_ : usec;
+    task_interrupted_ = more_handlers || usec == 0;
 
-    if (more_handlers && !one_thread_)
+    if (more_handlers && !one_thread_ && wait_usec_ != 0)
       wakeup_event_.unlock_and_signal_one(lock);
     else
       lock.unlock();
@@ -578,7 +600,7 @@ std::size_t scheduler::do_wait_one(mutex::scoped_lock& lock,
 
 std::size_t scheduler::do_poll_one(mutex::scoped_lock& lock,
     scheduler::thread_info& this_thread,
-    const asio::error_code& ec)
+    const boost::system::error_code& ec)
 {
   if (stopped_)
     return 0;
@@ -647,7 +669,7 @@ void scheduler::stop_all_threads(
 void scheduler::wake_one_thread_and_unlock(
     mutex::scoped_lock& lock)
 {
-  if (!wakeup_event_.maybe_unlock_and_signal_one(lock))
+  if (wait_usec_ == 0 || !wakeup_event_.maybe_unlock_and_signal_one(lock))
   {
     if (!task_interrupted_ && task_)
     {
@@ -658,18 +680,19 @@ void scheduler::wake_one_thread_and_unlock(
   }
 }
 
-scheduler_task* scheduler::get_default_task(asio::execution_context& ctx)
+scheduler_task* scheduler::get_default_task(boost::asio::execution_context& ctx)
 {
-#if defined(ASIO_HAS_IO_URING_AS_DEFAULT)
+#if defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
   return &use_service<io_uring_service>(ctx);
-#else // defined(ASIO_HAS_IO_URING_AS_DEFAULT)
+#else // defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
   return &use_service<reactor>(ctx);
-#endif // defined(ASIO_HAS_IO_URING_AS_DEFAULT)
+#endif // defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
 }
 
 } // namespace detail
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_DETAIL_IMPL_SCHEDULER_IPP
+#endif // BOOST_ASIO_DETAIL_IMPL_SCHEDULER_IPP

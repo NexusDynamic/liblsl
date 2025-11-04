@@ -2,7 +2,7 @@
 // impl/connect_pipe.ipp
 // ~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Copyright (c) 2021 Klemens D. Morgenstern
 //                    (klemens dot morgenstern at gmx dot net)
 //
@@ -10,41 +10,42 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_IMPL_CONNECT_PIPE_IPP
-#define ASIO_IMPL_CONNECT_PIPE_IPP
+#ifndef BOOST_ASIO_IMPL_CONNECT_PIPE_IPP
+#define BOOST_ASIO_IMPL_CONNECT_PIPE_IPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 
-#if defined(ASIO_HAS_PIPE)
+#if defined(BOOST_ASIO_HAS_PIPE)
 
-#include "asio/connect_pipe.hpp"
+#include <boost/asio/connect_pipe.hpp>
 
-#if defined(ASIO_HAS_IOCP)
+#if defined(BOOST_ASIO_HAS_IOCP)
 # include <cstdio>
 # if _WIN32_WINNT >= 0x601
 #  include <bcrypt.h>
-#  if !defined(ASIO_NO_DEFAULT_LINKED_LIBS)
+#  if !defined(BOOST_ASIO_NO_DEFAULT_LINKED_LIBS)
 #   if defined(_MSC_VER)
 #    pragma comment(lib, "bcrypt.lib")
 #   endif // defined(_MSC_VER)
-#  endif // !defined(ASIO_NO_DEFAULT_LINKED_LIBS)
+#  endif // !defined(BOOST_ASIO_NO_DEFAULT_LINKED_LIBS)
 # endif // _WIN32_WINNT >= 0x601
-#else // defined(ASIO_HAS_IOCP)
-# include "asio/detail/descriptor_ops.hpp"
-#endif // defined(ASIO_HAS_IOCP)
+#else // defined(BOOST_ASIO_HAS_IOCP)
+# include <boost/asio/detail/descriptor_ops.hpp>
+#endif // defined(BOOST_ASIO_HAS_IOCP)
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace detail {
 
-void create_pipe(native_pipe_handle p[2], asio::error_code& ec)
+void create_pipe(native_pipe_handle p[2], boost::system::error_code& ec)
 {
-#if defined(ASIO_HAS_IOCP)
+#if defined(BOOST_ASIO_HAS_IOCP)
   using namespace std; // For sprintf and memcmp.
 
   static long counter1 = 0;
@@ -56,14 +57,15 @@ void create_pipe(native_pipe_handle p[2], asio::error_code& ec)
     : ::InterlockedExchangeAdd(&counter2, 0);
 
   wchar_t pipe_name[128];
-#if defined(ASIO_HAS_SECURE_RTL)
+#if defined(BOOST_ASIO_HAS_SECURE_RTL)
   swprintf_s(
-#else // defined(ASIO_HAS_SECURE_RTL)
+#else // defined(BOOST_ASIO_HAS_SECURE_RTL)
   _snwprintf(
-#endif // defined(ASIO_HAS_SECURE_RTL)
+#endif // defined(BOOST_ASIO_HAS_SECURE_RTL)
       pipe_name, 128,
-      L"\\\\.\\pipe\\asio-A0812896-741A-484D-AF23-BE51BF620E22-%u-%ld-%ld",
-      static_cast<unsigned int>(::GetCurrentProcessId()), n1, n2);
+      // Include address of static to discriminate asio instances in DLLs.
+      L"\\\\.\\pipe\\asio-A0812896-741A-484D-AF23-BE51BF620E22-%u-%p-%ld-%ld",
+      static_cast<unsigned int>(::GetCurrentProcessId()), &counter1, n1, n2);
 
   p[0] = ::CreateNamedPipeW(pipe_name,
       PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED,
@@ -72,7 +74,7 @@ void create_pipe(native_pipe_handle p[2], asio::error_code& ec)
   if (p[0] == INVALID_HANDLE_VALUE)
   {
     DWORD last_error = ::GetLastError();
-    ec.assign(last_error, asio::error::get_system_category());
+    ec.assign(last_error, boost::asio::error::get_system_category());
     return;
   }
 
@@ -83,7 +85,7 @@ void create_pipe(native_pipe_handle p[2], asio::error_code& ec)
   {
     DWORD last_error = ::GetLastError();
     ::CloseHandle(p[0]);
-    ec.assign(last_error, asio::error::get_system_category());
+    ec.assign(last_error, boost::asio::error::get_system_category());
     return;
   }
 
@@ -92,7 +94,7 @@ void create_pipe(native_pipe_handle p[2], asio::error_code& ec)
   if (::BCryptGenRandom(0, nonce, sizeof(nonce),
         BCRYPT_USE_SYSTEM_PREFERRED_RNG) != 0)
   {
-    ec = asio::error::connection_aborted;
+    ec = boost::asio::error::connection_aborted;
     ::CloseHandle(p[0]);
     ::CloseHandle(p[1]);
     return;
@@ -102,7 +104,7 @@ void create_pipe(native_pipe_handle p[2], asio::error_code& ec)
   BOOL ok = ::WriteFile(p[1], nonce, sizeof(nonce), &bytes_written, 0);
   if (!ok || bytes_written != sizeof(nonce))
   {
-    ec = asio::error::connection_aborted;
+    ec = boost::asio::error::connection_aborted;
     ::CloseHandle(p[0]);
     ::CloseHandle(p[1]);
     return;
@@ -114,36 +116,37 @@ void create_pipe(native_pipe_handle p[2], asio::error_code& ec)
   if (!ok || bytes_read != sizeof(nonce)
       || memcmp(nonce, nonce_check, sizeof(nonce)) != 0)
   {
-    ec = asio::error::connection_aborted;
+    ec = boost::asio::error::connection_aborted;
     ::CloseHandle(p[0]);
     ::CloseHandle(p[1]);
     return;
   }
 #endif // _WIN32_WINNT >= 0x601
 
-  asio::error::clear(ec);
-#else // defined(ASIO_HAS_IOCP)
+  boost::asio::error::clear(ec);
+#else // defined(BOOST_ASIO_HAS_IOCP)
   int result = ::pipe(p);
   detail::descriptor_ops::get_last_error(ec, result != 0);
-#endif // defined(ASIO_HAS_IOCP)
+#endif // defined(BOOST_ASIO_HAS_IOCP)
 }
 
 void close_pipe(native_pipe_handle p)
 {
-#if defined(ASIO_HAS_IOCP)
+#if defined(BOOST_ASIO_HAS_IOCP)
   ::CloseHandle(p);
-#else // defined(ASIO_HAS_IOCP)
-  asio::error_code ignored_ec;
+#else // defined(BOOST_ASIO_HAS_IOCP)
+  boost::system::error_code ignored_ec;
   detail::descriptor_ops::state_type state = 0;
   detail::descriptor_ops::close(p, state, ignored_ec);
-#endif // defined(ASIO_HAS_IOCP)
+#endif // defined(BOOST_ASIO_HAS_IOCP)
 }
 
 } // namespace detail
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // defined(ASIO_HAS_PIPE)
+#endif // defined(BOOST_ASIO_HAS_PIPE)
 
-#endif // ASIO_IMPL_CONNECT_PIPE_IPP
+#endif // BOOST_ASIO_IMPL_CONNECT_PIPE_IPP

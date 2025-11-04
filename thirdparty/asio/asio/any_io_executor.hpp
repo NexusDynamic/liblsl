@@ -2,36 +2,37 @@
 // any_io_executor.hpp
 // ~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_ANY_IO_EXECUTOR_HPP
-#define ASIO_ANY_IO_EXECUTOR_HPP
+#ifndef BOOST_ASIO_ANY_IO_EXECUTOR_HPP
+#define BOOST_ASIO_ANY_IO_EXECUTOR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#if defined(ASIO_USE_TS_EXECUTOR_AS_DEFAULT)
-# include "asio/executor.hpp"
-#else // defined(ASIO_USE_TS_EXECUTOR_AS_DEFAULT)
-# include "asio/execution.hpp"
-# include "asio/execution_context.hpp"
-#endif // defined(ASIO_USE_TS_EXECUTOR_AS_DEFAULT)
+#include <boost/asio/detail/config.hpp>
+#if defined(BOOST_ASIO_USE_TS_EXECUTOR_AS_DEFAULT)
+# include <boost/asio/executor.hpp>
+#else // defined(BOOST_ASIO_USE_TS_EXECUTOR_AS_DEFAULT)
+# include <boost/asio/execution.hpp>
+# include <boost/asio/execution_context.hpp>
+#endif // defined(BOOST_ASIO_USE_TS_EXECUTOR_AS_DEFAULT)
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 
-#if defined(ASIO_USE_TS_EXECUTOR_AS_DEFAULT)
+#if defined(BOOST_ASIO_USE_TS_EXECUTOR_AS_DEFAULT)
 
 typedef executor any_io_executor;
 
-#else // defined(ASIO_USE_TS_EXECUTOR_AS_DEFAULT)
+#else // defined(BOOST_ASIO_USE_TS_EXECUTOR_AS_DEFAULT)
 
 /// Polymorphic executor type for use with I/O objects.
 /**
@@ -87,18 +88,16 @@ public:
 #endif // !defined(GENERATING_DOCUMENTATION)
 
   /// Default constructor.
-  ASIO_DECL any_io_executor() ASIO_NOEXCEPT;
+  BOOST_ASIO_DECL any_io_executor() noexcept;
 
   /// Construct in an empty state. Equivalent effects to default constructor.
-  ASIO_DECL any_io_executor(nullptr_t) ASIO_NOEXCEPT;
+  BOOST_ASIO_DECL any_io_executor(nullptr_t) noexcept;
 
   /// Copy constructor.
-  ASIO_DECL any_io_executor(const any_io_executor& e) ASIO_NOEXCEPT;
+  BOOST_ASIO_DECL any_io_executor(const any_io_executor& e) noexcept;
 
-#if defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
   /// Move constructor.
-  ASIO_DECL any_io_executor(any_io_executor&& e) ASIO_NOEXCEPT;
-#endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
+  BOOST_ASIO_DECL any_io_executor(any_io_executor&& e) noexcept;
 
   /// Construct to point to the same target as another any_executor.
 #if defined(GENERATING_DOCUMENTATION)
@@ -107,8 +106,8 @@ public:
 #else // defined(GENERATING_DOCUMENTATION)
   template <typename OtherAnyExecutor>
   any_io_executor(OtherAnyExecutor e,
-      typename constraint<
-        conditional<
+      constraint_t<
+        conditional_t<
           !is_same<OtherAnyExecutor, any_io_executor>::value
             && is_base_of<execution::detail::any_executor_base,
               OtherAnyExecutor>::value,
@@ -116,9 +115,9 @@ public:
             0, supportable_properties_type>::template
               is_valid_target<OtherAnyExecutor>,
           false_type
-        >::type::value
-      >::type = 0)
-    : base_type(ASIO_MOVE_CAST(OtherAnyExecutor)(e))
+        >::value
+      > = 0)
+    : base_type(static_cast<OtherAnyExecutor&&>(e))
   {
   }
 #endif // defined(GENERATING_DOCUMENTATION)
@@ -131,8 +130,8 @@ public:
 #else // defined(GENERATING_DOCUMENTATION)
   template <typename OtherAnyExecutor>
   any_io_executor(std::nothrow_t, OtherAnyExecutor e,
-      typename constraint<
-        conditional<
+      constraint_t<
+        conditional_t<
           !is_same<OtherAnyExecutor, any_io_executor>::value
             && is_base_of<execution::detail::any_executor_base,
               OtherAnyExecutor>::value,
@@ -140,100 +139,94 @@ public:
             0, supportable_properties_type>::template
               is_valid_target<OtherAnyExecutor>,
           false_type
-        >::type::value
-      >::type = 0) ASIO_NOEXCEPT
-    : base_type(std::nothrow, ASIO_MOVE_CAST(OtherAnyExecutor)(e))
+        >::value
+      > = 0) noexcept
+    : base_type(std::nothrow, static_cast<OtherAnyExecutor&&>(e))
   {
   }
 #endif // defined(GENERATING_DOCUMENTATION)
 
   /// Construct to point to the same target as another any_executor.
-  ASIO_DECL any_io_executor(std::nothrow_t,
-      const any_io_executor& e) ASIO_NOEXCEPT;
+  BOOST_ASIO_DECL any_io_executor(std::nothrow_t,
+      const any_io_executor& e) noexcept;
 
-#if defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
   /// Construct to point to the same target as another any_executor.
-  ASIO_DECL any_io_executor(std::nothrow_t,
-      any_io_executor&& e) ASIO_NOEXCEPT;
-#endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
+  BOOST_ASIO_DECL any_io_executor(std::nothrow_t, any_io_executor&& e) noexcept;
 
   /// Construct a polymorphic wrapper for the specified executor.
 #if defined(GENERATING_DOCUMENTATION)
-  template <ASIO_EXECUTION_EXECUTOR Executor>
+  template <BOOST_ASIO_EXECUTION_EXECUTOR Executor>
   any_io_executor(Executor e);
 #else // defined(GENERATING_DOCUMENTATION)
-  template <ASIO_EXECUTION_EXECUTOR Executor>
+  template <BOOST_ASIO_EXECUTION_EXECUTOR Executor>
   any_io_executor(Executor e,
-      typename constraint<
-        conditional<
+      constraint_t<
+        conditional_t<
           !is_same<Executor, any_io_executor>::value
             && !is_base_of<execution::detail::any_executor_base,
               Executor>::value,
           execution::detail::is_valid_target_executor<
             Executor, supportable_properties_type>,
           false_type
-        >::type::value
-      >::type = 0)
-    : base_type(ASIO_MOVE_CAST(Executor)(e))
+        >::value
+      > = 0)
+    : base_type(static_cast<Executor&&>(e))
   {
   }
 #endif // defined(GENERATING_DOCUMENTATION)
 
   /// Construct a polymorphic wrapper for the specified executor.
 #if defined(GENERATING_DOCUMENTATION)
-  template <ASIO_EXECUTION_EXECUTOR Executor>
+  template <BOOST_ASIO_EXECUTION_EXECUTOR Executor>
   any_io_executor(std::nothrow_t, Executor e);
 #else // defined(GENERATING_DOCUMENTATION)
-  template <ASIO_EXECUTION_EXECUTOR Executor>
+  template <BOOST_ASIO_EXECUTION_EXECUTOR Executor>
   any_io_executor(std::nothrow_t, Executor e,
-      typename constraint<
-        conditional<
+      constraint_t<
+        conditional_t<
           !is_same<Executor, any_io_executor>::value
             && !is_base_of<execution::detail::any_executor_base,
               Executor>::value,
           execution::detail::is_valid_target_executor<
             Executor, supportable_properties_type>,
           false_type
-        >::type::value
-      >::type = 0) ASIO_NOEXCEPT
-    : base_type(std::nothrow, ASIO_MOVE_CAST(Executor)(e))
+        >::value
+      > = 0) noexcept
+    : base_type(std::nothrow, static_cast<Executor&&>(e))
   {
   }
 #endif // defined(GENERATING_DOCUMENTATION)
 
   /// Assignment operator.
-  ASIO_DECL any_io_executor& operator=(
-      const any_io_executor& e) ASIO_NOEXCEPT;
+  BOOST_ASIO_DECL any_io_executor& operator=(
+      const any_io_executor& e) noexcept;
 
-#if defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
   /// Move assignment operator.
-  ASIO_DECL any_io_executor& operator=(
-      any_io_executor&& e) ASIO_NOEXCEPT;
-#endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
+  BOOST_ASIO_DECL any_io_executor& operator=(any_io_executor&& e) noexcept;
 
   /// Assignment operator that sets the polymorphic wrapper to the empty state.
-  ASIO_DECL any_io_executor& operator=(nullptr_t);
+  BOOST_ASIO_DECL any_io_executor& operator=(nullptr_t);
 
   /// Destructor.
-  ASIO_DECL ~any_io_executor();
+  BOOST_ASIO_DECL ~any_io_executor();
 
   /// Swap targets with another polymorphic wrapper.
-  ASIO_DECL void swap(any_io_executor& other) ASIO_NOEXCEPT;
+  BOOST_ASIO_DECL void swap(any_io_executor& other) noexcept;
 
   /// Obtain a polymorphic wrapper with the specified property.
   /**
    * Do not call this function directly. It is intended for use with the
-   * asio::require and asio::prefer customisation points.
+   * boost::asio::require and boost::asio::prefer customisation points.
    *
    * For example:
    * @code any_io_executor ex = ...;
-   * auto ex2 = asio::require(ex, execution::blocking.possibly); @endcode
+   * auto ex2 = boost::asio::require(ex, execution::blocking.possibly); @endcode
    */
   template <typename Property>
   any_io_executor require(const Property& p,
-      typename constraint<
+      constraint_t<
         traits::require_member<const base_type&, const Property&>::is_valid
-      >::type = 0) const
+      > = 0) const
   {
     return static_cast<const base_type&>(*this).require(p);
   }
@@ -241,17 +234,17 @@ public:
   /// Obtain a polymorphic wrapper with the specified property.
   /**
    * Do not call this function directly. It is intended for use with the
-   * asio::prefer customisation point.
+   * boost::asio::prefer customisation point.
    *
    * For example:
    * @code any_io_executor ex = ...;
-   * auto ex2 = asio::prefer(ex, execution::blocking.possibly); @endcode
+   * auto ex2 = boost::asio::prefer(ex, execution::blocking.possibly); @endcode
    */
   template <typename Property>
   any_io_executor prefer(const Property& p,
-      typename constraint<
+      constraint_t<
         traits::prefer_member<const base_type&, const Property&>::is_valid
-      >::type = 0) const
+      > = 0) const
   {
     return static_cast<const base_type&>(*this).prefer(p);
   }
@@ -260,32 +253,32 @@ public:
 #if !defined(GENERATING_DOCUMENTATION)
 
 template <>
-ASIO_DECL any_io_executor any_io_executor::require(
+BOOST_ASIO_DECL any_io_executor any_io_executor::require(
     const execution::blocking_t::never_t&, int) const;
 
 template <>
-ASIO_DECL any_io_executor any_io_executor::prefer(
+BOOST_ASIO_DECL any_io_executor any_io_executor::prefer(
     const execution::blocking_t::possibly_t&, int) const;
 
 template <>
-ASIO_DECL any_io_executor any_io_executor::prefer(
+BOOST_ASIO_DECL any_io_executor any_io_executor::prefer(
     const execution::outstanding_work_t::tracked_t&, int) const;
 
 template <>
-ASIO_DECL any_io_executor any_io_executor::prefer(
+BOOST_ASIO_DECL any_io_executor any_io_executor::prefer(
     const execution::outstanding_work_t::untracked_t&, int) const;
 
 template <>
-ASIO_DECL any_io_executor any_io_executor::prefer(
+BOOST_ASIO_DECL any_io_executor any_io_executor::prefer(
     const execution::relationship_t::fork_t&, int) const;
 
 template <>
-ASIO_DECL any_io_executor any_io_executor::prefer(
+BOOST_ASIO_DECL any_io_executor any_io_executor::prefer(
     const execution::relationship_t::continuation_t&, int) const;
 
 namespace traits {
 
-#if !defined(ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
+#if !defined(BOOST_ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
 
 template <>
 struct equality_comparable<any_io_executor>
@@ -294,9 +287,9 @@ struct equality_comparable<any_io_executor>
   static const bool is_noexcept = true;
 };
 
-#endif // !defined(ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
+#endif // !defined(BOOST_ASIO_HAS_DEDUCED_EQUALITY_COMPARABLE_TRAIT)
 
-#if !defined(ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT)
+#if !defined(BOOST_ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT)
 
 template <typename F>
 struct execute_member<any_io_executor, F>
@@ -306,9 +299,9 @@ struct execute_member<any_io_executor, F>
   typedef void result_type;
 };
 
-#endif // !defined(ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT)
+#endif // !defined(BOOST_ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT)
 
-#if !defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#if !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
 
 template <typename Prop>
 struct query_member<any_io_executor, Prop> :
@@ -316,9 +309,9 @@ struct query_member<any_io_executor, Prop> :
 {
 };
 
-#endif // !defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
+#endif // !defined(BOOST_ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
 
-#if !defined(ASIO_HAS_DEDUCED_REQUIRE_MEMBER_TRAIT)
+#if !defined(BOOST_ASIO_HAS_DEDUCED_REQUIRE_MEMBER_TRAIT)
 
 template <typename Prop>
 struct require_member<any_io_executor, Prop> :
@@ -327,9 +320,9 @@ struct require_member<any_io_executor, Prop> :
   typedef any_io_executor result_type;
 };
 
-#endif // !defined(ASIO_HAS_DEDUCED_REQUIRE_MEMBER_TRAIT)
+#endif // !defined(BOOST_ASIO_HAS_DEDUCED_REQUIRE_MEMBER_TRAIT)
 
-#if !defined(ASIO_HAS_DEDUCED_PREFER_MEMBER_TRAIT)
+#if !defined(BOOST_ASIO_HAS_DEDUCED_PREFER_MEMBER_TRAIT)
 
 template <typename Prop>
 struct prefer_member<any_io_executor, Prop> :
@@ -338,22 +331,23 @@ struct prefer_member<any_io_executor, Prop> :
   typedef any_io_executor result_type;
 };
 
-#endif // !defined(ASIO_HAS_DEDUCED_PREFER_MEMBER_TRAIT)
+#endif // !defined(BOOST_ASIO_HAS_DEDUCED_PREFER_MEMBER_TRAIT)
 
 } // namespace traits
 
 #endif // !defined(GENERATING_DOCUMENTATION)
 
-#endif // defined(ASIO_USE_TS_EXECUTOR_AS_DEFAULT)
+#endif // defined(BOOST_ASIO_USE_TS_EXECUTOR_AS_DEFAULT)
 
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#if defined(ASIO_HEADER_ONLY) \
-  && !defined(ASIO_USE_TS_EXECUTOR_AS_DEFAULT)
-# include "asio/impl/any_io_executor.ipp"
-#endif // defined(ASIO_HEADER_ONLY)
-       //   && !defined(ASIO_USE_TS_EXECUTOR_AS_DEFAULT)
+#if defined(BOOST_ASIO_HEADER_ONLY) \
+  && !defined(BOOST_ASIO_USE_TS_EXECUTOR_AS_DEFAULT)
+# include <boost/asio/impl/any_io_executor.ipp>
+#endif // defined(BOOST_ASIO_HEADER_ONLY)
+       //   && !defined(BOOST_ASIO_USE_TS_EXECUTOR_AS_DEFAULT)
 
-#endif // ASIO_ANY_IO_EXECUTOR_HPP
+#endif // BOOST_ASIO_ANY_IO_EXECUTOR_HPP

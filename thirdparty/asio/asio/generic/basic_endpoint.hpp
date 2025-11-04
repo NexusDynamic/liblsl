@@ -2,30 +2,31 @@
 // generic/basic_endpoint.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_GENERIC_BASIC_ENDPOINT_HPP
-#define ASIO_GENERIC_BASIC_ENDPOINT_HPP
+#ifndef BOOST_ASIO_GENERIC_BASIC_ENDPOINT_HPP
+#define BOOST_ASIO_GENERIC_BASIC_ENDPOINT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/generic/detail/endpoint.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <boost/asio/generic/detail/endpoint.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace generic {
 
 /// Describes an endpoint for any socket type.
 /**
- * The asio::generic::basic_endpoint class template describes an endpoint
+ * The boost::asio::generic::basic_endpoint class template describes an endpoint
  * that may be associated with any socket type.
  *
  * @note The socket types sockaddr type must be able to fit into a
@@ -50,11 +51,11 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined data_type;
 #else
-  typedef asio::detail::socket_addr_type data_type;
+  typedef boost::asio::detail::socket_addr_type data_type;
 #endif
 
   /// Default constructor.
-  basic_endpoint() ASIO_NOEXCEPT
+  basic_endpoint() noexcept
   {
   }
 
@@ -78,13 +79,11 @@ public:
   {
   }
 
-#if defined(ASIO_HAS_MOVE)
   /// Move constructor.
   basic_endpoint(basic_endpoint&& other)
     : impl_(other.impl_)
   {
   }
-#endif // defined(ASIO_HAS_MOVE)
 
   /// Assign from another endpoint.
   basic_endpoint& operator=(const basic_endpoint& other)
@@ -93,14 +92,12 @@ public:
     return *this;
   }
 
-#if defined(ASIO_HAS_MOVE)
   /// Move-assign from another endpoint.
   basic_endpoint& operator=(basic_endpoint&& other)
   {
     impl_ = other.impl_;
     return *this;
   }
-#endif // defined(ASIO_HAS_MOVE)
 
   /// The protocol associated with the endpoint.
   protocol_type protocol() const
@@ -182,12 +179,13 @@ public:
 
 private:
   // The underlying generic endpoint.
-  asio::generic::detail::endpoint impl_;
+  boost::asio::generic::detail::endpoint impl_;
 };
 
 } // namespace generic
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_GENERIC_BASIC_ENDPOINT_HPP
+#endif // BOOST_ASIO_GENERIC_BASIC_ENDPOINT_HPP

@@ -2,27 +2,25 @@
 // multiple_exceptions.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_MULTIPLE_EXCEPTIONS_HPP
-#define ASIO_MULTIPLE_EXCEPTIONS_HPP
+#ifndef BOOST_ASIO_MULTIPLE_EXCEPTIONS_HPP
+#define BOOST_ASIO_MULTIPLE_EXCEPTIONS_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
+#include <boost/asio/detail/config.hpp>
 #include <exception>
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
-
-#if defined(ASIO_HAS_STD_EXCEPTION_PTR) \
-  || defined(GENERATING_DOCUMENTATION)
 
 /// Exception thrown when there are multiple pending exceptions to rethrow.
 class multiple_exceptions
@@ -30,29 +28,27 @@ class multiple_exceptions
 {
 public:
   /// Constructor.
-  ASIO_DECL multiple_exceptions(
-      std::exception_ptr first) ASIO_NOEXCEPT;
+  BOOST_ASIO_DECL multiple_exceptions(
+      std::exception_ptr first) noexcept;
 
   /// Obtain message associated with exception.
-  ASIO_DECL virtual const char* what() const
-    ASIO_NOEXCEPT_OR_NOTHROW;
+  BOOST_ASIO_DECL virtual const char* what() const
+    noexcept;
 
   /// Obtain a pointer to the first exception.
-  ASIO_DECL std::exception_ptr first_exception() const;
+  BOOST_ASIO_DECL std::exception_ptr first_exception() const;
 
 private:
   std::exception_ptr first_;
 };
 
-#endif // defined(ASIO_HAS_STD_EXCEPTION_PTR)
-       //   || defined(GENERATING_DOCUMENTATION)
-
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#if defined(ASIO_HEADER_ONLY)
-# include "asio/impl/multiple_exceptions.ipp"
-#endif // defined(ASIO_HEADER_ONLY)
+#if defined(BOOST_ASIO_HEADER_ONLY)
+# include <boost/asio/impl/multiple_exceptions.ipp>
+#endif // defined(BOOST_ASIO_HEADER_ONLY)
 
-#endif // ASIO_MULTIPLE_EXCEPTIONS_HPP
+#endif // BOOST_ASIO_MULTIPLE_EXCEPTIONS_HPP

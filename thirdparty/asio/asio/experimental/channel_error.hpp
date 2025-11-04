@@ -2,24 +2,25 @@
 // experimental/channel_error.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_EXPERIMENTAL_CHANNEL_ERROR_HPP
-#define ASIO_EXPERIMENTAL_CHANNEL_ERROR_HPP
+#ifndef BOOST_ASIO_EXPERIMENTAL_CHANNEL_ERROR_HPP
+#define BOOST_ASIO_EXPERIMENTAL_CHANNEL_ERROR_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/error_code.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <boost/system/error_code.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace experimental {
 namespace error {
@@ -33,12 +34,12 @@ enum channel_errors
   channel_cancelled = 2
 };
 
-extern ASIO_DECL
-const asio::error_category& get_channel_category();
+extern BOOST_ASIO_DECL
+const boost::system::error_category& get_channel_category();
 
-static const asio::error_category&
-  channel_category ASIO_UNUSED_VARIABLE
-  = asio::experimental::error::get_channel_category();
+static const boost::system::error_category&
+  channel_category BOOST_ASIO_UNUSED_VARIABLE
+  = boost::asio::experimental::error::get_channel_category();
 
 } // namespace error
 namespace channel_errc {
@@ -48,37 +49,40 @@ namespace channel_errc {
 } // namespace channel_errc
 } // namespace experimental
 } // namespace asio
+} // namespace boost
 
-#if defined(ASIO_HAS_STD_SYSTEM_ERROR)
-namespace std {
+namespace boost {
+namespace system {
 
 template<> struct is_error_code_enum<
-    asio::experimental::error::channel_errors>
+    boost::asio::experimental::error::channel_errors>
 {
   static const bool value = true;
 };
 
-} // namespace std
-#endif // defined(ASIO_HAS_STD_SYSTEM_ERROR)
+} // namespace system
+} // namespace boost
 
+namespace boost {
 namespace asio {
 namespace experimental {
 namespace error {
 
-inline asio::error_code make_error_code(channel_errors e)
+inline boost::system::error_code make_error_code(channel_errors e)
 {
-  return asio::error_code(
+  return boost::system::error_code(
       static_cast<int>(e), get_channel_category());
 }
 
 } // namespace error
 } // namespace experimental
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#if defined(ASIO_HEADER_ONLY)
-# include "asio/experimental/impl/channel_error.ipp"
-#endif // defined(ASIO_HEADER_ONLY)
+#if defined(BOOST_ASIO_HEADER_ONLY)
+# include <boost/asio/experimental/impl/channel_error.ipp>
+#endif // defined(BOOST_ASIO_HEADER_ONLY)
 
-#endif // ASIO_EXPERIMENTAL_CHANNEL_ERROR_HPP
+#endif // BOOST_ASIO_EXPERIMENTAL_CHANNEL_ERROR_HPP

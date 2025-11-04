@@ -2,38 +2,39 @@
 // ip/tcp.hpp
 // ~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_IP_TCP_HPP
-#define ASIO_IP_TCP_HPP
+#ifndef BOOST_ASIO_IP_TCP_HPP
+#define BOOST_ASIO_IP_TCP_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-#include "asio/basic_socket_acceptor.hpp"
-#include "asio/basic_socket_iostream.hpp"
-#include "asio/basic_stream_socket.hpp"
-#include "asio/detail/socket_option.hpp"
-#include "asio/detail/socket_types.hpp"
-#include "asio/ip/basic_endpoint.hpp"
-#include "asio/ip/basic_resolver.hpp"
-#include "asio/ip/basic_resolver_iterator.hpp"
-#include "asio/ip/basic_resolver_query.hpp"
+#include <boost/asio/detail/config.hpp>
+#include <boost/asio/basic_socket_acceptor.hpp>
+#include <boost/asio/basic_socket_iostream.hpp>
+#include <boost/asio/basic_stream_socket.hpp>
+#include <boost/asio/detail/socket_option.hpp>
+#include <boost/asio/detail/socket_types.hpp>
+#include <boost/asio/ip/basic_endpoint.hpp>
+#include <boost/asio/ip/basic_resolver.hpp>
+#include <boost/asio/ip/basic_resolver_iterator.hpp>
+#include <boost/asio/ip/basic_resolver_query.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace ip {
 
 /// Encapsulates the flags needed for TCP.
 /**
- * The asio::ip::tcp class contains flags necessary for TCP sockets.
+ * The boost::asio::ip::tcp class contains flags necessary for TCP sockets.
  *
  * @par Thread Safety
  * @e Distinct @e objects: Safe.@n
@@ -49,31 +50,31 @@ public:
   typedef basic_endpoint<tcp> endpoint;
 
   /// Construct to represent the IPv4 TCP protocol.
-  static tcp v4() ASIO_NOEXCEPT
+  static tcp v4() noexcept
   {
-    return tcp(ASIO_OS_DEF(AF_INET));
+    return tcp(BOOST_ASIO_OS_DEF(AF_INET));
   }
 
   /// Construct to represent the IPv6 TCP protocol.
-  static tcp v6() ASIO_NOEXCEPT
+  static tcp v6() noexcept
   {
-    return tcp(ASIO_OS_DEF(AF_INET6));
+    return tcp(BOOST_ASIO_OS_DEF(AF_INET6));
   }
 
   /// Obtain an identifier for the type of the protocol.
-  int type() const ASIO_NOEXCEPT
+  int type() const noexcept
   {
-    return ASIO_OS_DEF(SOCK_STREAM);
+    return BOOST_ASIO_OS_DEF(SOCK_STREAM);
   }
 
   /// Obtain an identifier for the protocol.
-  int protocol() const ASIO_NOEXCEPT
+  int protocol() const noexcept
   {
-    return ASIO_OS_DEF(IPPROTO_TCP);
+    return BOOST_ASIO_OS_DEF(IPPROTO_TCP);
   }
 
   /// Obtain an identifier for the protocol family.
-  int family() const ASIO_NOEXCEPT
+  int family() const noexcept
   {
     return family_;
   }
@@ -87,10 +88,10 @@ public:
   /// The TCP resolver type.
   typedef basic_resolver<tcp> resolver;
 
-#if !defined(ASIO_NO_IOSTREAM)
+#if !defined(BOOST_ASIO_NO_IOSTREAM)
   /// The TCP iostream type.
   typedef basic_socket_iostream<tcp> iostream;
-#endif // !defined(ASIO_NO_IOSTREAM)
+#endif // !defined(BOOST_ASIO_NO_IOSTREAM)
 
   /// Socket option for disabling the Nagle algorithm.
   /**
@@ -99,18 +100,18 @@ public:
    * @par Examples
    * Setting the option:
    * @code
-   * asio::ip::tcp::socket socket(my_context);
+   * boost::asio::ip::tcp::socket socket(my_context);
    * ...
-   * asio::ip::tcp::no_delay option(true);
+   * boost::asio::ip::tcp::no_delay option(true);
    * socket.set_option(option);
    * @endcode
    *
    * @par
    * Getting the current option value:
    * @code
-   * asio::ip::tcp::socket socket(my_context);
+   * boost::asio::ip::tcp::socket socket(my_context);
    * ...
-   * asio::ip::tcp::no_delay option;
+   * boost::asio::ip::tcp::no_delay option;
    * socket.get_option(option);
    * bool is_set = option.value();
    * @endcode
@@ -121,8 +122,8 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined no_delay;
 #else
-  typedef asio::detail::socket_option::boolean<
-    ASIO_OS_DEF(IPPROTO_TCP), ASIO_OS_DEF(TCP_NODELAY)> no_delay;
+  typedef boost::asio::detail::socket_option::boolean<
+    BOOST_ASIO_OS_DEF(IPPROTO_TCP), BOOST_ASIO_OS_DEF(TCP_NODELAY)> no_delay;
 #endif
 
   /// Compare two protocols for equality.
@@ -139,7 +140,7 @@ public:
 
 private:
   // Construct with a specific family.
-  explicit tcp(int protocol_family) ASIO_NOEXCEPT
+  explicit tcp(int protocol_family) noexcept
     : family_(protocol_family)
   {
   }
@@ -149,7 +150,8 @@ private:
 
 } // namespace ip
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // ASIO_IP_TCP_HPP
+#endif // BOOST_ASIO_IP_TCP_HPP

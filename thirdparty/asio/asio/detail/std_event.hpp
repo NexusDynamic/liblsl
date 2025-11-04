@@ -2,30 +2,28 @@
 // detail/std_event.hpp
 // ~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2023 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2025 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef ASIO_DETAIL_STD_EVENT_HPP
-#define ASIO_DETAIL_STD_EVENT_HPP
+#ifndef BOOST_ASIO_DETAIL_STD_EVENT_HPP
+#define BOOST_ASIO_DETAIL_STD_EVENT_HPP
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include "asio/detail/config.hpp"
-
-#if defined(ASIO_HAS_STD_MUTEX_AND_CONDVAR)
-
+#include <boost/asio/detail/config.hpp>
 #include <chrono>
 #include <condition_variable>
-#include "asio/detail/assert.hpp"
-#include "asio/detail/noncopyable.hpp"
+#include <boost/asio/detail/assert.hpp>
+#include <boost/asio/detail/noncopyable.hpp>
 
-#include "asio/detail/push_options.hpp"
+#include <boost/asio/detail/push_options.hpp>
 
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -55,7 +53,7 @@ public:
   template <typename Lock>
   void signal_all(Lock& lock)
   {
-    ASIO_ASSERT(lock.locked());
+    BOOST_ASIO_ASSERT(lock.locked());
     (void)lock;
     state_ |= 1;
     cond_.notify_all();
@@ -65,7 +63,7 @@ public:
   template <typename Lock>
   void unlock_and_signal_one(Lock& lock)
   {
-    ASIO_ASSERT(lock.locked());
+    BOOST_ASIO_ASSERT(lock.locked());
     state_ |= 1;
     bool have_waiters = (state_ > 1);
     lock.unlock();
@@ -77,7 +75,7 @@ public:
   template <typename Lock>
   void unlock_and_signal_one_for_destruction(Lock& lock)
   {
-    ASIO_ASSERT(lock.locked());
+    BOOST_ASIO_ASSERT(lock.locked());
     state_ |= 1;
     bool have_waiters = (state_ > 1);
     if (have_waiters)
@@ -89,7 +87,7 @@ public:
   template <typename Lock>
   bool maybe_unlock_and_signal_one(Lock& lock)
   {
-    ASIO_ASSERT(lock.locked());
+    BOOST_ASIO_ASSERT(lock.locked());
     state_ |= 1;
     if (state_ > 1)
     {
@@ -104,7 +102,7 @@ public:
   template <typename Lock>
   void clear(Lock& lock)
   {
-    ASIO_ASSERT(lock.locked());
+    BOOST_ASIO_ASSERT(lock.locked());
     (void)lock;
     state_ &= ~std::size_t(1);
   }
@@ -113,7 +111,7 @@ public:
   template <typename Lock>
   void wait(Lock& lock)
   {
-    ASIO_ASSERT(lock.locked());
+    BOOST_ASIO_ASSERT(lock.locked());
     unique_lock_adapter u_lock(lock);
     while ((state_ & 1) == 0)
     {
@@ -126,7 +124,7 @@ public:
   template <typename Lock>
   bool wait_for_usec(Lock& lock, long usec)
   {
-    ASIO_ASSERT(lock.locked());
+    BOOST_ASIO_ASSERT(lock.locked());
     unique_lock_adapter u_lock(lock);
     if ((state_ & 1) == 0)
     {
@@ -180,9 +178,8 @@ private:
 
 } // namespace detail
 } // namespace asio
+} // namespace boost
 
-#include "asio/detail/pop_options.hpp"
+#include <boost/asio/detail/pop_options.hpp>
 
-#endif // defined(ASIO_HAS_STD_MUTEX_AND_CONDVAR)
-
-#endif // ASIO_DETAIL_STD_EVENT_HPP
+#endif // BOOST_ASIO_DETAIL_STD_EVENT_HPP
