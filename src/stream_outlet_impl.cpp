@@ -109,23 +109,22 @@ stream_outlet_impl::~stream_outlet_impl() {
 		//    the outlet
 		asio::post(*io_ctx_data_, [io = io_ctx_data_]() { io->stop(); });
 		asio::post(*io_ctx_service_, [io = io_ctx_service_]() { io->stop(); });
+		// Also stop the io_contexts directly to ensure they stop even if the posted
+		// stop commands haven't been processed yet
+		io_ctx_data_->stop();
+		io_ctx_service_->stop();
 		const char *name = this->info().name().c_str();
-		for (int try_nr = 0; try_nr <= 100; ++try_nr) {
+		for (int try_nr = 0; try_nr <= 400; ++try_nr) {
 			switch (try_nr) {
 			case 0: DLOG_F(INFO, "Trying to join IO threads for %s", name); break;
 			case 20: LOG_F(INFO, "Waiting for %s's IO threads to end", name); break;
-			case 80:
-				LOG_F(WARNING, "Stopping io_contexts for %s", name);
-				io_ctx_data_->stop();
-				io_ctx_service_->stop();
-				for (std::size_t k = 0; k < io_threads_.size(); k++) {
-					if (!io_threads_[k]->joinable()) {
-						LOG_F(ERROR, "%s's io thread #%lu still running", name, k);
-					}
-				}
+			case 200:
+				LOG_F(WARNING, "IO threads for %s taking longer than expected to finish", name);
+				// stop() was already called above, so just wait
 				break;
-			case 100:
-				LOG_F(ERROR, "Detaching io_threads for %s", name);
+			case 400:
+				LOG_F(ERROR, "Detaching io_threads for %s after 10 second timeout. "
+					"This may cause undefined behavior.", name);
 				for (auto &thread : io_threads_) thread->detach();
 				return;
 			default: break;
