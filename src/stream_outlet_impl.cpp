@@ -99,28 +99,27 @@ stream_outlet_impl::~stream_outlet_impl() {
 		for (auto &udp_server : udp_servers_) udp_server->end_serving();
 		for (auto &responder : responders_) responder->end_serving();
 
-		// In theory, an io context should end quickly, but in practice it
-		// might take a while. So we
-		// 1. ask them to stop after they've finished their current task
-		// 2. wait a bit
-		// 3. stop the io contexts from our thread. Not ideal, but better than
-		// 4. waiting a bit and
-		// 5. detaching thread, i.e. letting it hang and continue tearing down
-		//    the outlet
+		// Shutdown sequence:
+		// 1. end_serving() posts cleanup operations (close sockets, cancel handlers)
+		// 2. Post stop() commands to run AFTER cleanup completes
+		// 3. Wait briefly to allow cleanup and posted stop() to execute
+		// 4. If threads don't stop, call stop() directly (more aggressive)
+		// 5. Continue waiting with a generous timeout before giving up
 		asio::post(*io_ctx_data_, [io = io_ctx_data_]() { io->stop(); });
 		asio::post(*io_ctx_service_, [io = io_ctx_service_]() { io->stop(); });
-		// Also stop the io_contexts directly to ensure they stop even if the posted
-		// stop commands haven't been processed yet
-		io_ctx_data_->stop();
-		io_ctx_service_->stop();
 		const char *name = this->info().name().c_str();
 		for (int try_nr = 0; try_nr <= 400; ++try_nr) {
 			switch (try_nr) {
 			case 0: DLOG_F(INFO, "Trying to join IO threads for %s", name); break;
 			case 20: LOG_F(INFO, "Waiting for %s's IO threads to end", name); break;
+			case 40:
+				// If threads haven't stopped after 1 second, call stop() directly
+				DLOG_F(1, "Calling stop() directly for %s's IO contexts", name);
+				io_ctx_data_->stop();
+				io_ctx_service_->stop();
+				break;
 			case 200:
 				LOG_F(WARNING, "IO threads for %s taking longer than expected to finish", name);
-				// stop() was already called above, so just wait
 				break;
 			case 400:
 				LOG_F(ERROR, "Detaching io_threads for %s after 10 second timeout. "
