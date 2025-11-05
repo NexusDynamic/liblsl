@@ -107,14 +107,15 @@ stream_outlet_impl::~stream_outlet_impl() {
 		// 5. Continue waiting with a generous timeout before giving up
 		asio::post(*io_ctx_data_, [io = io_ctx_data_]() { io->stop(); });
 		asio::post(*io_ctx_service_, [io = io_ctx_service_]() { io->stop(); });
+
 		const char *name = this->info().name().c_str();
 		for (int try_nr = 0; try_nr <= 400; ++try_nr) {
 			switch (try_nr) {
 			case 0: DLOG_F(INFO, "Trying to join IO threads for %s", name); break;
 			case 20: LOG_F(INFO, "Waiting for %s's IO threads to end", name); break;
-			case 40:
-				// If threads haven't stopped after 1 second, call stop() directly
-				DLOG_F(1, "Calling stop() directly for %s's IO contexts", name);
+			case 80:
+				// If threads haven't stopped after 2 seconds, call stop() directly
+				LOG_F(WARNING, "Stopping io_contexts for %s", name);
 				io_ctx_data_->stop();
 				io_ctx_service_->stop();
 				break;
