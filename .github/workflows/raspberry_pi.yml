@@ -39,15 +39,15 @@ jobs:
         # cortex-a7 -> RPi 3+, if we need 1,2,zero, needs to use arm1176
         # see: https://github.com/marketplace/actions/arm-runner
         # adapted from: https://github.com/castle-engine/castle-engine/blob/master/.github/workflows/test-and-pack-arm-runner.yml
-        - {name: "rpi-armv71", os: "raspios_lite:latest", arch: "armv71", cpu: "cortex-a7", cmake_extra: "-DLSL_UNITTESTS=ON -DLSL_BENCHMARKS=ON" }
-        - {name: "rpi-aarch64", os: "raspios_lite_arm64:latest", arch: "aarch64", cpu: "cortex-a53", cmake_extra: "-DLSL_UNITTESTS=ON -DLSL_BENCHMARKS=ON" }
+        - {name: "rpi-armv7l", os: "raspios_lite:latest", cpu: "cortex-a7", cpu_info: "cpuinfo/raspberrypi_3b", cmake_extra: "-DLSL_UNITTESTS=ON -DLSL_BENCHMARKS=ON" }
+        - {name: "rpi-aarch64", os: "raspios_lite_arm64:latest", cpu: "cortex-a53", cpu_info: "cpuinfo/raspberrypi_4b", cmake_extra: "-DLSL_UNITTESTS=ON -DLSL_BENCHMARKS=ON" }
     steps:
       - uses: actions/checkout@v5
       - uses: pguyot/arm-runner-action@v2
         with:
           base_image: ${{ matrix.config.os }}
-          arch: ${{ matrix.config.arch }}
           cpu: ${{ matrix.config.cpu }}
+          cpu_info: ${{ matrix.config.cpu_info }}
           shell: /bin/bash -eo pipefail
           image_additional_mb: 1024
           bind_mount_repository: true
@@ -87,11 +87,11 @@ jobs:
            cmake --build build --target package --config Release -j
            echo $PWD
            ls -la
-            cmake -DCPACK_DEBIAN_PACKAGE_SHLIBDEPS=ON .
-            sudo dpkg -i package/*.deb
-            cmake --build build --target package --config Release -j
-            dpkg -I package/liblsl*.deb
-           cmake -E remove_directory package/_CPack_Packages
+           cmake -DCPACK_DEBIAN_PACKAGE_SHLIBDEPS=ON .
+           sudo dpkg -i package/*.deb
+           cmake --build build --target package --config Release -j
+           dpkg -I build/liblsl*.deb
+           cmake -E remove_directory build/_CPack_Packages
            cp testing/lslcfgs/default.cfg .
 
       - name: upload install dir
