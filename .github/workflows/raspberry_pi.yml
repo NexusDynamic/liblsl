@@ -88,7 +88,7 @@ jobs:
            echo $PWD
            ls -la
            cmake -DCPACK_DEBIAN_PACKAGE_SHLIBDEPS=ON .
-           sudo dpkg -i package/*.deb
+           sudo dpkg -i build/*.deb
            cmake --build build --target package --config Release -j
            dpkg -I build/liblsl*.deb
            cmake -E remove_directory build/_CPack_Packages
