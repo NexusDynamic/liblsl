@@ -44,7 +44,6 @@ jobs:
         - {name: "windows-x64",  os: "windows-latest", cmake_extra: "-T v142,host=x86"}
         - {name: "windows-32",   os: "windows-latest", cmake_extra: "-T v142,host=x86 -A Win32"}
         - {name: "windows-arm",  os: "windows-11-arm", cmake_extra: "-T v143,host=ARM64 -A ARM64"}
-    # runs all steps in the container configured in config.docker or as subprocesses when empty
     steps:
     - uses: actions/checkout@v4
 
