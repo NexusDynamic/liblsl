@@ -37,9 +37,12 @@ jobs:
         config:
         - {name: "ubuntu-22.04", os: "ubuntu-22.04",   cmake_extra: "-DLSL_BUNDLED_PUGIXML=OFF" }
         - {name: "ubuntu-24.04", os: "ubuntu-24.04",   cmake_extra: "-DLSL_BUNDLED_PUGIXML=OFF" }
+        - {name: "ubuntu-24.04-arm", os: "ubuntu-24.04-arm",   cmake_extra: "-DLSL_BUNDLED_PUGIXML=OFF" }
         - {name: "windows-x64",  os: "windows-latest", cmake_extra: "-T v142,host=x86"}
         - {name: "windows-32",   os: "windows-latest", cmake_extra: "-T v142,host=x86 -A Win32"}
-        - {name: "macOS-latest", os: "macOS-latest"}
+        - {name: "windows-arm",  os: "windows-11-arm", cmake_extra: "-T v142,host=arm64 -A ARM64"}
+        - {name: "macOS-latest-arm", os: "macOS-latest"}
+        - {name: "macOS-15-intel", os: "macOS-15-intel"}
     
     # runs all steps in the container configured in config.docker or as subprocesses when empty
     container: ${{ matrix.config.docker }}
