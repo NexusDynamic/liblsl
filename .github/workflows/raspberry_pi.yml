@@ -51,6 +51,10 @@ jobs:
           shell: /bin/bash -eo pipefail
           image_additional_mb: 1024
           bind_mount_repository: true
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential pkg-config
       - name: Configure CMake
         run: |
            cmake --version
