@@ -99,32 +99,33 @@ stream_outlet_impl::~stream_outlet_impl() {
 		for (auto &udp_server : udp_servers_) udp_server->end_serving();
 		for (auto &responder : responders_) responder->end_serving();
 
-		// Shutdown sequence:
-		// 1. end_serving() posts cleanup operations (close sockets, cancel handlers)
-		// 2. Post stop() commands to run AFTER cleanup completes
-		// 3. Wait briefly to allow cleanup and posted stop() to execute
-		// 4. If threads don't stop, call stop() directly (more aggressive)
-		// 5. Continue waiting with a generous timeout before giving up
+		// In theory, an io context should end quickly, but in practice it
+		// might take a while. So we
+		// 1. ask them to stop after they've finished their current task
+		// 2. wait a bit
+		// 3. stop the io contexts from our thread. Not ideal, but better than
+		// 4. waiting a bit and
+		// 5. detaching thread, i.e. letting it hang and continue tearing down
+		//    the outlet
 		asio::post(*io_ctx_data_, [io = io_ctx_data_]() { io->stop(); });
 		asio::post(*io_ctx_service_, [io = io_ctx_service_]() { io->stop(); });
-
 		const char *name = this->info().name().c_str();
-		for (int try_nr = 0; try_nr <= 400; ++try_nr) {
+		for (int try_nr = 0; try_nr <= 100; ++try_nr) {
 			switch (try_nr) {
 			case 0: DLOG_F(INFO, "Trying to join IO threads for %s", name); break;
 			case 20: LOG_F(INFO, "Waiting for %s's IO threads to end", name); break;
 			case 80:
-				// If threads haven't stopped after 2 seconds, call stop() directly
 				LOG_F(WARNING, "Stopping io_contexts for %s", name);
 				io_ctx_data_->stop();
 				io_ctx_service_->stop();
+				for (std::size_t k = 0; k < io_threads_.size(); k++) {
+					if (!io_threads_[k]->joinable()) {
+						LOG_F(ERROR, "%s's io thread #%lu still running", name, k);
+					}
+				}
 				break;
-			case 200:
-				LOG_F(WARNING, "IO threads for %s taking longer than expected to finish", name);
-				break;
-			case 400:
-				LOG_F(ERROR, "Detaching io_threads for %s after 10 second timeout. "
-					"This may cause undefined behavior.", name);
+			case 100:
+				LOG_F(ERROR, "Detaching io_threads for %s", name);
 				for (auto &thread : io_threads_) thread->detach();
 				return;
 			default: break;
