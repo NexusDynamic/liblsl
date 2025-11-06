@@ -43,8 +43,9 @@ jobs:
         - {name: "ubuntu-24.04-x64", os: "ubuntu-24.04", arch: "x86_64", cmake_extra: "-DLSL_BUNDLED_PUGIXML=OFF" }
 
         # ARM Linux builds - cross-compiled with QEMU testing (Jetson, Raspberry Pi compatible)
-        - {name: "ubuntu-22.04-arm64", os: "ubuntu-22.04", arch: "aarch64", cross_compile: true, cmake_extra: "-DLSL_BUNDLED_PUGIXML=OFF" }
-        - {name: "ubuntu-22.04-armhf", os: "ubuntu-22.04", arch: "armv7", cross_compile: true, cmake_extra: "-DLSL_BUNDLED_PUGIXML=OFF" }
+        # Note: Using bundled pugixml for cross-compilation (no ARM cross-compiled system package available)
+        - {name: "ubuntu-22.04-arm64", os: "ubuntu-22.04", arch: "aarch64", cross_compile: true, cmake_extra: "" }
+        - {name: "ubuntu-22.04-armhf", os: "ubuntu-22.04", arch: "armv7", cross_compile: true, cmake_extra: "" }
 
         # Native ARM build (optional - can be enabled for additional validation)
         # - {name: "ubuntu-24.04-arm64-native", os: "ubuntu-24.04-arm", arch: "aarch64", cmake_extra: "-DLSL_BUNDLED_PUGIXML=OFF" }
@@ -70,14 +71,14 @@ jobs:
             gcc-aarch64-linux-gnu \
             g++-aarch64-linux-gnu \
             qemu-user-static
-          echo "CMAKE_TOOLCHAIN=-DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/.github/toolchains/aarch64-linux-gnu.cmake" >> $GITHUB_ENV
+          echo "CMAKE_TOOLCHAIN=-DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/cmake/toolchains/aarch64-linux-gnu.cmake" >> $GITHUB_ENV
           echo "QEMU_LD_PREFIX=/usr/aarch64-linux-gnu" >> $GITHUB_ENV
         elif [[ "${{ matrix.config.arch }}" == "armv7" ]]; then
           sudo apt-get install -y --no-install-recommends \
             gcc-arm-linux-gnueabihf \
             g++-arm-linux-gnueabihf \
             qemu-user-static
-          echo "CMAKE_TOOLCHAIN=-DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/.github/toolchains/arm-linux-gnueabihf.cmake" >> $GITHUB_ENV
+          echo "CMAKE_TOOLCHAIN=-DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/cmake/toolchains/arm-linux-gnueabihf.cmake" >> $GITHUB_ENV
           echo "QEMU_LD_PREFIX=/usr/arm-linux-gnueabihf" >> $GITHUB_ENV
         fi
 
