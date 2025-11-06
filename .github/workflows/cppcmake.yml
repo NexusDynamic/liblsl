@@ -45,9 +45,9 @@ jobs:
         # ARM Linux builds - cross-compiled (Jetson, Raspberry Pi compatible)
         # Tests skipped (require real ARM hardware) - build validation only
         # Note: Using bundled pugixml for cross-compilation (no ARM cross-compiled system package available)
-        # Note: Must disable BOTH general and component-specific SHLIBDEPS (liblsl component hardcodes it to ON)
-        - {name: "ubuntu-22.04-arm64", os: "ubuntu-22.04", arch: "aarch64", cross_compile: true, cmake_extra: "-DLSL_BUNDLED_PUGIXML=ON -DCPACK_DEBIAN_PACKAGE_SHLIBDEPS=OFF -DCPACK_DEBIAN_LIBLSL_PACKAGE_SHLIBDEPS=OFF" }
-        - {name: "ubuntu-22.04-armhf", os: "ubuntu-22.04", arch: "armv7", cross_compile: true, cmake_extra: "-DLSL_BUNDLED_PUGIXML=ON -DCPACK_DEBIAN_PACKAGE_SHLIBDEPS=OFF -DCPACK_DEBIAN_LIBLSL_PACKAGE_SHLIBDEPS=OFF" }
+        # Note: LIBLSL_DISABLE_PACKAGE_SHLIBDEPS=ON prevents dpkg-shlibdeps from analyzing ARM binaries on x86_64 host
+        - {name: "ubuntu-22.04-arm64", os: "ubuntu-22.04", arch: "aarch64", cross_compile: true, cmake_extra: "-DLSL_BUNDLED_PUGIXML=ON -DLIBLSL_DISABLE_PACKAGE_SHLIBDEPS=ON" }
+        - {name: "ubuntu-22.04-armhf", os: "ubuntu-22.04", arch: "armv7", cross_compile: true, cmake_extra: "-DLSL_BUNDLED_PUGIXML=ON -DLIBLSL_DISABLE_PACKAGE_SHLIBDEPS=ON" }
 
         # Native ARM build (optional - can be enabled for additional validation)
         # - {name: "ubuntu-24.04-arm64-native", os: "ubuntu-24.04-arm", arch: "aarch64", cmake_extra: "-DLSL_BUNDLED_PUGIXML=OFF" }
@@ -178,17 +178,6 @@ jobs:
     - name: Package
       run: |
         echo "Creating package for ${{ matrix.config.arch }}"
-
-        # For cross-compiled builds, explicitly disable shlibdeps before packaging
-        if [[ "${{ matrix.config.cross_compile }}" == "true" ]]; then
-          # LSLCMake.cmake hardcodes SHLIBDEPS=ON, overwriting command-line flags
-          # Solution: Directly edit the generated CPackConfig.cmake file
-          sed -i 's/SET(CPACK_DEBIAN_LIBLSL_PACKAGE_SHLIBDEPS "ON")/SET(CPACK_DEBIAN_LIBLSL_PACKAGE_SHLIBDEPS "OFF")/' build/CPackConfig.cmake
-          sed -i 's/SET(CPACK_DEBIAN_PACKAGE_SHLIBDEPS "ON")/SET(CPACK_DEBIAN_PACKAGE_SHLIBDEPS "OFF")/' build/CPackConfig.cmake
-          echo "Modified CPackConfig.cmake to disable SHLIBDEPS for cross-compilation"
-          grep "SHLIBDEPS" build/CPackConfig.cmake || true
-        fi
-
         cmake --build build --target package --config Release -j
 
         # On Debian / Ubuntu the dependencies can only be resolved for

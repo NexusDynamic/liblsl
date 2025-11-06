@@ -312,7 +312,10 @@ macro(LSLGenerateCPackConfig)
 			set(CPACK_DEBIAN_ENABLE_COMPONENT_DEPENDS ON)
 			set(CPACK_DEB_COMPONENT_INSTALL ON)
 			set(CPACK_DEBIAN_PACKAGE_PRIORITY optional)
-			set(CPACK_DEBIAN_LIBLSL_PACKAGE_SHLIBDEPS ON)
+			# Allow disabling SHLIBDEPS for cross-compilation (dpkg-shlibdeps can't analyze ARM binaries on x86 host)
+			if(NOT LIBLSL_DISABLE_PACKAGE_SHLIBDEPS)
+				set(CPACK_DEBIAN_LIBLSL_PACKAGE_SHLIBDEPS ON)
+			endif()
 			set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
 
 			# include distribution name (e.g. trusty or xenial) in the file name
