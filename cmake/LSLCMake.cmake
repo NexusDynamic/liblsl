@@ -318,6 +318,21 @@ macro(LSLGenerateCPackConfig)
 			endif()
 			set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
 
+			# Set correct architecture for cross-compilation
+			# CMake uses different names than Debian: aarch64->arm64, armv7l->armhf, x86_64->amd64
+			if(CMAKE_CROSSCOMPILING)
+				if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64)")
+					set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "arm64")
+				elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(armv7|arm)")
+					set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "armhf")
+				elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64)")
+					set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
+				elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(i.86|x86)")
+					set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "i386")
+				endif()
+				message(STATUS "Cross-compiling: Setting Debian package architecture to ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE} (CMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR})")
+			endif()
+
 			# include distribution name (e.g. trusty or xenial) in the file name
 			find_program(LSB_RELEASE lsb_release)
 			execute_process(COMMAND ${LSB_RELEASE} -cs
