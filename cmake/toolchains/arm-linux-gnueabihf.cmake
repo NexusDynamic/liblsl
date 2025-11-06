@@ -17,7 +17,8 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 # Search for libraries and headers in the target directories
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
-set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+# Allow packages to be found in both sysroot and host paths (e.g., for locally built dependencies)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
 
 # Set additional compiler flags for ARMv7 with NEON support
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard" CACHE STRING "C flags")

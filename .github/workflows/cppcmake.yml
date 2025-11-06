@@ -170,10 +170,8 @@ jobs:
         fi
 
         # Test that the in-tree install was successful by building the examples
-        # For cross-compilation, we need to help CMake find the LSL package
         cmake -S examples -B examples/build \
           -DLSL_INSTALL_ROOT=${PWD}/install \
-          -DCMAKE_PREFIX_PATH=${PWD}/install \
           -DCMAKE_INSTALL_PREFIX=examples/build/install \
           -DLSL_COMFY_DEFAULTS=ON \
           ${CMAKE_TOOLCHAIN} \
