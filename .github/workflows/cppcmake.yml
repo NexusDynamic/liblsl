@@ -44,8 +44,8 @@ jobs:
 
         # ARM Linux builds - cross-compiled with QEMU testing (Jetson, Raspberry Pi compatible)
         # Note: Using bundled pugixml for cross-compilation (no ARM cross-compiled system package available)
-        - {name: "ubuntu-22.04-arm64", os: "ubuntu-22.04", arch: "aarch64", cross_compile: true, cmake_extra: "" }
-        - {name: "ubuntu-22.04-armhf", os: "ubuntu-22.04", arch: "armv7", cross_compile: true, cmake_extra: "" }
+        - {name: "ubuntu-22.04-arm64", os: "ubuntu-22.04", arch: "aarch64", cross_compile: true, cmake_extra: "-DLSL_BUNDLED_PUGIXML=ON" }
+        - {name: "ubuntu-22.04-armhf", os: "ubuntu-22.04", arch: "armv7", cross_compile: true, cmake_extra: "-DLSL_BUNDLED_PUGIXML=ON" }
 
         # Native ARM build (optional - can be enabled for additional validation)
         # - {name: "ubuntu-24.04-arm64-native", os: "ubuntu-24.04-arm", arch: "aarch64", cmake_extra: "-DLSL_BUNDLED_PUGIXML=OFF" }
@@ -124,8 +124,8 @@ jobs:
 
     - name: Configure CMake
       run: |
-        # Set up ccache as compiler wrapper
-        if [[ "${{ runner.os }}" == "Linux" ]] || [[ "${{ runner.os }}" == "macOS" ]]; then
+        # Set up ccache as compiler wrapper (skip for cross-compilation - toolchain handles it)
+        if [[ "${{ runner.os }}" == "Linux" || "${{ runner.os }}" == "macOS" ]] && [[ "${{ matrix.config.cross_compile }}" != "true" ]]; then
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           export CC="ccache gcc"
           export CXX="ccache g++"
@@ -170,8 +170,10 @@ jobs:
         fi
 
         # Test that the in-tree install was successful by building the examples
+        # For cross-compilation, we need to help CMake find the LSL package
         cmake -S examples -B examples/build \
           -DLSL_INSTALL_ROOT=${PWD}/install \
+          -DCMAKE_PREFIX_PATH=${PWD}/install \
           -DCMAKE_INSTALL_PREFIX=examples/build/install \
           -DLSL_COMFY_DEFAULTS=ON \
           ${CMAKE_TOOLCHAIN} \
