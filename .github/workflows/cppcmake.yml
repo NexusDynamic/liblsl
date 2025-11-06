@@ -81,12 +81,13 @@ jobs:
         fi
 
     # Cache dependencies for Linux
+    # Note: Cache key uses runner.os + matrix name for stability across workflow changes
     - name: Cache APT packages
       if: runner.os == 'Linux'
       uses: actions/cache@v4
       with:
         path: /var/cache/apt/archives
-        key: ${{ runner.os }}-apt-${{ matrix.config.name }}-${{ hashFiles('.github/workflows/cppcmake.yml') }}
+        key: ${{ runner.os }}-apt-${{ matrix.config.name }}-v1
         restore-keys: |
           ${{ runner.os }}-apt-${{ matrix.config.name }}-
           ${{ runner.os }}-apt-
