@@ -178,6 +178,13 @@ jobs:
     - name: Package
       run: |
         echo "Creating package for ${{ matrix.config.arch }}"
+
+        # For cross-compiled builds, explicitly disable shlibdeps before packaging
+        if [[ "${{ matrix.config.cross_compile }}" == "true" ]]; then
+          # Reconfigure with SHLIBDEPS explicitly OFF for cross-compilation
+          cmake -DCPACK_DEBIAN_PACKAGE_SHLIBDEPS=OFF build
+        fi
+
         cmake --build build --target package --config Release -j
 
         # On Debian / Ubuntu the dependencies can only be resolved for
