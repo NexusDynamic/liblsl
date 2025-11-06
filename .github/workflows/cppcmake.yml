@@ -181,8 +181,12 @@ jobs:
 
         # For cross-compiled builds, explicitly disable shlibdeps before packaging
         if [[ "${{ matrix.config.cross_compile }}" == "true" ]]; then
-          # Reconfigure with SHLIBDEPS explicitly OFF (both general and component-specific)
-          cmake -DCPACK_DEBIAN_PACKAGE_SHLIBDEPS=OFF -DCPACK_DEBIAN_LIBLSL_PACKAGE_SHLIBDEPS=OFF build
+          # LSLCMake.cmake hardcodes SHLIBDEPS=ON, overwriting command-line flags
+          # Solution: Directly edit the generated CPackConfig.cmake file
+          sed -i 's/SET(CPACK_DEBIAN_LIBLSL_PACKAGE_SHLIBDEPS "ON")/SET(CPACK_DEBIAN_LIBLSL_PACKAGE_SHLIBDEPS "OFF")/' build/CPackConfig.cmake
+          sed -i 's/SET(CPACK_DEBIAN_PACKAGE_SHLIBDEPS "ON")/SET(CPACK_DEBIAN_PACKAGE_SHLIBDEPS "OFF")/' build/CPackConfig.cmake
+          echo "Modified CPackConfig.cmake to disable SHLIBDEPS for cross-compilation"
+          grep "SHLIBDEPS" build/CPackConfig.cmake || true
         fi
 
         cmake --build build --target package --config Release -j
