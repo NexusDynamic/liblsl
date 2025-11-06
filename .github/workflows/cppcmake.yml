@@ -42,7 +42,8 @@ jobs:
         - {name: "ubuntu-22.04-x64", os: "ubuntu-22.04", arch: "x86_64", cmake_extra: "-DLSL_BUNDLED_PUGIXML=OFF" }
         - {name: "ubuntu-24.04-x64", os: "ubuntu-24.04", arch: "x86_64", cmake_extra: "-DLSL_BUNDLED_PUGIXML=OFF" }
 
-        # ARM Linux builds - cross-compiled with QEMU testing (Jetson, Raspberry Pi compatible)
+        # ARM Linux builds - cross-compiled (Jetson, Raspberry Pi compatible)
+        # Tests skipped (require real ARM hardware) - build validation only
         # Note: Using bundled pugixml for cross-compilation (no ARM cross-compiled system package available)
         - {name: "ubuntu-22.04-arm64", os: "ubuntu-22.04", arch: "aarch64", cross_compile: true, cmake_extra: "-DLSL_BUNDLED_PUGIXML=ON" }
         - {name: "ubuntu-22.04-armhf", os: "ubuntu-22.04", arch: "armv7", cross_compile: true, cmake_extra: "-DLSL_BUNDLED_PUGIXML=ON" }
@@ -69,17 +70,13 @@ jobs:
         if [[ "${{ matrix.config.arch }}" == "aarch64" ]]; then
           sudo apt-get install -y --no-install-recommends \
             gcc-aarch64-linux-gnu \
-            g++-aarch64-linux-gnu \
-            qemu-user-static
+            g++-aarch64-linux-gnu
           echo "CMAKE_TOOLCHAIN=-DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/cmake/toolchains/aarch64-linux-gnu.cmake" >> $GITHUB_ENV
-          echo "QEMU_LD_PREFIX=/usr/aarch64-linux-gnu" >> $GITHUB_ENV
         elif [[ "${{ matrix.config.arch }}" == "armv7" ]]; then
           sudo apt-get install -y --no-install-recommends \
             gcc-arm-linux-gnueabihf \
-            g++-arm-linux-gnueabihf \
-            qemu-user-static
+            g++-arm-linux-gnueabihf
           echo "CMAKE_TOOLCHAIN=-DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/cmake/toolchains/arm-linux-gnueabihf.cmake" >> $GITHUB_ENV
-          echo "QEMU_LD_PREFIX=/usr/arm-linux-gnueabihf" >> $GITHUB_ENV
         fi
 
     # Cache dependencies for Linux
@@ -159,19 +156,6 @@ jobs:
 
     - name: Test install using examples
       run: |
-        # Set up QEMU for cross-compiled binaries
-        QEMU_RUNNER=""
-        ALLOW_FAILURE=""
-        if [[ "${{ matrix.config.cross_compile }}" == "true" ]]; then
-          if [[ "${{ matrix.config.arch }}" == "aarch64" ]]; then
-            QEMU_RUNNER="qemu-aarch64-static -L /usr/aarch64-linux-gnu"
-          elif [[ "${{ matrix.config.arch }}" == "armv7" ]]; then
-            QEMU_RUNNER="qemu-arm-static -L /usr/arm-linux-gnueabihf"
-          fi
-          ALLOW_FAILURE="true"
-          echo "Note: Example may fail due to QEMU networking limitations, but build validation is the key test"
-        fi
-
         # Test that the in-tree install was successful by building the examples
         cmake -S examples -B examples/build \
           -DLSL_INSTALL_ROOT=${PWD}/install \
@@ -182,11 +166,12 @@ jobs:
           ${{ github.event.inputs.cmakeextra }}
         cmake --build examples/build --target install --config Release -j
 
-        # Run example with QEMU if cross-compiled (allow failure due to networking)
-        if [[ -n "$QEMU_RUNNER" ]]; then
-          $QEMU_RUNNER ./examples/build/install/bin/HandleMetaData || test -n "$ALLOW_FAILURE"
-        else
+        # Run example binary (skip for cross-compiled builds - no QEMU)
+        if [[ "${{ matrix.config.cross_compile }}" != "true" ]]; then
           ./examples/build/install/bin/HandleMetaData
+        else
+          echo "Skipping example execution for cross-compiled build (requires real ARM hardware)"
+          echo "Build validation successful - binary can be tested on target hardware"
         fi
 
     - name: Package
@@ -234,38 +219,20 @@ jobs:
               ip -6 route
            fi
 
-    # Run internal tests (with QEMU for cross-compiled binaries)
+    # Run unit tests (native builds only - cross-compiled binaries require real ARM hardware)
     - name: Unit tests
+      if: matrix.config.cross_compile != true
       run: |
-        # Set up core dumps for debugging (native builds only)
-        if [[ "${{ matrix.config.name }}" == ubuntu-* ]] && [[ "${{ matrix.config.cross_compile }}" != "true" ]]; then
+        # Set up core dumps for debugging
+        if [[ "${{ matrix.config.name }}" == ubuntu-* ]]; then
           ulimit -c unlimited
           echo "$PWD/dumps/corefile-%e-%p-%t" | sudo tee /proc/sys/kernel/core_pattern
         fi
         mkdir -p dumps
 
-        # Set up QEMU for cross-compiled binaries
-        QEMU_RUNNER=""
-        ALLOW_FAILURE=""
-        if [[ "${{ matrix.config.cross_compile }}" == "true" ]]; then
-          if [[ "${{ matrix.config.arch }}" == "aarch64" ]]; then
-            QEMU_RUNNER="qemu-aarch64-static -L /usr/aarch64-linux-gnu"
-          elif [[ "${{ matrix.config.arch }}" == "armv7" ]]; then
-            QEMU_RUNNER="qemu-arm-static -L /usr/arm-linux-gnueabihf"
-          fi
-          ALLOW_FAILURE="true"
-          echo "Running tests with QEMU: $QEMU_RUNNER"
-          echo "Note: Network tests may fail due to QEMU user-mode networking limitations (multicast not supported)"
-        fi
-
-        # Run unit tests (allow failures for QEMU due to networking limitations)
-        if [[ -n "$QEMU_RUNNER" ]]; then
-          $QEMU_RUNNER install/bin/lsl_test_internal --order rand --wait-for-keypress never --durations yes || test -n "$ALLOW_FAILURE"
-          $QEMU_RUNNER install/bin/lsl_test_exported --order rand --wait-for-keypress never --durations yes || test -n "$ALLOW_FAILURE"
-        else
-          install/bin/lsl_test_internal --order rand --wait-for-keypress never --durations yes
-          install/bin/lsl_test_exported --order rand --wait-for-keypress never --durations yes
-        fi
+        # Run unit tests
+        install/bin/lsl_test_internal --order rand --wait-for-keypress never --durations yes
+        install/bin/lsl_test_exported --order rand --wait-for-keypress never --durations yes
       timeout-minutes: 10
 
     - name: upload dump
