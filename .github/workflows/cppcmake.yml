@@ -45,8 +45,9 @@ jobs:
         # ARM Linux builds - cross-compiled (Jetson, Raspberry Pi compatible)
         # Tests skipped (require real ARM hardware) - build validation only
         # Note: Using bundled pugixml for cross-compilation (no ARM cross-compiled system package available)
-        - {name: "ubuntu-22.04-arm64", os: "ubuntu-22.04", arch: "aarch64", cross_compile: true, cmake_extra: "-DLSL_BUNDLED_PUGIXML=ON" }
-        - {name: "ubuntu-22.04-armhf", os: "ubuntu-22.04", arch: "armv7", cross_compile: true, cmake_extra: "-DLSL_BUNDLED_PUGIXML=ON" }
+        # Note: CPACK_DEBIAN_PACKAGE_SHLIBDEPS=OFF because dpkg-shlibdeps cannot analyze ARM binaries on x86_64 host
+        - {name: "ubuntu-22.04-arm64", os: "ubuntu-22.04", arch: "aarch64", cross_compile: true, cmake_extra: "-DLSL_BUNDLED_PUGIXML=ON -DCPACK_DEBIAN_PACKAGE_SHLIBDEPS=OFF" }
+        - {name: "ubuntu-22.04-armhf", os: "ubuntu-22.04", arch: "armv7", cross_compile: true, cmake_extra: "-DLSL_BUNDLED_PUGIXML=ON -DCPACK_DEBIAN_PACKAGE_SHLIBDEPS=OFF" }
 
         # Native ARM build (optional - can be enabled for additional validation)
         # - {name: "ubuntu-24.04-arm64-native", os: "ubuntu-24.04-arm", arch: "aarch64", cmake_extra: "-DLSL_BUNDLED_PUGIXML=OFF" }
