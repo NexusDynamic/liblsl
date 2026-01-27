@@ -79,8 +79,6 @@ public:
 	bool allow_ipv6() const { return allow_ipv6_; }
 	bool allow_ipv4() const { return allow_ipv4_; }
 
-
-
 	/**
 	* @brief Set the configuration directly from a string.
 	* 
@@ -104,7 +102,6 @@ public:
 	static void set_api_config_filename(const std::string &filename) {
 		api_config_filename_ = filename;
 	}
-
 
 	/**
 	 * @brief The range or scope of stream lookup when using multicast-based discovery
