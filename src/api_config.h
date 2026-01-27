@@ -87,9 +87,9 @@ public:
 	* This allows passing in configuration content directly rather than from a file.
 	* This MUST be called before the first call to get_instance() to have any effect.
 	*/
-    static void set_api_config_content(const std::string &content) {
-        api_config_content_ = content;
-    }
+	static void set_api_config_content(const std::string &content) {
+		api_config_content_ = content;
+	}
 
 	/**
 	 * @brief An additional settings path to load configuration from.
