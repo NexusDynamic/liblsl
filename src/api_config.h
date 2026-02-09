@@ -79,6 +79,33 @@ public:
 	bool allow_ipv6() const { return allow_ipv6_; }
 	bool allow_ipv4() const { return allow_ipv4_; }
 
+
+
+	/**
+	* @brief Set the configuration directly from a string.
+	* 
+	* This allows passing in configuration content directly rather than from a file.
+	* This MUST be called before the first call to get_instance() to have any effect.
+	*/
+    static void set_api_config_content(const std::string &content) {
+        api_config_content_ = content;
+    }
+
+	/**
+	 * @brief An additional settings path to load configuration from.
+	 */
+	const std::string &api_config_filename() const { return api_config_filename_; }
+
+	/**
+	 * @brief Set the config file name used to load the settings.
+	 * 
+	 * This MUST be called before the first call to get_instance() to have any effect.
+	 */
+	static void set_api_config_filename(const std::string &filename) {
+		api_config_filename_ = filename;
+	}
+
+
 	/**
 	* @brief Set the configuration directly from a string.
 	* 
